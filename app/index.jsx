@@ -8,22 +8,28 @@ import {
   View,
 } from "react-native";
 
+import { images } from "../constants";
+
 export default function App() {
   return (
-    <SafeAreaView className="h-full flex-1">
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
-        <View className="w-full justify-center items-center h-full px-4">
-          <View>
-            <View className="flex-row justify-center items-center">
-              <Text className="text-lg font-pregular">
-                Don't have an account?
-              </Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+    <SafeAreaView
+      className="h-full flex-1 relative items-center justify-center"
+      style={styles.background}
+    >
+      <Image source={images.welcomePNG} className="w-screen h-screen" />
+
+      <Image source={images.welcomeLogo} className="absolute" />
 
       <StatusBar backgroundColor="#161622" style="light" />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: "rgb(5,0,33)",
+    backgroundImage:
+      "linear-gradient(90deg, rgba(5,0,33,1) 0%, rgba(10,0,72,1) 54%, rgba(5,0,33,1) 100%);",
+  },
+});

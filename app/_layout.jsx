@@ -6,7 +6,7 @@ SplashScreen.preventAutoHideAsync(); //prevent splashscreen from auto hiding bef
 
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
-    "Montserrat-Black": require("../assets/fonts/Poppins-Black.ttf"),
+    "Montserrat-Black": require("../assets/fonts/Montserrat-Black.ttf"),
     "Montserrat-Bold": require("../assets/fonts/Montserrat-Bold.ttf"),
     "Montserrat-ExtraBold": require("../assets/fonts/Montserrat-ExtraBold.ttf"),
     "Montserrat-ExtraLight": require("../assets/fonts/Montserrat-ExtraLight.ttf"),
