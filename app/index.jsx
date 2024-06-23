@@ -1,35 +1,25 @@
-import { StatusBar } from "expo-status-bar";
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
-import { images } from "../constants";
+// App.js
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import WelcomeScreen from "../components/WelcomeScreen/welcome";
+import Onboarding from "./(auth)/onboarding";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BgDarkGradient from "../components/BgDarkGradient";
 
 export default function App() {
+  const [currentScreen, setCurrentScreen] = useState("Welcome");
+
+  const handleWelcomeDone = () => {
+    //TODO: change this to feed page if the user is logged in
+    setCurrentScreen("Onboarding");
+  };
+
   return (
-    <SafeAreaView
-      className="h-full flex-1 relative items-center justify-center"
-      style={styles.background}
-    >
-      <Image source={images.welcomePNG} className="w-screen h-screen" />
-
-      <Image source={images.welcomeLogo} className="absolute" />
-
-      <StatusBar backgroundColor="#161622" style="light" />
-    </SafeAreaView>
+    <BgDarkGradient>
+      {currentScreen === "Welcome" && (
+        <WelcomeScreen onDone={handleWelcomeDone} />
+      )}
+      {currentScreen === "Onboarding" && <Onboarding />}
+    </BgDarkGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    backgroundColor: "rgb(5,0,33)",
-    backgroundImage:
-      "linear-gradient(90deg, rgba(5,0,33,1) 0%, rgba(10,0,72,1) 54%, rgba(5,0,33,1) 100%);",
-  },
-});

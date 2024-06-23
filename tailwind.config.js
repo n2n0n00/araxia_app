@@ -4,20 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#161622",
-        secondary: {
-          DEFAULT: "#FF9C01",
-          100: "#FF9001",
-          200: "#FF8642",
-        },
-        black: {
-          DEFAULT: "#000",
-          100: "#1E1E2D",
-          200: "#232533",
-        },
-        gray: {
-          100: "#81999E",
-        },
+        "custom-dark": "rgb(5,0,33)",
+        "custom-darker": "rgba(10,0,72,1)",
+      },
+      backgroundImage: {
+        "dark-gradient":
+          "linear-gradient(90deg, rgba(5,0,33,1) 0%, rgba(10,0,72,1) 54%, rgba(5,0,33,1) 100%)",
       },
       fontFamily: {
         mthin: ["Montserrat-Thin", "sans-serif"],
