@@ -10,7 +10,7 @@ import {
 
 import { images } from "../../constants";
 import React, { useEffect } from "react";
-import BgDarkGradient from "../BgDarkGradient";
+import BgDarkGradient from "../BackgroundGradients/BgDarkGradient";
 
 const WelcomeScreen = ({ onDone }) => {
   //TODO: should replace this with a loader to wait until the onboarding has loaded if the user is logged out
@@ -23,12 +23,16 @@ const WelcomeScreen = ({ onDone }) => {
   }, [onDone]);
 
   return (
-    <BgDarkGradient>
-      <Image source={images.welcomePNG} className="w-screen h-screen" />
+    <BgDarkGradient extraClasses={"h-screen border-2 borde-red-200"}>
+      <Image
+        source={images.welcomePNG}
+        className="w-screen h-screen"
+        resizeMode="cover"
+      />
 
       <Image source={images.welcomeLogo} className="absolute" />
 
-      <StatusBar backgroundColor="#161622" style="light" />
+      <StatusBar backgroundColor="#000" style="light" />
     </BgDarkGradient>
   );
 };
