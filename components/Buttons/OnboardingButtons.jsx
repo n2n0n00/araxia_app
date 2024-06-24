@@ -2,7 +2,12 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-const OnboardingButtons = ({ onPress, extraClasses, children }) => {
+const OnboardingButtons = ({
+  onPress,
+  extraClasses,
+  children,
+  textClasses,
+}) => {
   return (
     <View className={`${extraClasses}`}>
       <LinearGradient
@@ -31,9 +36,7 @@ const OnboardingButtons = ({ onPress, extraClasses, children }) => {
               style={styles.button}
             >
               <TouchableOpacity onPress={onPress} style={styles.touchable}>
-                <Text className="font-mbold text-2xl text-white">
-                  {children}
-                </Text>
+                <Text className={`text-white ${textClasses}`}>{children}</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -48,7 +51,7 @@ export default OnboardingButtons;
 const styles = StyleSheet.create({
   touchable: {
     paddingVertical: 5,
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
     alignItems: "center",
   },
   gradientBorder: {
@@ -62,7 +65,7 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 50,
     paddingVertical: 5,
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
     borderRadius: 8,
     alignItems: "center",
   },

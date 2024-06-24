@@ -11,6 +11,7 @@ import password from "../assets/images/Password.png";
 import login from "../assets/images/Login.png";
 import loginGradient from "../assets/images/loginWithGradient.png";
 import loginBG from "../assets/images/loginBG.png";
+import safetyText from "../assets/images/safetyText.png";
 
 export default {
   welcomePNG,
@@ -26,4 +27,5 @@ export default {
   login,
   loginGradient,
   loginBG,
+  safetyText,
 };

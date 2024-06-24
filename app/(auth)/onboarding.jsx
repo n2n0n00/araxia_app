@@ -23,6 +23,7 @@ const Onboarding = () => {
       <View className="items-start max-h-full w-full">
         <TextBold25 extraClasses="pb-4">Already A User?</TextBold25>
         <OnboardingButtons
+          textClasses={"font-mbold text-2xl"}
           extraClasses={"w-full mt-5"}
           onPress={() => router.push("./sign-in")}
         >
@@ -47,8 +48,9 @@ const Onboarding = () => {
       <View className="items-center max-h-full w-full">
         <TextBold25>Don't have an account?</TextBold25>
         <OnboardingButtons
+          textClasses={"font-mbold text-2xl"}
           extraClasses={"w-full mt-5"}
-          onPress={() => router.push("./sign-up")}
+          onPress={() => router.push("./infoPage")}
         >
           Sign Up
         </OnboardingButtons>

@@ -48,6 +48,7 @@ const SignIn = () => {
 
           <View className="items-end w-full mt-10">
             <OnboardingButtons
+              textClasses={"font-mbold text-2xl"}
               extraClasses={"w-[60%]"}
               onPress={() => router.push("feed")}
             >

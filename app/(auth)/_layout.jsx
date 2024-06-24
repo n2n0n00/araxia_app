@@ -24,6 +24,18 @@ const AuthLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="infoPage"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="safetyVideo"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor="#161622" style="light" />
