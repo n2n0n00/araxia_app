@@ -18,7 +18,7 @@ const OnboardingButtons = ({ onPress, extraClasses, children }) => {
         style={styles.gradientBorder}
       >
         <View style={styles.inner}>
-          <View style={styles.background}>
+          <View>
             <LinearGradient
               colors={[
                 "rgba(157,61,248,1)",
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   gradientBorder: {
-    padding: 6, // Adjust the padding to control the border thickness
+    padding: 4, // Adjust the padding to control the border thickness
     borderRadius: 50,
   },
   inner: {

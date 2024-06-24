@@ -8,6 +8,7 @@ import { SocialMedia } from "../../constants/constants";
 import { router } from "expo-router";
 import VerticalLogo from "../../components/AraxiaLogos/VerticalLogo";
 import { images } from "../../constants";
+import { StatusBar } from "expo-status-bar";
 
 const Onboarding = () => {
   return (
@@ -49,9 +50,10 @@ const Onboarding = () => {
           extraClasses={"w-full mt-5"}
           onPress={() => router.push("./sign-up")}
         >
-          Sign Up{" "}
+          Sign Up
         </OnboardingButtons>
       </View>
+      <StatusBar backgroundColor="#000" style="light" />
     </View>
   );
 };
