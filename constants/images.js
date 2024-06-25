@@ -12,6 +12,12 @@ import login from "../assets/images/Login.png";
 import loginGradient from "../assets/images/loginWithGradient.png";
 import loginBG from "../assets/images/loginBG.png";
 import safetyText from "../assets/images/safetyText.png";
+import signupWithGradient from "../assets/images/signupWithGradient.png";
+import videoSafety from "../assets/images/videoSafety.png";
+import agreementUnticked from "../assets/images/agreementUnticked.png";
+import agreementTicked from "../assets/images/agreementTicked.png";
+import copyWords from "../assets/images/copyWords.png";
+import cryptoWord from "../assets/images/cryptoWord.png";
 
 export default {
   welcomePNG,
@@ -28,4 +34,10 @@ export default {
   loginGradient,
   loginBG,
   safetyText,
+  signupWithGradient,
+  videoSafety,
+  agreementUnticked,
+  agreementTicked,
+  copyWords,
+  cryptoWord,
 };
