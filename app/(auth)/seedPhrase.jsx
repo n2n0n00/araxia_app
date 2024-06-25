@@ -96,7 +96,7 @@ const SeedPhrase = () => {
         <Image source={images.copyWords} />
       </TouchableOpacity>
 
-      <View className="flex-row items-start justify-center pt-10">
+      <View className="flex-row items-start justify-center pt-10 px-8">
         <TouchableOpacity className="pr-4 pt-1" onPress={onTick}>
           {agreed === true ? (
             <Image source={images.agreementTicked} />
@@ -111,7 +111,7 @@ const SeedPhrase = () => {
         </TextMedium18>
       </View>
 
-      <View className="items-end w-full pb-8 pt-4">
+      <View className="items-end w-full pb-2 pt-4">
         <OnboardingButtons
           textClasses={"font-mbold text-2xl"}
           extraClasses={"w-[60%]"}
