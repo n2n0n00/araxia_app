@@ -1,10 +1,8 @@
 import { View, Text, Image, TextInput, AppState, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
-import VerticalLogo from "../../components/AraxiaLogos/VerticalLogo";
 import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
 import TextExtra30 from "../../components/Typography/TextExtra30";
-
 import { images } from "../../constants";
 import GradientImageText from "../../components/Typography/GradientImageText";
 import InputButton from "../../components/Buttons/InputButton";
@@ -12,48 +10,29 @@ import OnboardingButtons from "../../components/Buttons/OnboardingButtons";
 import { router } from "expo-router";
 import SocialButton from "../../components/Buttons/SocialButton";
 import { SocialMedia } from "../../constants/constants";
-
-import { signUpWithEmail } from "../../api/supabase_api";
+import { useAuth } from "../../context/AuthProvider";
 import { supabase } from "../../api/supabase";
 
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
-
 const SignUp = () => {
+  const { signUpWithEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState(""); // Add a state for username if needed
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const handleAppStateChange = (state) => {
-      if (state === "active") {
-        supabase.auth.startAutoRefresh();
-      } else {
-        supabase.auth.stopAutoRefresh();
-      }
-    };
-
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
   const handleSignUp = async () => {
-    setLoading(true);
-    await signUpWithEmail(email, password);
-    setLoading(false);
-    router.push("feed");
+    try {
+      setLoading(true);
+      const { success, user, message } = await signUpWithEmail(email, password);
+      if (success) {
+        setLoading(false);
+        router.push("feed");
+        Alert.alert("Sign Up Successful", `Welcome ${user.email}`);
+      } else {
+        Alert.alert("Sign Up Error", message);
+      }
+    } catch (error) {
+      Alert.alert("Sign Up Error", error.message);
+    }
   };
 
   return (

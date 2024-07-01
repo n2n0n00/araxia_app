@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
           fetchUserData(session.user.id);
         } else if (event === "SIGNED_OUT") {
           setUser(null);
+          setAuthUser(null); // Clear authUser data when signing out
         }
       }
     );
@@ -33,16 +34,20 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchUserData = async (userId) => {
-    const { data, error } = await supabase
-      .from("userDatabase")
-      .select("*")
-      .eq("userId", userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("userDatabase")
+        .select("*")
+        .eq("userId", userId)
+        .single();
 
-    if (error) {
+      if (error) {
+        Alert.alert("Error", error.message);
+      } else {
+        setAuthUser({ ...data, id: userId });
+      }
+    } catch (error) {
       Alert.alert("Error", error.message);
-    } else {
-      setUser({ ...data, id: userId });
     }
   };
 
@@ -84,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
-      fetchUserData(user.id);
+      fetchUserData(user.id); // Fetch additional user data after sign-up
       return { success: true, user };
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -115,7 +120,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
-      fetchUserData(user.id);
+      fetchUserData(user.id); // Fetch additional user data after sign-in
       return { success: true, user };
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -131,6 +136,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: error.message };
       }
       setUser(null);
+      setAuthUser(null); // Clear authUser data when signing out
       return { success: true };
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -140,7 +146,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, signUpWithEmail, signInWithEmail, signOut }}
+      value={{ user, signUpWithEmail, signInWithEmail, signOut, authUser }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,5 +1,5 @@
 import { View, Image, TextInput, AppState, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import VerticalLogo from "../../components/AraxiaLogos/VerticalLogo";
 import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
@@ -10,46 +10,28 @@ import OnboardingButtons from "../../components/Buttons/OnboardingButtons";
 import { router } from "expo-router";
 import SocialButton from "../../components/Buttons/SocialButton";
 import { SocialMedia } from "../../constants/constants";
-import { supabase } from "../../api/supabase";
-import { signInWithEmail, supabaseSignUp } from "../../api/supabase_api";
-
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
+import { useAuth } from "../../context/AuthProvider";
 
 const SignIn = () => {
+  const { signInWithEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const handleAppStateChange = (state) => {
-      if (state === "active") {
-        supabase.auth.startAutoRefresh();
-      } else {
-        supabase.auth.stopAutoRefresh();
-      }
-    };
-
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
   const handleSignIn = async () => {
-    setLoading(true);
-    await signInWithEmail(email, password);
-    setLoading(false);
-    router.push("feed");
+    try {
+      setLoading(true);
+      const { success, user, message } = await signInWithEmail(email, password);
+      if (success) {
+        setLoading(false);
+        router.push("feed");
+        Alert.alert("Sign In Successful", `Welcome back ${user.email}`);
+      } else {
+        Alert.alert("Sign In Error", message);
+      }
+    } catch (error) {
+      Alert.alert("Sign In Error", error.message);
+    }
   };
 
   return (

@@ -75,15 +75,3 @@ export async function signInWithEmail(email, password) {
     return { success: false, message: error.message };
   }
 }
-
-// PERSISTING USER ACROSS SCREENS
-
-const session = supabase.auth.session();
-
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN') {
-    console.log('User signed in:', session.user);
-  } else if (event === 'SIGNED_OUT') {
-    console.log('User signed out');
-  }
-});
