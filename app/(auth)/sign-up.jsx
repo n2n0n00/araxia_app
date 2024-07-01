@@ -26,7 +26,6 @@ const SignUp = () => {
       if (success) {
         setLoading(false);
         router.push("feed");
-        Alert.alert("Sign Up Successful", `Welcome ${user.email}`);
       } else {
         Alert.alert("Sign Up Error", message);
       }

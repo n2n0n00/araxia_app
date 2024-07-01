@@ -10,11 +10,13 @@ export const AuthProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
 
   useEffect(() => {
-    const session = supabase.auth.session();
-    if (session) {
-      setUser(session.user);
-      fetchUserData(session.user.id);
-    }
+    supabase.auth.getSession().then((data) => {
+      const session = data.session;
+      if (session) {
+        setUser(session.user);
+        fetchUserData(session.user.id);
+      }
+    });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
