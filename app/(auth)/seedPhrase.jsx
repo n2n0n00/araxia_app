@@ -1,27 +1,11 @@
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  Touchable,
-} from "react-native";
+import { View, Text, Image, FlatList, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
-import VerticalLogo from "../../components/AraxiaLogos/VerticalLogo";
-import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
-import TextExtra30 from "../../components/Typography/TextExtra30";
 import TextBold25 from "../../components/Typography/TextBold25";
 import TextMedium18 from "../../components/Typography/TextMedium18";
 import { images } from "../../constants";
-import GradientImageText from "../../components/Typography/GradientImageText";
-import InputButton from "../../components/Buttons/InputButton";
 import OnboardingButtons from "../../components/Buttons/OnboardingButtons";
 import { router } from "expo-router";
-import SocialButton from "../../components/Buttons/SocialButton";
-import { SocialMedia } from "../../constants/constants";
 import * as Clipboard from "expo-clipboard";
 
 const dataDummy = [
@@ -72,7 +56,6 @@ const SeedPhrase = () => {
   const copyWords = async () => {
     const copiedText = dataDummy.join(" ");
     await Clipboard.setStringAsync(copiedText);
-    Alert.alert("Copied!", "Words have been copied to the clipboard.");
   };
 
   return (

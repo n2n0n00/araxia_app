@@ -1,17 +1,12 @@
-import { View, Text, Image, TextInput } from "react-native";
+import { View, Image } from "react-native";
 import React from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import HorizontalLogo from "../../components/AraxiaLogos/HorizontalLogo";
-import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
-import TextExtra30 from "../../components/Typography/TextExtra30";
 
 import { images } from "../../constants";
-import GradientImageText from "../../components/Typography/GradientImageText";
-import InputButton from "../../components/Buttons/InputButton";
 import OnboardingButtons from "../../components/Buttons/OnboardingButtons";
 import { router } from "expo-router";
-import SocialButton from "../../components/Buttons/SocialButton";
-import { SocialMedia } from "../../constants/constants";
+
 import TextBold25 from "../../components/Typography/TextBold25";
 
 const InfoPage = () => {
@@ -23,8 +18,9 @@ const InfoPage = () => {
     >
       <Image source={images.loginBG} className="absolute -bottom-1" />
       <HorizontalLogo />
-      <View className="w-full my-20 flex-col items-start">
-        <GradientImageText image={images.safetyText} />
+      <View className="w-full my-5 flex-col items-start">
+        {/* <GradientImageText image={images.safetyText} /> */}
+        <TextBold25>To Ensure Your Safety Choose One From Below</TextBold25>
         <OnboardingButtons
           textClasses={"font-msemibold text-xl"}
           extraClasses={"w-full mt-20"}

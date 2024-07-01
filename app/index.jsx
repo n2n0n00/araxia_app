@@ -1,9 +1,7 @@
 // App.js
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
 import WelcomeScreen from "../components/WelcomeScreen/welcome";
 import Onboarding from "./(auth)/onboarding";
-import { SafeAreaView } from "react-native-safe-area-context";
 import BgDarkGradient from "../components/BackgroundGradients/BgDarkGradient";
 import { StatusBar } from "expo-status-bar";
 

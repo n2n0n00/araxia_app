@@ -8,7 +8,7 @@ const VerticalLogo = () => {
       <Image
         source={images.VerticalLogo}
         resizeMethod="contain"
-        className="h-[244px] w-[250px]"
+        className="w-[200px]"
       />
     </View>
   );
