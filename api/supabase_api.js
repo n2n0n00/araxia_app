@@ -1,8 +1,8 @@
 import { Alert } from "react-native";
 import { supabase } from "./supabase";
-import { router } from "expo-router";
 
-export async function signUpWithEmail(email, password, username) {
+// SIGN UP WITH EMAIL FUNCTION
+export async function signUpWithEmail(email, password) {
   try {
     // Sign up the user with Supabase authentication
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -45,3 +45,45 @@ export async function signUpWithEmail(email, password, username) {
     return { success: false, message: error.message };
   }
 }
+
+//SIGN IN WITH EMAIL FUNCTION
+
+export async function signInWithEmail(email, password) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      return { success: false, message: error.message };
+    }
+
+    const user = data.user;
+    if (!user) {
+      Alert.alert("Error", "User sign in failed. No user data returned.");
+      return {
+        success: false,
+        message: "User sign in failed. No user data returned.",
+      };
+    }
+
+    return { success: true, user };
+  } catch (error) {
+    Alert.alert("Error", error.message);
+    return { success: false, message: error.message };
+  }
+}
+
+// PERSISTING USER ACROSS SCREENS
+
+const session = supabase.auth.session();
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN') {
+    console.log('User signed in:', session.user);
+  } else if (event === 'SIGNED_OUT') {
+    console.log('User signed out');
+  }
+});

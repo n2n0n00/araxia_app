@@ -51,7 +51,7 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     setLoading(true);
-    await signUpWithEmail(email, password, username);
+    await signUpWithEmail(email, password);
     setLoading(false);
     router.push("feed");
   };

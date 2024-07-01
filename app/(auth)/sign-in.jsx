@@ -1,5 +1,5 @@
 import { View, Image, TextInput, AppState, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import VerticalLogo from "../../components/AraxiaLogos/VerticalLogo";
 import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import SocialButton from "../../components/Buttons/SocialButton";
 import { SocialMedia } from "../../constants/constants";
 import { supabase } from "../../api/supabase";
-import { supabaseSignUp } from "../../api/supabase_api";
+import { signInWithEmail, supabaseSignUp } from "../../api/supabase_api";
 
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
@@ -26,17 +26,31 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function signInWithEmail() {
+  useEffect(() => {
+    const handleAppStateChange = (state) => {
+      if (state === "active") {
+        supabase.auth.startAutoRefresh();
+      } else {
+        supabase.auth.stopAutoRefresh();
+      }
+    };
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const handleSignIn = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    await supabaseSignUp();
-    router.push("feed");
-    if (error) Alert.alert(error.message);
+    await signInWithEmail(email, password);
     setLoading(false);
-  }
+    router.push("feed");
+  };
 
   return (
     <BgDarkGradient
@@ -87,7 +101,7 @@ const SignIn = () => {
             <OnboardingButtons
               textClasses={"font-mbold text-2xl"}
               extraClasses={"w-[60%]"}
-              onPress={() => signInWithEmail()}
+              onPress={() => handleSignIn()}
             >
               Login
             </OnboardingButtons>
