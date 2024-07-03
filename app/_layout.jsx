@@ -17,6 +17,13 @@ const RootLayout = () => {
     "Montserrat-SemiBold": require("../assets/fonts/Montserrat-SemiBold.ttf"),
     "Montserrat-Thin": require("../assets/fonts/Montserrat-Thin.ttf"),
     "Montserrat-Italic": require("../assets/fonts/Montserrat-Italic.ttf"),
+
+    "Orbitron-Black": require("../assets/fonts/Orbitron-Black.ttf"),
+    "Orbitron-Bold": require("../assets/fonts/Orbitron-Bold.ttf"),
+    "Orbitron-ExtraBold": require("../assets/fonts/Orbitron-ExtraBold.ttf"),
+    "Orbitron-Medium": require("../assets/fonts/Orbitron-Medium.ttf"),
+    "Orbitron-Regular": require("../assets/fonts/Orbitron-Regular.ttf"),
+    "Orbitron-SemiBold": require("../assets/fonts/Orbitron-SemiBold.ttf"),
   });
 
   //allows to do some action while screen is loading etc
@@ -40,6 +47,14 @@ const RootLayout = () => {
         {/* //remove ugly expo header */}
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="notifications/[notifications]"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="messages/[messages]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

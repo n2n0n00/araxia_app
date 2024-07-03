@@ -27,8 +27,13 @@ const TabsLayout = () => {
         tabBarBackground: () => <MenuGlassContainer />,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#fff",
-          borderTopWidth: 0.5,
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          left: 0,
+          backgroundColor: "transparent",
+          borderWidth: 1,
+          borderColor: "#fff",
           borderTopLeftRadius: 25,
           borderTopRightRadius: 25,
           height: 70,
@@ -99,7 +104,7 @@ const TabsLayout = () => {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              focusedIcon={icons.profileSelected}
+              focusedIcon={icons.profilePressed}
               icon={icons.profile}
               name="Tickets"
               focused={focused}

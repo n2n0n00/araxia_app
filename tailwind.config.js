@@ -22,6 +22,13 @@ module.exports = {
         mextrabold: ["Montserrat-ExtraBold", "sans-serif"],
         mblack: ["Montserrat-Black", "sans-serif"],
         mitalic: ["Montserrat-Italic", "sans-serif"],
+
+        oregular: ["Orbitron-Black", "sans-serif"],
+        omedium: ["Orbitron-Medium", "sans-serif"],
+        osemibold: ["Orbitron-SemiBold", "sans-serif"],
+        obold: ["Orbitron-Bold", "sans-serif"],
+        oextrabold: ["Orbitron-ExtraBold", "sans-serif"],
+        oblack: ["Orbitron-Black", "sans-serif"],
       },
     },
   },

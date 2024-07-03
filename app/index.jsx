@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BackHandler, View, Text } from "react-native";
+import { BackHandler, View } from "react-native";
 import WelcomeScreen from "../components/WelcomeScreen/welcome";
 import BgDarkGradient from "../components/BackgroundGradients/BgDarkGradient";
 import { StatusBar } from "expo-status-bar";
@@ -8,9 +8,12 @@ import { router } from "expo-router";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false); // Flag to track component mounting
   const { user } = useAuth();
 
   useEffect(() => {
+    setIsMounted(true); // Component is mounted
+
     // Handle back button press to avoid going back to the login screen
     const backAction = () => {
       if (user) {
@@ -25,22 +28,27 @@ export default function App() {
       backAction
     );
 
-    return () => backHandler.remove();
+    return () => {
+      backHandler.remove();
+      setIsMounted(false); // Component is unmounted
+    };
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      router.replace("/feed");
+    if (isMounted && user) {
+      router.replace("/feed"); // Navigate to feed after user is authenticated
     } else {
       setLoading(false); // Set loading to false if no user is found
     }
-  }, [user]);
+  }, [isMounted, user]);
 
   const handleWelcomeDone = () => {
-    if (user) {
-      router.replace("/feed");
-    } else {
-      router.replace("/(auth)/onboarding");
+    if (isMounted) {
+      if (user) {
+        router.replace("/feed");
+      } else {
+        router.replace("/(auth)/onboarding");
+      }
     }
   };
 
