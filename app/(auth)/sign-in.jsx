@@ -24,7 +24,7 @@ const SignIn = () => {
       const { success, user, message } = await signInWithEmail(email, password);
       if (success) {
         setLoading(false);
-        router.push("feed");
+        router.push("/feed");
         Alert.alert("Sign In Successful", `Welcome back ${user.email}`);
       } else {
         Alert.alert("Sign In Error", message);

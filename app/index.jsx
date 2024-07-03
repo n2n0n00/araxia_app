@@ -1,25 +1,60 @@
-// App.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { BackHandler, View, Text } from "react-native";
 import WelcomeScreen from "../components/WelcomeScreen/welcome";
-import Onboarding from "./(auth)/onboarding";
 import BgDarkGradient from "../components/BackgroundGradients/BgDarkGradient";
 import { StatusBar } from "expo-status-bar";
+import { useAuth } from "../context/AuthProvider";
+import { router } from "expo-router";
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState("Welcome");
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Handle back button press to avoid going back to the login screen
+    const backAction = () => {
+      if (user) {
+        BackHandler.exitApp();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/feed");
+    } else {
+      setLoading(false); // Set loading to false if no user is found
+    }
+  }, [user]);
 
   const handleWelcomeDone = () => {
-    //TODO: change this to feed page if the user is logged in
-    setCurrentScreen("Onboarding");
+    if (user) {
+      router.replace("/feed");
+    } else {
+      router.replace("/(auth)/onboarding");
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <WelcomeScreen onDone={handleWelcomeDone} />
+      </View>
+    );
+  }
 
   return (
     <BgDarkGradient>
-      {currentScreen === "Welcome" && (
-        <WelcomeScreen onDone={handleWelcomeDone} />
-      )}
-      {currentScreen === "Onboarding" && <Onboarding />}
-
+      <WelcomeScreen onDone={handleWelcomeDone} />
       <StatusBar backgroundColor="#000" style="light" />
     </BgDarkGradient>
   );

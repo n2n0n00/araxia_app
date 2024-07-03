@@ -16,7 +16,7 @@ const Onboarding = () => {
       <Image
         source={images.onboardingBG}
         resizeMode="cover"
-        className="w-screen h-screen absolute top-0 mt-5 rounded-3xl"
+        className="w-screen h-[120vh] absolute top-0 mt-6 rounded-3xl"
       />
 
       <VerticalLogo />

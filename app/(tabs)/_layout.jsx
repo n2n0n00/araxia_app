@@ -24,7 +24,7 @@ const TabIcon = ({ icon, color, name, focused, focusedIcon }) => {
 const TabsLayout = () => {
   return (
     <>
-      {/* <Tabs
+      <Tabs
         screenOptions={{
           tabBarActiveTintColor: "#ffa001",
           tabBarShowLabel: false,
@@ -44,43 +44,27 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-                focusedIcon={icons.feedSelected}
-                icon={icons.feed}
-                color={color}
+                // focusedIcon={icons.feedSelected}
+                // icon={icons.feed}
+                // color={white}
                 name="Feed"
-                focused={focused}
+                // focused={focused}
               />
             ),
           }}
         />
         <Tabs.Screen
-          name="messages"
+          name="marketplace"
           options={{
-            title: "Messages",
+            title: "Marketplace",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-                focusedIcon={icons.messagesSelected}
-                icon={icons.messages}
-                color={color}
-                name="Messages"
-                focused={focused}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="friends"
-          options={{
-            title: "Friends",
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                focusedIcon={icons.friendsSelected}
-                icon={icons.friends}
-                color={color}
-                name="Friends"
-                focused={focused}
+                // focusedIcon={icons.messagesSelected}
+                // icon={icons.messages}
+                // color={color}
+                name="Marketplace"
+                // focused={focused}
               />
             ),
           }}
@@ -92,16 +76,48 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-                focusedIcon={icons.profileSelected}
-                icon={icons.profile}
-                color={color}
+                // focusedIcon={icons.friendsSelected}
+                // icon={icons.friends}
+                // color={color}
                 name="Profile"
-                focused={focused}
+                // focused={focused}
               />
             ),
           }}
         />
-      </Tabs> */}
+        <Tabs.Screen
+          name="tickets"
+          options={{
+            title: "Tickets",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                // focusedIcon={icons.profileSelected}
+                // icon={icons.profile}
+                // color={color}
+                name="Tickets"
+                // focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="search"
+          options={{
+            title: "Search",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                // focusedIcon={icons.profileSelected}
+                // icon={icons.profile}
+                // color={color}
+                name="Search"
+                // focused={focused}
+              />
+            ),
+          }}
+        />
+      </Tabs>
     </>
   );
 };

@@ -1,37 +1,48 @@
-// AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { Alert } from "react-native";
+import { Alert, Text } from "react-native";
 import { supabase } from "../api/supabase";
+import { router } from "expo-router";
+import WelcomeScreen from "../components/WelcomeScreen/welcome";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authUser, setAuthUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then((data) => {
-      const session = data.session;
-      if (session) {
-        setUser(session.user);
-        fetchUserData(session.user.id);
+    const getUserData = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Error fetching session:", error);
       }
-    });
+
+      if (data.session) {
+        setUser(data.session.user);
+        fetchUserData(data.session.user.id);
+      }
+
+      setLoading(false);
+    };
+
+    getUserData();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === "SIGNED_IN") {
+        if (event === "SIGNED_IN" && session) {
           setUser(session.user);
           fetchUserData(session.user.id);
         } else if (event === "SIGNED_OUT") {
           setUser(null);
-          setAuthUser(null); // Clear authUser data when signing out
+          setAuthUser(null);
         }
       }
     );
 
     return () => {
-      authListener.unsubscribe();
+      authListener?.unsubscribe?.();
     };
   }, []);
 
@@ -44,18 +55,17 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (error) {
-        Alert.alert("Error", error.message);
+        console.error("Error fetching user data:", error);
       } else {
-        setAuthUser({ ...data, id: userId });
+        setAuthUser(data);
       }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("Error:", error);
     }
   };
 
   const signUpWithEmail = async (email, password) => {
     try {
-      // Sign up the user with Supabase authentication
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -76,22 +86,27 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      // Insert user data into userDatabase table
-      const { error: dbError } = await supabase.from("userDatabase").insert([
-        {
-          userId: user.id,
-          email: user.email,
-          username: user.email.split("@")[0],
-        },
-      ]);
+      if (user.id) {
+        const { error: dbError } = await supabase.from("userDatabase").insert([
+          {
+            userId: user.id,
+            email: user.email,
+            username: user.email.split("@")[0],
+          },
+        ]);
 
-      if (dbError) {
-        Alert.alert("Error", dbError.message);
-        return { success: false, message: dbError.message };
+        if (dbError) {
+          Alert.alert("Error", dbError.message);
+          return { success: false, message: dbError.message };
+        }
+
+        setUser(user);
+        fetchUserData(user.id);
+      } else {
+        Alert.alert("Error", "Invalid user ID.");
+        return { success: false, message: "Invalid user ID." };
       }
 
-      setUser(user);
-      fetchUserData(user.id); // Fetch additional user data after sign-up
       return { success: true, user };
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -122,7 +137,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
-      fetchUserData(user.id); // Fetch additional user data after sign-in
+      fetchUserData(user.id);
       return { success: true, user };
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -138,13 +153,25 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: error.message };
       }
       setUser(null);
-      setAuthUser(null); // Clear authUser data when signing out
+      setAuthUser(null);
       return { success: true };
     } catch (error) {
       Alert.alert("Error", error.message);
       return { success: false, message: error.message };
     }
   };
+
+  const handleWelcomeDone = () => {
+    if (user) {
+      router.replace("/feed");
+    } else {
+      router.replace("/(auth)/onboarding");
+    }
+  };
+
+  if (loading) {
+    return <WelcomeScreen onDone={handleWelcomeDone} />;
+  }
 
   return (
     <AuthContext.Provider
