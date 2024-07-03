@@ -12,6 +12,8 @@ import ticketsPressed from "../assets/icons/ticketsPressed.png";
 import userMessages from "../assets/icons/userMessages.png";
 import userNotifications from "../assets/icons/userNotifications.png";
 import userSettigns from "../assets/icons/userSettings.png";
+import levelXP from "../assets/icons/levelXP.png";
+import nftCount from "../assets/icons/nftCount.png";
 
 export default {
   backArrow,
@@ -28,4 +30,6 @@ export default {
   userMessages,
   userNotifications,
   userSettigns,
+  levelXP,
+  nftCount,
 };
