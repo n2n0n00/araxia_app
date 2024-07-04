@@ -46,3 +46,105 @@ export const exp = [
     expImage: samples.sample4,
   },
 ];
+
+export const dataPosts = [
+  {
+    id: "1",
+    photos: [samples.sample1],
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    artistName: "JK",
+    cryptoAddress: "0x11..111",
+    avatar: samples.sample1,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "2 mins ago",
+  },
+  {
+    id: "2",
+    photos: [samples.sample2, samples.sample2],
+    content:
+      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+    artistName: "JS",
+    cryptoAddress: "0x22..222",
+    avatar: samples.sample2,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "5 mins ago",
+  },
+  {
+    id: "3",
+    photos: [samples.sample3],
+    content:
+      "when an unknown printer took a galley of type and scrambled it to.",
+    artistName: "JW",
+    cryptoAddress: "0x33..333",
+    avatar: samples.sample3,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "10 mins ago",
+  },
+  {
+    id: "4",
+    photos: [samples.sample4, samples.sample4],
+    content:
+      "Make a type specimen book. It has survived not only five centuries...",
+    artistName: "MY",
+    cryptoAddress: "0x44..444",
+    avatar: samples.sample4,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "15 mins ago",
+  },
+];
+
+export const dataAltPosts = [
+  {
+    id: "3",
+    photos: [samples.sample3],
+    content:
+      "when an unknown printer took a galley of type and scrambled it to.",
+    artistName: "JW",
+    cryptoAddress: "0x33..333",
+    avatar: samples.sample3,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "10 mins ago",
+  },
+  {
+    id: "1",
+    photos: [samples.sample1],
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    artistName: "JK",
+    cryptoAddress: "0x11..111",
+    avatar: samples.sample1,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "2 mins ago",
+  },
+  {
+    id: "4",
+    photos: [samples.sample4, samples.sample4],
+    content:
+      "Make a type specimen book. It has survived not only five centuries...",
+    artistName: "MY",
+    cryptoAddress: "0x44..444",
+    avatar: samples.sample4,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "15 mins ago",
+  },
+  {
+    id: "2",
+    photos: [samples.sample2, samples.sample2],
+    content:
+      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+    artistName: "JS",
+    cryptoAddress: "0x22..222",
+    avatar: samples.sample2,
+    comments: "24k",
+    likes: "50k",
+    timeStamp: "5 mins ago",
+  },
+];

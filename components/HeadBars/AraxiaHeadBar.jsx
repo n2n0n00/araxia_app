@@ -17,7 +17,7 @@ const AraxiaHeadBar = () => {
   };
 
   return (
-    <View className="flex-row items-center justify-between w-screen p-4">
+    <View className="flex-row items-center justify-between w-screen p-4 pt-12">
       <TouchableOpacity onPress={goToFeed}>
         <Text className="font-osemibold text-4xl text-[#8F29FD]">araxia</Text>
       </TouchableOpacity>

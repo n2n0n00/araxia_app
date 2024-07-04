@@ -36,8 +36,9 @@ const SignIn = () => {
   return (
     <BgDarkGradient
       extraClasses={
-        "flex-col justify-between h-full w-full p-4 items-center relative"
+        "flex-col justify-between h-screen w-screen p-4 items-center relative"
       }
+      linearGradientMarginTop={"mt-6"}
     >
       <Image source={images.loginBG} className="absolute -bottom-1" />
       <VerticalLogo />
@@ -93,7 +94,7 @@ const SignIn = () => {
       <GlassContainer extraClasses={"pt-5"}>
         <GradientImageText image={images.loginGradient} />
 
-        <View className="flex-row w-full items-center justify-between mt-5">
+        <View className="flex-row w-full items-center justify-between mt-2">
           {SocialMedia.map((social) => (
             <SocialButton
               button={social.icon}

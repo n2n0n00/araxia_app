@@ -23,14 +23,17 @@ const WelcomeScreen = ({ onDone }) => {
   }, [onDone]);
 
   return (
-    <BgDarkGradient extraClasses={"h-screen border-2 borde-red-200"}>
+    <BgDarkGradient extraClasses={"h-screen items-center justify-center"}>
       <Image
         source={images.welcomePNG}
         className="w-screen h-screen"
         resizeMode="cover"
       />
 
-      <Image source={images.welcomeLogo} className="absolute" />
+      <Image
+        source={images.welcomeLogo}
+        className="absolute bottom-[280px] right-[70px]"
+      />
 
       <StatusBar backgroundColor="#000" style="light" />
     </BgDarkGradient>
