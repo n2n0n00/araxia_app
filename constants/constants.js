@@ -317,3 +317,46 @@ export const locations = [
     locationRoute: "../../",
   },
 ];
+
+export const nftsList = [
+  {
+    id: "1",
+    nftImage: samples.sample4,
+    nftRoute: "../../",
+  },
+  {
+    id: "2",
+    nftImage: samples.sample3,
+    nftRoute: "../../",
+  },
+  {
+    id: "3",
+    nftImage: samples.sample2,
+    nftRoute: "../../",
+  },
+  {
+    id: "4",
+    nftImage: samples.sample1,
+    nftRoute: "../../",
+  },
+  {
+    id: "5",
+    nftImage: samples.sample4,
+    nftRoute: "../../",
+  },
+  {
+    id: "6",
+    nftImage: samples.sample3,
+    nftRoute: "../../",
+  },
+  {
+    id: "7",
+    nftImage: samples.sample2,
+    nftRoute: "../../",
+  },
+  {
+    id: "8",
+    nftImage: samples.sample1,
+    nftRoute: "../../",
+  },
+];

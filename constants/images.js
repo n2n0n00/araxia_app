@@ -25,6 +25,8 @@ import topArtists from "../assets/images/topArtists.png";
 import topArtistsPressed from "../assets/images/topArtistsPressed.png";
 import ticket from "../assets/images/ticket.png";
 import pastLocationBG from "../assets/images/pastLocationBG.png";
+import dummyAvatar from "../assets/images/dummyAvatar.png";
+import XPCert from "../assets/images/XPCert.png";
 
 export default {
   welcomePNG,
@@ -53,4 +55,6 @@ export default {
   topArtistsPressed,
   ticket,
   pastLocationBG,
+  dummyAvatar,
+  XPCert,
 };

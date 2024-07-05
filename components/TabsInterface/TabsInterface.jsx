@@ -20,8 +20,8 @@ const TabsInterface = ({
   return (
     <View className="flex-1">
       <View className="flex-row items-center justify-around w-screen border-b-[1px] border-[#C796FF]">
-        <TouchableOpacity onPress={() => handleTabChange("TopNFTs")}>
-          {currentTab === "TopNFTs" ? (
+        <TouchableOpacity onPress={() => handleTabChange(tabLeft)}>
+          {currentTab === tabLeft ? (
             <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center pb-3">
               <TextBold25 extraClasses="text-[#C796FF]" styles={styles.glow}>
                 {tabLeftLabel}
@@ -33,8 +33,8 @@ const TabsInterface = ({
             </View>
           )}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleTabChange("TopArtists")}>
-          {currentTab === "TopArtists" ? (
+        <TouchableOpacity onPress={() => handleTabChange(tabRight)}>
+          {currentTab === tabRight ? (
             <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center pb-3">
               <TextBold25 extraClasses="text-[#C796FF]" styles={styles.glow}>
                 {tabRightLabel}
