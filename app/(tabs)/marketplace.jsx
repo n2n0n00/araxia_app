@@ -135,7 +135,7 @@ const Marketplace = () => {
                         avatar={item.avatar}
                         price={item.price}
                         getExpLink={item.expLink}
-                        expLocation={item.expLocation}
+                        expLocation={item.location}
                         date={item.date}
                         expName={item.expName}
                       />

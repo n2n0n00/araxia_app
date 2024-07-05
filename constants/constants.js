@@ -235,7 +235,7 @@ export const marketplaceTopNear = [
 export const marketplaceTopArtists = [
   {
     expName: "Bunny Tour",
-    expLocation: "Nashville, USA",
+    location: "Nashville, USA",
     expArtist: "JK",
     expLink: "[buy]/upcoming_experiences/[artist]/[experience]",
     expImage: samples.sample1,
@@ -248,7 +248,7 @@ export const marketplaceTopArtists = [
   },
   {
     expName: "Jeff's Tour",
-    location: "Nashville, USA",
+    location: "Texas, USA",
     expArtist: "JS",
     expLink: "[user]/upcoming_experiences/[artist]/[experience]",
     expImage: samples.sample2,
