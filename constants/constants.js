@@ -172,3 +172,117 @@ export const dataAltPosts = [
     timeStamp: "5 mins ago",
   },
 ];
+
+export const marketplaceTopNear = [
+  {
+    expName: "Bunny Tour",
+    location: "Nashville, USA",
+    expArtist: "JK",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample1,
+  },
+  {
+    expName: "Jeff's Tour",
+    location: "Nashville, USA",
+    expArtist: "JS",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample2,
+  },
+  {
+    expName: "Seggsy Tour",
+    location: "Nashville, USA",
+    expArtist: "JW",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample3,
+  },
+  {
+    expName: "Dilf Tour",
+    location: "Nashville, USA",
+    expArtist: "AD",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample4,
+  },
+  {
+    expName: "Bun Tour",
+    location: "Nashville, USA",
+    expArtist: "JK",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample1,
+  },
+  {
+    expName: "Jeff Tour",
+    location: "Nashville, USA",
+    expArtist: "JS",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample2,
+  },
+  {
+    expName: "Super Seggsy Tour",
+    location: "Nashville, USA",
+    expArtist: "JW",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample3,
+  },
+  {
+    expName: "Super Dilf Tour",
+    location: "Nashville, USA",
+    expArtist: "AD",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample4,
+  },
+];
+
+export const marketplaceTopArtists = [
+  {
+    expName: "Bunny Tour",
+    expLocation: "Nashville, USA",
+    expArtist: "JK",
+    expLink: "[buy]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample1,
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    cryptoAddress: "0x11..111",
+    avatar: samples.sample1,
+    price: "500 ETH",
+    date: "24/07/2025",
+  },
+  {
+    expName: "Jeff's Tour",
+    location: "Nashville, USA",
+    expArtist: "JS",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample2,
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    cryptoAddress: "0x22..222",
+    avatar: samples.sample2,
+    price: "500 ETH",
+    date: "24/07/2025",
+  },
+  {
+    expName: "Seggsy Tour",
+    location: "Nashville, USA",
+    expArtist: "JW",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample3,
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    cryptoAddress: "0x33..333",
+    avatar: samples.sample3,
+    price: "500 ETH",
+    date: "24/07/2025",
+  },
+  {
+    expName: "Dilf Tour",
+    location: "Nashville, USA",
+    expArtist: "AD",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample4,
+    content:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+    cryptoAddress: "0x44..444",
+    avatar: samples.sample4,
+    price: "500 ETH",
+    date: "24/07/2025",
+  },
+];

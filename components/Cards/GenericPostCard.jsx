@@ -27,10 +27,10 @@ const GenericPostCard = ({
               className="bg-[#BCC2C3] w-[45px] h-[45px] rounded-full"
             />
             <View>
-              <Text className="text-[13px] font-medium text-white">
+              <Text className="text-[13px] font-mmedium text-white">
                 {artistName}
               </Text>
-              <Text className="text-[#81999E] font-regular text-[11px]">
+              <Text className="text-[#81999E] font-mregular text-[11px]">
                 {cryptoAddress}
               </Text>
             </View>
@@ -43,7 +43,9 @@ const GenericPostCard = ({
           </View>
         </View>
         <View className="mb-4">
-          <Text className="text-[13px] text-white font-regular">{content}</Text>
+          <Text className="text-[13px] text-white font-mregular">
+            {content}
+          </Text>
         </View>
         <View style={styles.photosContainer(numColumns)}>
           {photos.map((item, index) => (
@@ -59,18 +61,18 @@ const GenericPostCard = ({
           <View className="flex-row w-2/4 items-start justify-start gap-5">
             <View className="flex-row items-center">
               <EvilIcons name="comment" size={30} color="#fff" />
-              <Text className="text-[#fff] font-regular text-[15px]">
+              <Text className="text-[#fff] font-mregular text-[15px]">
                 {comments}
               </Text>
             </View>
             <View className="flex-row items-center">
               <EvilIcons name="like" size={30} color="#fff" />
-              <Text className="text-[#fff] font-regular text-[15px]">
+              <Text className="text-[#fff] font-mregular text-[15px]">
                 {likes}
               </Text>
             </View>
           </View>
-          <Text className="text-[#81999E] font-regular text-[11px]">
+          <Text className="text-[#81999E] font-mregular text-[11px]">
             {timeStamp}
           </Text>
         </View>

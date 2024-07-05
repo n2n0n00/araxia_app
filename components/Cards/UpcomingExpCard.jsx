@@ -13,7 +13,10 @@ const UpcomingExpCard = ({ expName, expArtist, expImage }) => {
       <View className="mt-5 mr-4 relative w-[150px] h-[200px] rounded-3xl">
         <Image source={expImage} className="w-[150px] h-[200px] rounded-3xl" />
         <View className="absolute bottom-0 bg-black opacity-30 w-[150px] h-[60px] rounded-b-3xl" />
-        <TextMedium18 extraClasses={"absolute bottom-5 left-2"}>
+        <TextMedium18
+          extraClasses={"absolute bottom-5 left-2 w-[150px]"}
+          numberOfLines={1}
+        >
           {expName}
         </TextMedium18>
       </View>
