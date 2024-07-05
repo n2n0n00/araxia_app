@@ -286,3 +286,34 @@ export const marketplaceTopArtists = [
     date: "24/07/2025",
   },
 ];
+
+export const locations = [
+  {
+    location: "Colorado",
+    locationRoute: "../../",
+  },
+  {
+    location: "Nashville",
+    locationRoute: "../../",
+  },
+  {
+    location: "Kuala Lumpur",
+    locationRoute: "../../",
+  },
+  {
+    location: "London",
+    locationRoute: "../../",
+  },
+  {
+    location: "Athens",
+    locationRoute: "../../",
+  },
+  {
+    location: "Seoul",
+    locationRoute: "../../",
+  },
+  {
+    location: "Paris",
+    locationRoute: "../../",
+  },
+];

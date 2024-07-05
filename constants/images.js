@@ -23,6 +23,8 @@ import topNFTs from "../assets/images/topNFTs.png";
 import topNFTsPressed from "../assets/images/topNFTsPressed.png";
 import topArtists from "../assets/images/topArtists.png";
 import topArtistsPressed from "../assets/images/topArtistsPressed.png";
+import ticket from "../assets/images/ticket.png";
+import pastLocationBG from "../assets/images/pastLocationBG.png";
 
 export default {
   welcomePNG,
@@ -49,4 +51,6 @@ export default {
   topNFTsPressed,
   topArtists,
   topArtistsPressed,
+  ticket,
+  pastLocationBG,
 };

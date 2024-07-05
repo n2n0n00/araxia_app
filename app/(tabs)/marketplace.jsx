@@ -113,7 +113,7 @@ const Marketplace = () => {
               <>
                 <View className="flex-col items-center w-screen p-4 h-full mb-8">
                   <View className="w-screen p-4 items-start">
-                    <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center">
+                    <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center pb-3">
                       <TextBold25
                         extraClasses="text-[#C796FF]"
                         styles={styles.glow}
