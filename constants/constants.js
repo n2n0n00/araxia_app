@@ -45,6 +45,30 @@ export const exp = [
     expLink: "[user]/upcoming_experiences/[artist]/[experience]",
     expImage: samples.sample4,
   },
+  {
+    expName: "Bun Tour",
+    expArtist: "JK",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample1,
+  },
+  {
+    expName: "Jeff Tour",
+    expArtist: "JS",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample2,
+  },
+  {
+    expName: "Super Seggsy Tour",
+    expArtist: "JW",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample3,
+  },
+  {
+    expName: "Super Dilf Tour",
+    expArtist: "AD",
+    expLink: "[user]/upcoming_experiences/[artist]/[experience]",
+    expImage: samples.sample4,
+  },
 ];
 
 export const dataPosts = [

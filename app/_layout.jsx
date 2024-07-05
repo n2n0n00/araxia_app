@@ -55,6 +55,7 @@ const RootLayout = () => {
           name="messages/[messages]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
       </Stack>
     </AuthProvider>
   );

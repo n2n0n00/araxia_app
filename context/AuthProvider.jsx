@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import { Alert, Text } from "react-native";
 import { supabase } from "../api/supabase";
 import { router } from "expo-router";
-import WelcomeScreen from "../components/WelcomeScreen/welcome";
+import WelcomeScreen from "../components/WelcomeScreen/WelcomeScreen";
 
 const AuthContext = createContext();
 

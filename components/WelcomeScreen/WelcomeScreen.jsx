@@ -30,10 +30,7 @@ const WelcomeScreen = ({ onDone }) => {
         resizeMode="cover"
       />
 
-      <Image
-        source={images.welcomeLogo}
-        className="absolute bottom-[280px] right-[70px]"
-      />
+      <Image source={images.welcomeLogo} className="absolute" />
 
       <StatusBar backgroundColor="#000" style="light" />
     </BgDarkGradient>

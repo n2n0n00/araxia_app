@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BackHandler, View } from "react-native";
-import WelcomeScreen from "../components/WelcomeScreen/welcome";
+import WelcomeScreen from "../components/WelcomeScreen/WelcomeScreen";
 import BgDarkGradient from "../components/BackgroundGradients/BgDarkGradient";
 import { StatusBar } from "expo-status-bar";
 import { useAuth } from "../context/AuthProvider";
