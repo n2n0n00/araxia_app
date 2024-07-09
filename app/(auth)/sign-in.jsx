@@ -21,7 +21,7 @@ const SignIn = () => {
   const handleSignIn = async () => {
     try {
       setLoading(true);
-      const { success, user, message } = await signInWithEmail(email, password);
+      const { success, message } = await signInWithEmail(email, password);
       if (success) {
         setLoading(false);
         router.push("/feed");

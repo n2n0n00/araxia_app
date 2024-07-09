@@ -27,6 +27,7 @@ import ticket from "../assets/images/ticket.png";
 import pastLocationBG from "../assets/images/pastLocationBG.png";
 import dummyAvatar from "../assets/images/dummyAvatar.png";
 import XPCert from "../assets/images/XPCert.png";
+import profileBG from "../assets/images/profileBG.png";
 
 export default {
   welcomePNG,
@@ -57,4 +58,5 @@ export default {
   pastLocationBG,
   dummyAvatar,
   XPCert,
+  profileBG,
 };

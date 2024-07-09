@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   FlatList,
   Image,
   RefreshControl,
@@ -10,20 +9,20 @@ import React, { useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
-import UpcomingExpCard from "../../components/Cards/UpcomingExpCard";
-import { exp } from "../../constants/constants";
-import TextSemi20 from "../../components/Typography/TextSemi20";
 import BgBlackOverlay from "../../components/BackgroundGradients/BgBlackOverlay";
 import TabsInterface from "../../components/TabsInterface/TabsInterface";
-import TopNFTs from "../../components/FeedComponents/TopNFTs";
-import TopArtists from "../../components/FeedComponents/TopArtists";
-import GlassContainer from "../../components/BackgroundContainers/GlassContainer";
 import Header from "../../components/ProfileComponents/Header";
 import NFTsList from "../../components/ProfileComponents/NFTsList";
 import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPosts";
+import FandomCard from "../../components/ProfileComponents/FandomCard";
+import { useAuth } from "../../context/AuthProvider";
+import { addressShortener } from "../../utils/addressShortener";
 
 const Profile = () => {
+  const { authUser } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+
+  const cryptoAddressShort = addressShortener(authUser.cryptoAddress);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -44,8 +43,19 @@ const Profile = () => {
             ListHeaderComponent={
               <>
                 <AraxiaHeadBar />
-                <View className="flex-col items-center w-full p-4 h-[378.82px]">
-                  <Header />
+                <View className="flex-col items-center w-full p-4 h-[450px]">
+                  <Header
+                    totalNfts={authUser.nfts}
+                    levelXP={authUser.levelXP}
+                    followers={authUser.followers.length}
+                    following={authUser.following.length}
+                    cryptoAddress={cryptoAddressShort}
+                    username={authUser.username}
+                    bio={authUser.bio}
+                    userId={authUser.userId}
+                    avatar={authUser.avatar}
+                  />
+                  <FandomCard currentFandom={authUser.currentFandom} />
                 </View>
               </>
             }

@@ -56,6 +56,10 @@ const RootLayout = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="edit/[id]/UserProfile"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

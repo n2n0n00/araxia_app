@@ -13,7 +13,7 @@ const InfoPage = () => {
   return (
     <BgDarkGradient
       extraClasses={
-        "flex-col justify-between h-full w-full p-4 items-center relative "
+        "flex-col justify-between h-screen w-screen p-4 items-center relative mt-10"
       }
     >
       <Image source={images.loginBG} className="absolute -bottom-1" />

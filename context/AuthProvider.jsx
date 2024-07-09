@@ -7,8 +7,8 @@ import WelcomeScreen from "../components/WelcomeScreen/WelcomeScreen";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [authUser, setAuthUser] = useState(null);
+  const [user, setUser] = useState(null); // user from auth.users
+  const [authUser, setAuthUser] = useState(null); // user from userDatabase
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,10 +41,28 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
+    const userDatabaseChanges = supabase
+      .channel("table-db-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "userDatabase",
+        },
+        (payload) => {
+          if (payload.new.id === user?.id) {
+            setAuthUser(payload.new);
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       authListener?.unsubscribe?.();
+      supabase.removeChannel(userDatabaseChanges);
     };
-  }, []);
+  }, [user]);
 
   const fetchUserData = async (userId) => {
     try {
@@ -55,12 +73,23 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (error) {
-        console.error("Error fetching user data:", error);
+        if (error.code === "PGRST116") {
+          console.error("No user data found for userId:", userId);
+          Alert.alert("Error", "No user data found.");
+          return { success: false, message: "No user data found." };
+        } else {
+          console.error("Error fetching user data:", error);
+          Alert.alert("Error", error.message);
+          return { success: false, message: error.message };
+        }
       } else {
         setAuthUser(data);
+        return { success: true, data };
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
+      Alert.alert("Error", error.message);
+      return { success: false, message: error.message };
     }
   };
 
@@ -72,6 +101,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (signUpError) {
+        console.error("Signup Error:", signUpError);
         Alert.alert("Error", signUpError.message);
         return { success: false, message: signUpError.message };
       }
@@ -79,6 +109,7 @@ export const AuthProvider = ({ children }) => {
       const user = data.user;
 
       if (!user) {
+        console.error("No user data returned after signup.");
         Alert.alert("Error", "User signup failed. No user data returned.");
         return {
           success: false,
@@ -96,19 +127,30 @@ export const AuthProvider = ({ children }) => {
         ]);
 
         if (dbError) {
+          console.error("Database Insertion Error:", dbError);
           Alert.alert("Error", dbError.message);
           return { success: false, message: dbError.message };
         }
 
         setUser(user);
-        fetchUserData(user.id);
+        const fetchUserDataResult = await fetchUserData(user.id);
+        if (!fetchUserDataResult.success) {
+          console.error(
+            "Fetching User Data Error:",
+            fetchUserDataResult.message
+          );
+          Alert.alert("Error", fetchUserDataResult.message);
+          return { success: false, message: fetchUserDataResult.message };
+        }
       } else {
+        console.error("Invalid user ID.");
         Alert.alert("Error", "Invalid user ID.");
         return { success: false, message: "Invalid user ID." };
       }
 
       return { success: true, user };
     } catch (error) {
+      console.error("Unexpected Error:", error);
       Alert.alert("Error", error.message);
       return { success: false, message: error.message };
     }
@@ -122,6 +164,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (error) {
+        console.error("Sign-In Error:", error);
         Alert.alert("Error", error.message);
         return { success: false, message: error.message };
       }
@@ -129,6 +172,7 @@ export const AuthProvider = ({ children }) => {
       const user = data.user;
 
       if (!user) {
+        console.error("No user data returned after sign-in.");
         Alert.alert("Error", "User sign in failed. No user data returned.");
         return {
           success: false,
@@ -137,9 +181,16 @@ export const AuthProvider = ({ children }) => {
       }
 
       setUser(user);
-      fetchUserData(user.id);
+      const fetchUserDataResult = await fetchUserData(user.id);
+
+      if (!fetchUserDataResult.success) {
+        console.error("Fetching User Data Error:", fetchUserDataResult.message);
+        Alert.alert("Error", fetchUserDataResult.message);
+        return { success: false, message: fetchUserDataResult.message };
+      }
       return { success: true, user };
     } catch (error) {
+      console.error("Unexpected Error:", error);
       Alert.alert("Error", error.message);
       return { success: false, message: error.message };
     }

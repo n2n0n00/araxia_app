@@ -17,7 +17,7 @@ const ExperiencesPosts = () => {
   };
 
   return (
-    <View className="mt-5">
+    <View className="mt-5 mb-10">
       <FlatList
         data={dataAltPosts}
         renderItem={({ item }) => (

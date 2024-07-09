@@ -16,7 +16,7 @@ const NFTsList = () => {
   };
 
   return (
-    <View className="mt-5 items-center">
+    <View className="mt-5 items-center mb-12">
       <FlatList
         horizontal={false}
         numColumns={2}

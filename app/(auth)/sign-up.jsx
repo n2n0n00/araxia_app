@@ -11,7 +11,6 @@ import { router } from "expo-router";
 import SocialButton from "../../components/Buttons/SocialButton";
 import { SocialMedia } from "../../constants/constants";
 import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../api/supabase";
 
 const SignUp = () => {
   const { signUpWithEmail } = useAuth();
@@ -36,7 +35,9 @@ const SignUp = () => {
 
   return (
     <BgDarkGradient
-      extraClasses={"flex-col h-full w-full p-4 items-center relative"}
+      extraClasses={
+        "flex-col h-screen w-screen p-4 items-center relative mt-10"
+      }
     >
       <Image source={images.loginBG} className="absolute -bottom-1" />
       {/* <GradientImageText image={images.signupWithGradient} /> */}
@@ -101,14 +102,6 @@ const SignUp = () => {
           ))}
         </View>
       </GlassContainer>
-
-      <OnboardingButtons
-        textClasses={"font-msemibold text-xl"}
-        extraClasses={"w-full mt-8"}
-        onPress={() => router.push("./safetyVideo")}
-      >
-        Never used a crypto wallet before?
-      </OnboardingButtons>
     </BgDarkGradient>
   );
 };

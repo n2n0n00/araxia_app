@@ -3,7 +3,6 @@ create table
     created_at timestamp with time zone null default now(),
     username text null,
     email character varying null,
-    password character varying null,
     "cryptoAddress" text null,
     "seedPhrase" text[] null,
     posts text[] null,
