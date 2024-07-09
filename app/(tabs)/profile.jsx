@@ -5,7 +5,7 @@ import {
   RefreshControl,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
@@ -25,9 +25,9 @@ const Profile = () => {
   const cryptoAddressShort = addressShortener(authUser.cryptoAddress);
 
   const onRefresh = async () => {
-    setRefreshing(true);
+    // setRefreshing(true);
     // Add your refetch logic here
-    setRefreshing(false);
+    // setRefreshing(false);
   };
 
   return (
