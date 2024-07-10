@@ -20,15 +20,15 @@ import { addressShortener } from "../../utils/addressShortener";
 
 const Profile = () => {
   const { authUser } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
+  // const [refreshing, setRefreshing] = useState(false);
 
   const cryptoAddressShort = addressShortener(authUser.cryptoAddress);
 
-  const onRefresh = async () => {
-    // setRefreshing(true);
-    // Add your refetch logic here
-    // setRefreshing(false);
-  };
+  // const onRefresh = async () => {
+  //   // setRefreshing(true);
+  //   // Add your refetch logic here
+  //   // setRefreshing(false);
+  // };
 
   return (
     <SafeAreaView className="flex-1">
@@ -74,9 +74,9 @@ const Profile = () => {
                 />
               </View>
             }
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            // refreshControl={
+            //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            // }
           />
         </BgBlackOverlay>
       </BgDarkGradient>

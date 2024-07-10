@@ -11,7 +11,6 @@ import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
 import BgBlackOverlay from "../../../components/BackgroundGradients/BgBlackOverlay";
 import { icons, images } from "../../../constants";
-import AraxiaHeadBar from "../../../components/HeadBars/AraxiaHeadBar";
 import EditFields from "../../../components/ProfileComponents/EditFields";
 import { router } from "expo-router";
 import TextBold18 from "../../../components/Typography/TextBold18";
@@ -21,8 +20,7 @@ import GlassContainer from "../../../components/BackgroundContainers/GlassContai
 import TextSemi18 from "../../../components/Typography/TextSemi18";
 import SubmitButton from "../../../components/Buttons/SubmitButton";
 import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../api/supabase";
-import { decode } from "base64-arraybuffer";
+import { uploadAvatar, updateUserProfile } from "../../../api/supabase_api";
 
 const UserProfile = () => {
   const { authUser } = useAuth();
@@ -75,98 +73,14 @@ const UserProfile = () => {
     }
   };
 
-  const uploadAvatar = async () => {
-    if (!form.avatar) {
-      Alert.alert("Error", "Please select an avatar image first.");
-      return null;
-    }
-
-    setUploading(true);
-    const file = await fetch(form.avatar);
-    const fileType = file._bodyBlob._data.type;
-
-    const fileName = `${authUser.userId}/avatar.${
-      fileType == "image/jpeg"
-        ? "jpeg"
-        : fileType == "image/png"
-        ? "png"
-        : "jpg"
-    }`;
-
-    try {
-      const { data, error } = await supabase.storage
-        .from("userAvatar")
-        .remove([
-          `${authUser.userId}/avatar.png`,
-          `${authUser.userId}/avatar.jpeg`,
-          `${authUser.userId}/avatar.jpg`,
-          `${authUser.userId}/avatar.undefined`,
-        ]);
-    } catch (error) {
-      console.log(error.message);
-    }
-
-    try {
-      const { data, error } = await supabase.storage
-        .from("userAvatar")
-        .upload(fileName, decode(form.base64), {
-          contentType: fileType,
-          upsert: true,
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      const getImageUrl = supabase.storage
-        .from("userAvatar")
-        .getPublicUrl(fileName);
-
-      const avatarUrl = getImageUrl.data.publicUrl;
-
-      return `${avatarUrl}?t=${new Date().getTime()}`;
-    } catch (error) {
-      console.log(error.message);
-      Alert.alert("Error", `Avatar upload failed: ${error.message}`);
-      return null;
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const updateUserProfile = async (avatarUrl) => {
-    const updates = {
-      username: form.username,
-      email: form.email,
-      bio: form.bio,
-      currentFandom: form.fandom,
-      avatar: avatarUrl || form.avatar,
-    };
-
-    try {
-      const { data, error } = await supabase
-        .from("userDatabase")
-        .update(updates)
-        .eq("userId", authUser.userId);
-
-      if (error) {
-        throw error;
-      }
-
-      Alert.alert("Success", "Profile updated successfully");
-    } catch (error) {
-      Alert.alert("Error", `Profile update failed: ${error.message}`);
-    }
-  };
-
   const submitChanges = async () => {
     if (!form.username || !form.email || !form.bio || !form.fandom) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
 
-    const avatarUrl = await uploadAvatar();
-    await updateUserProfile(avatarUrl);
+    const avatarUrl = await uploadAvatar(authUser, form, setUploading);
+    await updateUserProfile(authUser, form, avatarUrl);
 
     router.push("/profile");
   };
@@ -278,7 +192,6 @@ export default UserProfile;
 // import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
 // import BgBlackOverlay from "../../../components/BackgroundGradients/BgBlackOverlay";
 // import { icons, images } from "../../../constants";
-// import AraxiaHeadBar from "../../../components/HeadBars/AraxiaHeadBar";
 // import EditFields from "../../../components/ProfileComponents/EditFields";
 // import { router } from "expo-router";
 // import TextBold18 from "../../../components/Typography/TextBold18";
@@ -300,6 +213,7 @@ export default UserProfile;
 //     bio: authUser?.bio || "",
 //     fandom: authUser?.currentFandom || "",
 //     avatar: authUser?.avatar || null,
+//     base64: "",
 //   });
 
 //   useEffect(() => {
@@ -309,6 +223,7 @@ export default UserProfile;
 //       bio: authUser?.bio || "",
 //       fandom: authUser?.currentFandom || "",
 //       avatar: authUser?.avatar || null,
+//       base64: "" || null,
 //     });
 //   }, []);
 
@@ -328,10 +243,15 @@ export default UserProfile;
 //       allowsEditing: true,
 //       aspect: [4, 3],
 //       quality: 1,
+//       base64: true,
 //     });
 
 //     if (!result.canceled) {
-//       setForm({ ...form, avatar: result.assets[0].uri });
+//       setForm({
+//         ...form,
+//         avatar: result.assets[0].uri,
+//         base64: result.assets[0].base64,
+//       });
 //     }
 //   };
 
@@ -343,25 +263,50 @@ export default UserProfile;
 
 //     setUploading(true);
 //     const file = await fetch(form.avatar);
-//     // const blob = await file.blob();
-//     const fileName = `${authUser.userId}/avatar.jpg`;
+//     const fileType = file._bodyBlob._data.type;
+
+//     const fileName = `${authUser.userId}/avatar.${
+//       fileType == "image/jpeg"
+//         ? "jpeg"
+//         : fileType == "image/png"
+//         ? "png"
+//         : "jpg"
+//     }`;
 
 //     try {
 //       const { data, error } = await supabase.storage
 //         .from("userAvatar")
-//         .upload(fileName, decode("base64FileData"), {
-//           contentType: "image/png" || "image/jpeg",
+//         .remove([
+//           `${authUser.userId}/avatar.png`,
+//           `${authUser.userId}/avatar.jpeg`,
+//           `${authUser.userId}/avatar.jpg`,
+//           `${authUser.userId}/avatar.undefined`,
+//         ]);
+//     } catch (error) {
+//       console.log(error.message);
+//     }
+
+//     try {
+//       const { data, error } = await supabase.storage
+//         .from("userAvatar")
+//         .upload(fileName, decode(form.base64), {
+//           contentType: fileType,
+//           upsert: true,
 //         });
 
 //       if (error) {
 //         throw error;
 //       }
 
-//       const avatarUrl = supabase.storage
+//       const getImageUrl = supabase.storage
 //         .from("userAvatar")
-//         .getPublicUrl(fileName).data.publicUrl;
-//       return avatarUrl;
+//         .getPublicUrl(fileName);
+
+//       const avatarUrl = getImageUrl.data.publicUrl;
+
+//       return `${avatarUrl}?t=${new Date().getTime()}`;
 //     } catch (error) {
+//       console.log(error.message);
 //       Alert.alert("Error", `Avatar upload failed: ${error.message}`);
 //       return null;
 //     } finally {
