@@ -1,40 +1,40 @@
-import { View, Text, FlatList, RefreshControl, Image } from "react-native";
+import { View, FlatList, Image, TouchableOpacity } from "react-native";
+import TextMedium18 from "../../components/Typography/TextMedium18";
 import React from "react";
-import GenericPostCard from "../Cards/GenericPostCard";
-import { dataPosts, nftsList } from "../../constants/constants";
-import TextSemi20 from "../Typography/TextSemi20";
-import { useState } from "react";
+import { router } from "expo-router";
 
-const NFTsList = () => {
-  const [refreshing, setRefreshing] = useState(false);
+//userNFTs => NFTs that the user is owner of not creator of
 
-  const onRefresh = async () => {
-    setRefreshing(false);
-    // recall exp to see if any new ones
-    //  await refetch();
-    setRefreshing(false);
-  };
-
+const NFTsList = ({ userNFTs, userId }) => {
   return (
     <View className="mt-5 items-center mb-12">
       <FlatList
         horizontal={false}
         numColumns={2}
-        data={nftsList}
-        renderItem={({ item }) => (
-          <View className="p-2">
-            <Image
-              source={item.nftImage}
-              resizeMethod="contain"
-              className="w-[180px] h-[150px] rounded-3xl"
-            />
-          </View>
-        )}
+        data={userNFTs}
+        renderItem={({ item }) => {
+          const handlePress = () => {
+            router.push(`/owned_nfts/${userId}/${item.id}`);
+          };
+
+          return (
+            <TouchableOpacity className="p-2" onPress={handlePress}>
+              <Image
+                source={{ uri: item.image_url }}
+                resizeMethod="contain"
+                className="w-[180px] h-[150px] rounded-3xl"
+              />
+            </TouchableOpacity>
+          );
+        }}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{
           justifyContent: "center",
           paddingTop: 10,
         }}
+        ListEmptyComponent={() => (
+          <TextMedium18>No NFTs here yet...</TextMedium18>
+        )}
       />
     </View>
   );

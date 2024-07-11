@@ -1,23 +1,13 @@
-import { View, Text, FlatList, RefreshControl } from "react-native";
+import { View, FlatList } from "react-native";
 import React from "react";
-import GenericPostCard from "../Cards/GenericPostCard";
-import { dataAltPosts, dataPosts } from "../../constants/constants";
-import TextSemi20 from "../Typography/TextSemi20";
+import { dataAltPosts } from "../../constants/constants";
+import TextMedium18 from "../../components/Typography/TextMedium18";
 import { useState } from "react";
 import ExperienceCertCard from "../Cards/ExperienceCertCard";
 
 const ExperiencesPosts = () => {
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = async () => {
-    setRefreshing(false);
-    // recall exp to see if any new ones
-    //  await refetch();
-    setRefreshing(false);
-  };
-
   return (
-    <View className="mt-5 mb-10">
+    <View className="mt-5 mb-10 items-center">
       <FlatList
         data={dataAltPosts}
         renderItem={({ item }) => (
@@ -37,6 +27,9 @@ const ExperiencesPosts = () => {
           justifyContent: "center",
           paddingTop: 10,
         }}
+        ListEmptyComponent={() => (
+          <TextMedium18>No Experiences here yet...</TextMedium18>
+        )}
       />
     </View>
   );

@@ -60,6 +60,10 @@ const RootLayout = () => {
           name="edit/[id]/UserProfile"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="owned_nfts/[userId]/[nftId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

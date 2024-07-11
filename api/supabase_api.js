@@ -54,7 +54,7 @@ export const uploadAvatar = async (authUser, form, setUploading) => {
 export const updateUserProfile = async (authUser, form, avatarUrl) => {
   const updates = {
     username: form.username,
-    email: form.email,
+    // email: form.email,
     bio: form.bio,
     currentFandom: form.fandom,
     avatar: avatarUrl || form.avatar,
@@ -73,5 +73,87 @@ export const updateUserProfile = async (authUser, form, avatarUrl) => {
     Alert.alert("Success", "Profile updated successfully");
   } catch (error) {
     Alert.alert("Error", `Profile update failed: ${error.message}`);
+  }
+};
+
+// getting and updating the user nfts data, used in the Profile component for the TabsInterface Component with listerner function for backend relatime update
+
+export const getUserNFTs = async (userId) => {
+  try {
+    let { data: globalNFTs, error } = await supabase
+      .from("globalNFTs")
+      .select("*")
+      .eq("owner_id", userId);
+
+    if (error) throw error;
+
+    return globalNFTs;
+  } catch (error) {
+    console.error("Error fetching NFTs: ", error.message);
+    throw error;
+  }
+};
+
+export const globalNFTsListener = (setUserNFTs, userId) => {
+  return supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "globalNFTs" },
+      async () => {
+        const nfts = await getUserNFTs(userId);
+        setUserNFTs(nfts);
+      }
+    )
+    .subscribe();
+};
+
+// getting the nft data from the nftid taken from the url for the individual nft card routed from the user's profile
+
+export const getIndividualNFT = async (nftId) => {
+  try {
+    let { data: nftData, error } = await supabase
+      .from("globalNFTs")
+      .select("*")
+      .eq("id", nftId);
+
+    if (error) throw error;
+
+    return nftData;
+  } catch (error) {
+    console.error("Error fetching NFTs: ", error.message);
+    throw error;
+  }
+};
+
+export const getIndividualNFTCreator = async (nftCreatorId) => {
+  try {
+    let { data: creatorData, error } = await supabase
+      .from("userDatabase")
+      .select("*")
+      .eq("userId", nftCreatorId);
+
+    if (error) throw error;
+
+    return creatorData;
+  } catch (error) {
+    console.error("Error fetching NFTs: ", error.message);
+    throw error;
+  }
+};
+
+export const getIndividualNFTOwner = async (nftOwnerId) => {
+  try {
+    let { data: ownerData, error } = await supabase
+      .from("userDatabase")
+      .select("*")
+      .eq("userId", nftOwnerId);
+
+    if (error) throw error;
+
+    return ownerData;
+  } catch (error) {
+    console.error("Error fetching NFTs: ", error.message);
+    throw error;
   }
 };

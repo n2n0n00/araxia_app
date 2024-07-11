@@ -27,7 +27,7 @@ const UserProfile = () => {
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     username: authUser?.username || "",
-    email: authUser?.email || "",
+    // email: authUser?.email || "",
     bio: authUser?.bio || "",
     fandom: authUser?.currentFandom || "",
     avatar: authUser?.avatar || null,
@@ -37,7 +37,7 @@ const UserProfile = () => {
   useEffect(() => {
     setForm({
       username: authUser?.username || "",
-      email: authUser?.email || "",
+      // email: authUser?.email || "",
       bio: authUser?.bio || "",
       fandom: authUser?.currentFandom || "",
       avatar: authUser?.avatar || null,
@@ -74,7 +74,8 @@ const UserProfile = () => {
   };
 
   const submitChanges = async () => {
-    if (!form.username || !form.email || !form.bio || !form.fandom) {
+    // if (!form.username || !form.email || !form.bio || !form.fandom) {
+    if (!form.username || !form.bio || !form.fandom) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
@@ -113,14 +114,14 @@ const UserProfile = () => {
                 iconsLibrary="FontAwesome"
                 onChangeText={(username) => setForm({ ...form, username })}
               />
-              <EditFields
+              {/* <EditFields
                 label={"Email"}
                 icon="email"
                 value={form.email}
                 iconsLibrary="Entypo"
                 onChangeText={(email) => setForm({ ...form, email })}
                 extraClasses="mt-4"
-              />
+              /> */}
               <EditFields
                 label={"Bio"}
                 icon="info-with-circle"

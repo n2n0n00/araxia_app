@@ -1,11 +1,6 @@
-import {
-  View,
-  FlatList,
-  Image,
-  RefreshControl,
-  SafeAreaView,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+// src/screens/Profile.js
+import { View, FlatList, Image, SafeAreaView } from "react-native";
+import React, { useState, useEffect } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
@@ -17,22 +12,29 @@ import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPost
 import FandomCard from "../../components/ProfileComponents/FandomCard";
 import { useAuth } from "../../context/AuthProvider";
 import { addressShortener } from "../../utils/addressShortener";
+import { getUserNFTs, globalNFTsListener } from "../../api/supabase_api";
+import { supabase } from "../../api/supabase";
 
 const Profile = () => {
   const { authUser } = useAuth();
-  // const [refreshing, setRefreshing] = useState(false);
-
   const cryptoAddressShort = addressShortener(authUser.cryptoAddress);
 
-  // const onRefresh = async () => {
-  //   // setRefreshing(true);
-  //   // Add your refetch logic here
-  //   // setRefreshing(false);
-  // };
+  const [userNFTs, setUserNFTs] = useState([]);
+
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      globalNFTsListener(setUserNFTs, authUser.userId);
+
+      const nfts = await getUserNFTs(authUser.userId);
+      setUserNFTs(nfts);
+    };
+
+    fetchNFTs();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1">
-      <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
+      <BgDarkGradient linearGradientMarginTop="-mt-5">
         <Image
           source={images.loginBG}
           resizeMode="contain"
@@ -65,18 +67,17 @@ const Profile = () => {
             ListFooterComponent={
               <View className="items-center justify-center flex-1 w-full p-4 mt-10 h-full">
                 <TabsInterface
-                  tabLeft={"nfts"}
-                  tabRight={"experiences"}
-                  tabLeftComponent={<NFTsList />}
+                  tabLeft="nfts"
+                  tabRight="experiences"
+                  tabLeftComponent={
+                    <NFTsList userNFTs={userNFTs} userId={authUser.userId} />
+                  }
                   tabRightComponent={<ExperiencesPosts />}
-                  tabLeftLabel={"NFTs"}
-                  tabRightLabel={"Experiences"}
+                  tabLeftLabel="NFTs"
+                  tabRightLabel="Experiences"
                 />
               </View>
             }
-            // refreshControl={
-            //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            // }
           />
         </BgBlackOverlay>
       </BgDarkGradient>
