@@ -1,4 +1,3 @@
-// src/screens/Profile.js
 import { View, FlatList, Image, SafeAreaView } from "react-native";
 import React, { useState, useEffect } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";

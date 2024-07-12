@@ -64,6 +64,7 @@ const RootLayout = () => {
           name="owned_nfts/[userId]/[nftId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="user/[userId]" options={{ headerShown: false }} />
       </Stack>
     </AuthProvider>
   );

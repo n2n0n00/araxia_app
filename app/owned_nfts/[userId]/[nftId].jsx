@@ -18,51 +18,82 @@ import TextRegular18 from "../../../components/Typography/TextRegular18";
 import TextBold15 from "../../../components/Typography/TextBold15";
 import BuyNFTButton from "../../../components/Buttons/BuyNFTButton";
 import {
-  getIndividualNFT,
-  getIndividualNFTCreator,
-  getIndividualNFTOwner,
+  getIndividualNFTData,
+  globalNFTPageListener,
+  updateFavoriteCount,
+  addUserLike,
+  removeUserLike,
+  checkUserLike,
 } from "../../../api/supabase_api";
+import Feather from "@expo/vector-icons/Feather";
 
 const OwnedNFT = () => {
+  globalNFTPageListener();
   const { userId, nftId } = useLocalSearchParams();
   const [NFT, setNFT] = useState(null);
   const [creator, setCreator] = useState(null);
   const [owner, setOwner] = useState(null);
+  const [maximizeImage, setMaximizeImage] = useState(false);
+  const [likeNFT, setLikeNFT] = useState(false);
 
   const handleBack = () => {
     router.push("/profile");
   };
 
+  const handleMaximizeImage = () => {
+    setMaximizeImage(!maximizeImage);
+  };
+
+  const handleUserProfileRoute = (user) => {
+    if (user === "creator") {
+      router.push(`/user/${creator.userId}`);
+    } else router.push(`/user/${owner.userId}`);
+  };
+
+  const handleLikedNFT = async () => {
+    if (!likeNFT) {
+      const likesCounter = NFT.favorite_count + 1;
+      setLikeNFT(true);
+      setNFT({ ...NFT, favorite_count: likesCounter });
+      await updateFavoriteCount(nftId, likesCounter);
+      await addUserLike(userId, nftId);
+    }
+  };
+
+  const handleUnlikedNFT = async () => {
+    if (likeNFT) {
+      const likesCounter = NFT.favorite_count - 1;
+      setLikeNFT(false);
+      setNFT({ ...NFT, favorite_count: likesCounter });
+      await updateFavoriteCount(nftId, likesCounter);
+      await removeUserLike(userId, nftId);
+    }
+  };
+
   useEffect(() => {
     const fetchNFT = async () => {
       try {
-        const nftData = await getIndividualNFT(nftId);
-        setNFT(nftData);
-        const dum = nftData[0].creator_id;
-        const dumdum = nftData[0].owner_id;
+        const { nft, creator, owner } = await getIndividualNFTData(nftId);
+        setNFT(nft);
+        setCreator(creator);
+        setOwner(owner);
 
-        const creatorData = await getIndividualNFTCreator(dum);
-        setCreator(creatorData);
-
-        const ownerData = await getIndividualNFTOwner(dumdum);
-        setOwner(ownerData);
+        const userLiked = await checkUserLike(userId, nftId);
+        setLikeNFT(userLiked);
       } catch (error) {
-        console.error("Error fetching NFT data: ", error.message);
+        console.error("Error fetching NFT and related data:", error.message);
       }
     };
     fetchNFT();
-  }, [nftId]);
+  }, [nftId, userId]);
 
-  if (!NFT || !creator || !owner) {
+  if (!NFT || !owner || !creator) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center">
         <Text>Loading...</Text>
       </SafeAreaView>
     );
   }
-
-  console.log(owner);
-  console.log(creator);
 
   return (
     <SafeAreaView className="flex-1">
@@ -76,49 +107,109 @@ const OwnedNFT = () => {
           <TouchableOpacity onPress={handleBack}>
             <Image source={icons.backArrow} resizeMethod="contain" />
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleMaximizeImage}
+            className="h-[40px] w-[40px] rounded-3xl bg-purple-900 items-center justify-center"
+          >
+            <Feather name="maximize" size={24} color="white" />
+          </TouchableOpacity>
         </View>
         <BgBlackOverlay>
-          <View className="bg-white h-[60vh] w-screen rounded-b-[50px]" />
+          <Image
+            className="h-[60vh] w-screen rounded-b-[50px]"
+            resizeMode="cover"
+            source={{ uri: NFT.image_url }}
+          />
+
+          {maximizeImage ? (
+            <TouchableOpacity
+              className="h-screen w-screen absolute z-50 items-center justify-center"
+              onPress={handleMaximizeImage}
+            >
+              <View className="bg-black opacity-80 h-full w-full absolute" />
+              <View className="w-screen h-screen items-center justify-center">
+                <Image
+                  source={{ uri: NFT.image_url }}
+                  resizeMode="contain"
+                  className="w-full h-full"
+                />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <></>
+          )}
+
           <ScrollView>
             <View className="flex-col items-center w-screen h-full p-4">
               <View className="w-full flex-row items-center justify-between">
                 <View>
-                  <TextBold25>{NFT[0]?.name}</TextBold25>
+                  <TextBold25>{NFT.name}</TextBold25>
                   <TextMedium18>
                     Asking Price:{" "}
                     <Text className="text-purple-500 font-mbold">
-                      {NFT[0]?.price} {NFT[0]?.currency}
+                      {NFT.price} {NFT.currency}
                     </Text>
                   </TextMedium18>
                 </View>
-                <View className="flex-row items-center">
-                  <AntDesign name="hearto" size={24} color="white" />
-                  <TextMedium18 extraClasses={"pl-2"}>35</TextMedium18>
-                </View>
+                {likeNFT ? (
+                  <TouchableOpacity
+                    onPress={handleUnlikedNFT}
+                    className="flex-row items-center"
+                  >
+                    <AntDesign name="heart" size={24} color="white" />
+                    <TextMedium18 extraClasses={"pl-2"}>
+                      {NFT.favorite_count}
+                    </TextMedium18>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={handleLikedNFT}
+                    className="flex-row items-center"
+                  >
+                    <AntDesign name="hearto" size={24} color="white" />
+                    <TextMedium18 extraClasses={"pl-2"}>
+                      {NFT.favorite_count}
+                    </TextMedium18>
+                  </TouchableOpacity>
+                )}
               </View>
 
               <TextRegular18 extraClasses={"mt-10 mb-5"}>
-                Lorem ipsum dolor sit amet consectetur. Placerat nec lacus
-                facilisis nulla. Amet vitae vel posuere faucibus eu. Sed arcu
-                amet et habitant
+                {NFT.description}
               </TextRegular18>
               <View>
-                <BuyNFTButton price={"100 ETH"} />
+                <BuyNFTButton price={`${NFT.price} ${NFT.currency}`} />
               </View>
               <View className="flex-row w-full items-start justify-between my-10">
                 <View>
                   <TextMedium18>Artist</TextMedium18>
-                  <View className="flex-row items-center mt-2">
-                    <View className="bg-white w-[35px] h-[35px] rounded-full mr-2" />
-                    <TextBold15>{creator[0]?.username}</TextBold15>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleUserProfileRoute("creator")}
+                    className="flex-row items-center mt-2"
+                  >
+                    <Image
+                      resizeMode="contain"
+                      className="w-[40px] h-[40px] rounded-full mr-2"
+                      source={{ uri: creator.avatar }}
+                    />
+                    <TextBold15>{creator.username}</TextBold15>
+                  </TouchableOpacity>
                 </View>
                 <View>
                   <TextMedium18>Collector</TextMedium18>
-                  <View className="flex-row items-center mt-2">
-                    <View className="bg-white w-[35px] h-[35px] rounded-full mr-2" />
-                    <TextBold15>{owner[0]?.username}</TextBold15>
-                  </View>
+                  {/* if owner is not the authUser then onPress={() => handleUserProfileRoute(owner.userId)} */}
+                  <TouchableOpacity
+                    onPress={handleBack}
+                    className="flex-row items-center mt-2"
+                  >
+                    <Image
+                      resizeMode="contain"
+                      className="w-[40px] h-[40px] rounded-full mr-2"
+                      source={{ uri: owner.avatar }}
+                    />
+
+                    <TextBold15>{owner.username}</TextBold15>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>

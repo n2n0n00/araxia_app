@@ -59,7 +59,7 @@ const UserProfile = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
       base64: true,
     });
@@ -149,7 +149,7 @@ const UserProfile = () => {
                     <Image
                       source={{ uri: form.avatar }}
                       resizeMode="cover"
-                      className="w-[100px] h-[100px] rounded-full"
+                      className="w-[100px] h-[100px] rounded-full "
                     />
                   ) : (
                     <Text className="flex-1 text-white font-mregular mt-0.5 text-base">
