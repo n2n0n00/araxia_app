@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import { supabase } from "./supabase";
 import { decode } from "base64-arraybuffer";
+import { addressShortener } from "../utils/addressShortener";
 
 //NOTE: Functions for profile editing
 
@@ -367,4 +368,60 @@ export const removeArtistLike = async (userId, artistId) => {
   if (error) {
     console.error("Error removing user like:", error);
   }
+};
+
+//NOTE: Fetch Favorite Artists For Feed Page
+
+export const favoriteArtist = async (userId) => {
+  const { data, error } = await supabase
+    .from("userLikedArtists")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Error fetching liked artists:", error);
+    return [];
+  }
+
+  return data;
+};
+
+export const fetchLikedArtistsData = async (userId) => {
+  const likedArtists = await favoriteArtist(userId);
+  const likedArtistsArray = [];
+
+  for (const artist of likedArtists) {
+    const { data, error } = await supabase
+      .from("userDatabase")
+      .select("*")
+      .eq("userId", artist.artist_id);
+
+    if (error) {
+      console.error("Error fetching artist data:", error);
+      continue;
+    }
+
+    if (data.length > 0) {
+      likedArtistsArray.push(data[0]);
+    }
+  }
+
+  return likedArtistsArray;
+};
+
+//NOTE: Fetch User based on userId for Feed liked artists and NFT artist and collector pages
+export const fetchUserDetails = async (artistId) => {
+  const { data: artistData, error: ownerError } = await supabase
+    .from("userDatabase")
+    .select("*")
+    .eq("userId", artistId);
+
+  if (ownerError) {
+    throw new Error(ownerError.message);
+  }
+
+  if (artistData.length === 0) {
+    throw new Error("User not found");
+  }
+  return artistData;
 };

@@ -19,18 +19,20 @@ import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPost
 import { images } from "../../constants";
 import { useAuth } from "../../context/AuthProvider";
 
-const UserProfilePage = () => {
+const ArtistId = () => {
+  //TODO: ADD A LOADER BEFORE THE DATA LOADER
   const { authUser } = useAuth();
-  const { userId } = useLocalSearchParams();
+  const { artistId } = useLocalSearchParams();
+
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
 
   const userDetails = async () => {
     try {
-      const user = await fetchUserDetails(userId);
-      setUserData(user[0]);
-      setUserCryptoAddress(addressShortener(await user[0]?.cryptoAddress));
+      const artist = await fetchUserDetails(artistId);
+      setUserData(artist[0]);
+      setUserCryptoAddress(addressShortener(await artist[0]?.cryptoAddress));
     } catch (error) {
       console.error(error);
     }
@@ -40,14 +42,14 @@ const UserProfilePage = () => {
     userDetails();
 
     const fetchNFTs = async () => {
-      globalNFTsListener(setUserNFTs, userId);
+      globalNFTsListener(setUserNFTs, artistId);
 
-      const nfts = await getUserNFTs(userId);
+      const nfts = await getUserNFTs(artistId);
       setUserNFTs(nfts);
     };
 
     fetchNFTs();
-  }, [userId]);
+  }, [artistId]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -111,4 +113,4 @@ const UserProfilePage = () => {
   );
 };
 
-export default UserProfilePage;
+export default ArtistId;

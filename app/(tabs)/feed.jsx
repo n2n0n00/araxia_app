@@ -6,19 +6,40 @@ import {
   RefreshControl,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
 import UpcomingExpCard from "../../components/Cards/UpcomingExpCard";
-import { exp } from "../../constants/constants";
 import TextSemi20 from "../../components/Typography/TextSemi20";
 import BgBlackOverlay from "../../components/BackgroundGradients/BgBlackOverlay";
 import TabsInterface from "../../components/TabsInterface/TabsInterface";
 import TopNFTs from "../../components/FeedComponents/TopNFTs";
 import TopArtists from "../../components/FeedComponents/TopArtists";
+import { useAuth } from "../../context/AuthProvider";
+import { fetchLikedArtistsData } from "../../api/supabase_api";
 
 const Feed = () => {
+  const { authUser } = useAuth();
+  const [userLikedArtists, setUserLikedArtists] = useState([]);
+
+  const likedArtists = async () => {
+    try {
+      const artists = await fetchLikedArtistsData(authUser.userId);
+      setUserLikedArtists(artists);
+    } catch (error) {
+      console.error("Error fetching liked artists:", error);
+    }
+  };
+
+  //TODO: ADD A LOADER TO WAIT UNTIL ARTISTS ARE FETCHED!!!!
+
+  useEffect(() => {
+    if (authUser && authUser.userId) {
+      likedArtists();
+    }
+  }, [authUser]);
+
   return (
     <SafeAreaView className="flex-1">
       <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
@@ -29,6 +50,12 @@ const Feed = () => {
         />
         <BgBlackOverlay>
           <FlatList
+            // refreshControl={
+            //   <RefreshControl
+            //     refreshing={refreshing}
+            //     onRefresh={likedArtists}
+            //   />
+            // }
             ListHeaderComponent={
               <>
                 <AraxiaHeadBar />
@@ -37,21 +64,19 @@ const Feed = () => {
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    data={exp}
-                    keyExtractor={(item) => item.expName}
+                    data={userLikedArtists}
+                    keyExtractor={(item) => item.userId}
                     renderItem={({ item }) => (
                       <UpcomingExpCard
-                        expName={item.expName}
-                        expArtist={item.expArtist}
-                        expLink={item.expLink}
-                        expImage={item.expImage}
+                        artistName={item.username}
+                        artistId={item.userId}
+                        artistAvatar={item.avatar}
                       />
                     )}
                     ListEmptyComponent={() => (
-                      <EmptyState
-                        title="No Experiences Found"
-                        subtitle="Get Your First Experience At The Marketplace"
-                      />
+                      <View className="flex items-center justify-center">
+                        <Text>No Favorite Artists Found</Text>
+                      </View>
                     )}
                   />
                 </View>

@@ -190,7 +190,7 @@ const OwnedNFT = () => {
                     className="flex-row items-center mt-2"
                   >
                     <Image
-                      resizeMode="contain"
+                      resizeMode="cover"
                       className="w-[40px] h-[40px] rounded-full mr-2"
                       source={{ uri: creator.avatar }}
                     />
@@ -204,7 +204,7 @@ const OwnedNFT = () => {
                     className="flex-row items-center mt-2"
                   >
                     <Image
-                      resizeMode="contain"
+                      resizeMode="cover"
                       className="w-[40px] h-[40px] rounded-full mr-2"
                       source={{ uri: owner.avatar }}
                     />
