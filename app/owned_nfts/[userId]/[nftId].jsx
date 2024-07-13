@@ -26,9 +26,11 @@ import {
   checkUserLike,
 } from "../../../api/supabase_api";
 import Feather from "@expo/vector-icons/Feather";
+import { useAuth } from "../../../context/AuthProvider";
 
 const OwnedNFT = () => {
   globalNFTPageListener();
+  const { authUser } = useAuth();
   const { userId, nftId } = useLocalSearchParams();
   const [NFT, setNFT] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -37,17 +39,17 @@ const OwnedNFT = () => {
   const [likeNFT, setLikeNFT] = useState(false);
 
   const handleBack = () => {
-    router.push("/profile");
+    router.back();
   };
 
   const handleMaximizeImage = () => {
     setMaximizeImage(!maximizeImage);
   };
 
-  const handleUserProfileRoute = (user) => {
-    if (user === "creator") {
-      router.push(`/user/${creator.userId}`);
-    } else router.push(`/user/${owner.userId}`);
+  const handleUserProfileRoute = (userId) => {
+    if (userId === authUser.userId) {
+      router.push("/profile");
+    } else router.push(`/user/${userId}`);
   };
 
   const handleLikedNFT = async () => {
@@ -184,7 +186,7 @@ const OwnedNFT = () => {
                 <View>
                   <TextMedium18>Artist</TextMedium18>
                   <TouchableOpacity
-                    onPress={() => handleUserProfileRoute("creator")}
+                    onPress={() => handleUserProfileRoute(creator.userId)}
                     className="flex-row items-center mt-2"
                   >
                     <Image
@@ -197,9 +199,8 @@ const OwnedNFT = () => {
                 </View>
                 <View>
                   <TextMedium18>Collector</TextMedium18>
-                  {/* if owner is not the authUser then onPress={() => handleUserProfileRoute(owner.userId)} */}
                   <TouchableOpacity
-                    onPress={handleBack}
+                    onPress={() => handleUserProfileRoute(owner.userId)}
                     className="flex-row items-center mt-2"
                   >
                     <Image

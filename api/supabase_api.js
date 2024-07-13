@@ -327,3 +327,44 @@ export const removeUserLike = async (userId, nftId) => {
     console.error("Error removing user like:", error);
   }
 };
+
+// NOTE: Fetch and Check If a User has liked an artist for the artist's page
+
+export const checkArtistLike = async (userId, artistId) => {
+  const { data, error } = await supabase
+    .from("userLikedArtists")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("artist_id", artistId);
+  if (error) {
+    console.error("Error checking user like:", error);
+    return false;
+  }
+
+  if (data.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// add user like
+export const addArtistLike = async (userId, artistId) => {
+  const { error } = await supabase
+    .from("userLikedArtists")
+    .insert([{ user_id: userId, artist_id: artistId }]);
+  if (error) {
+    console.error("Error adding user like:", error);
+  }
+};
+
+// remove user like
+export const removeArtistLike = async (userId, artistId) => {
+  const { error } = await supabase
+    .from("userLikedArtists")
+    .delete()
+    .match({ user_id: userId, artist_id: artistId });
+  if (error) {
+    console.error("Error removing user like:", error);
+  }
+};

@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GlassContainer from "../BackgroundContainers/GlassContainer";
 import { icons, images } from "../../constants";
 import TextBold18 from "../Typography/TextBold18";
@@ -7,6 +7,11 @@ import TextMedium14 from "../Typography/TextMedium14";
 import TextSemi27 from "../Typography/TextSemi27";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
+import {
+  addArtistLike,
+  checkArtistLike,
+  removeArtistLike,
+} from "../../api/supabase_api";
 
 const Header = ({
   avatar,
@@ -18,19 +23,64 @@ const Header = ({
   username,
   bio,
   userId,
+  currentUser,
+  isUserArtist,
+  artistId,
 }) => {
+  const [artistLike, setArtistLike] = useState(false);
+
+  useEffect(() => {
+    if (isUserArtist === true) {
+      const fetchUserLike = async () => {
+        const artistLiked = await checkArtistLike(userId, artistId);
+        setArtistLike(artistLiked);
+      };
+      fetchUserLike();
+    }
+  }, [userId, artistId, isUserArtist]);
+
   const handleEdit = () => {
     router.push(`/edit/${userId}/UserProfile`);
   };
+
+  const handleLikedArtist = async () => {
+    setArtistLike(true);
+    await addArtistLike(userId, artistId);
+  };
+
+  const handleUnlikedArtist = async () => {
+    setArtistLike(false);
+    await removeArtistLike(userId, artistId);
+  };
+
   return (
     <GlassContainer
-      insideContainerClasses={"flex-col items-center justify-center px-3 pb-12"}
+      insideContainerClasses={`flex-col items-center justify-center px-3 pb-12`}
     >
-      <TouchableOpacity onPress={handleEdit}>
-        <View className="flex-row gap-2 w-full items-center justify-end pb-4 pt-4 pr-4">
-          <AntDesign name="edit" size={24} color="white" />
-        </View>
-      </TouchableOpacity>
+      {currentUser === userId ? (
+        <TouchableOpacity onPress={handleEdit}>
+          <View className="flex-row gap-2 w-full items-center justify-end pb-4 pt-4 pr-4">
+            <AntDesign name="edit" size={24} color="white" />
+          </View>
+        </TouchableOpacity>
+      ) : isUserArtist === true ? (
+        artistLike ? (
+          <TouchableOpacity onPress={handleUnlikedArtist}>
+            <View className="flex-row gap-2 w-full items-center justify-end pb-4 pt-4 pr-4">
+              <AntDesign name="heart" size={24} color="white" />
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleLikedArtist}>
+            <View className="flex-row gap-2 w-full items-center justify-end pb-4 pt-4 pr-4">
+              <AntDesign name="hearto" size={24} color="white" />
+            </View>
+          </TouchableOpacity>
+        )
+      ) : (
+        <View className="pt-12" />
+      )}
+
       <View className="flex-row items-center justify-between w-full">
         <View>
           <View className="flex-row items-start justify-start mb-8">

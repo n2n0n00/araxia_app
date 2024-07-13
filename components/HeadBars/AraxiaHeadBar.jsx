@@ -3,7 +3,10 @@ import React from "react";
 import { router } from "expo-router";
 import { icons } from "../../constants";
 
-const AraxiaHeadBar = () => {
+const AraxiaHeadBar = ({ nonTabPage }) => {
+  const handleBack = () => {
+    router.back();
+  };
   const goToFeed = () => {
     router.push("./feed");
   };
@@ -18,9 +21,23 @@ const AraxiaHeadBar = () => {
 
   return (
     <View className="flex-row items-center justify-between w-screen p-4 pt-16">
-      <TouchableOpacity onPress={goToFeed}>
-        <Text className="font-osemibold text-4xl text-[#8F29FD]">araxia</Text>
-      </TouchableOpacity>
+      {nonTabPage ? (
+        <View className="flex-row items-center">
+          <TouchableOpacity onPress={handleBack}>
+            <Image source={icons.backArrow} resizeMethod="contain" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={goToFeed}>
+            <Text className="font-osemibold text-4xl text-[#8F29FD] pl-5">
+              araxia
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <TouchableOpacity onPress={goToFeed}>
+          <Text className="font-osemibold text-4xl text-[#8F29FD]">araxia</Text>
+        </TouchableOpacity>
+      )}
+
       <View className="flex-row items-center justify-center">
         <TouchableOpacity onPress={goToNotifications} className="pr-8">
           <Image source={icons.userNotifications} />

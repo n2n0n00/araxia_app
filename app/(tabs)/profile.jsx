@@ -46,6 +46,7 @@ const Profile = () => {
                 <AraxiaHeadBar />
                 <View className="flex-col items-center w-full p-4 h-[450px]">
                   <Header
+                    currentUser={authUser.userId}
                     totalNfts={authUser.nfts}
                     levelXP={authUser.levelXP}
                     followers={authUser.followers.length}

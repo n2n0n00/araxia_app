@@ -19,14 +19,6 @@ import TopNFTs from "../../components/FeedComponents/TopNFTs";
 import TopArtists from "../../components/FeedComponents/TopArtists";
 
 const Feed = () => {
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Add your refetch logic here
-    setRefreshing(false);
-  };
-
   return (
     <SafeAreaView className="flex-1">
       <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
@@ -41,7 +33,7 @@ const Feed = () => {
               <>
                 <AraxiaHeadBar />
                 <View className="flex-col items-start w-screen p-4 h-[300px]">
-                  <TextSemi20>Your Upcoming Experiences...</TextSemi20>
+                  <TextSemi20>Your Favorite Artists</TextSemi20>
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -61,12 +53,6 @@ const Feed = () => {
                         subtitle="Get Your First Experience At The Marketplace"
                       />
                     )}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                      />
-                    }
                   />
                 </View>
               </>
@@ -85,9 +71,6 @@ const Feed = () => {
                   tabRightLabel={"Top Artists"}
                 />
               </View>
-            }
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
         </BgBlackOverlay>
