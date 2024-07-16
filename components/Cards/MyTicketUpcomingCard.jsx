@@ -11,7 +11,10 @@ const MyTicketUpcomingCard = ({
   expLocation,
 }) => {
   return (
-    <TouchableOpacity className="items-center justify-center h-[130px] realtive mt-5">
+    <TouchableOpacity
+      className="items-center justify-center h-[130px] realtive mt-5"
+      onPress={ticketLink}
+    >
       <Image
         source={images.ticket}
         resizeMethod="contain"

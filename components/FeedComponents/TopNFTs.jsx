@@ -5,7 +5,7 @@ import { dataPosts } from "../../constants/constants";
 import TextSemi20 from "../Typography/TextSemi20";
 import { useState } from "react";
 
-const TopNFTs = () => {
+const TopNFTs = ({}) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -21,10 +21,10 @@ const TopNFTs = () => {
         data={dataPosts}
         renderItem={({ item }) => (
           <GenericPostCard
+            cardType={"NFT"}
             content={item.content}
             artistName={item.artistName}
             cryptoAddress={item.cryptoAddress}
-            comments={item.comments}
             likes={item.likes}
             timeStamp={item.timeStamp}
             avatar={item.avatar}

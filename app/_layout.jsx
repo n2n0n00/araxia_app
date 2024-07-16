@@ -69,6 +69,10 @@ const RootLayout = () => {
           name="artist/[artistId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="tickets/[userId]/[artistId]/[ticketId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

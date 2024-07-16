@@ -425,3 +425,44 @@ export const fetchUserDetails = async (artistId) => {
   }
   return artistData;
 };
+
+//NOTE: Get upcoming events tickets and data
+export const fetchUserUpcomingEvents = async (userId) => {
+  const { data: userTickets, error: ticketError } = await supabase
+    .from("globalTickets")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("completed", false);
+
+  if (ticketError) {
+    console.error("Error fetching tickets:", ticketError);
+    throw new Error(ticketError.message);
+  }
+
+  if (userTickets.length === 0) {
+    throw new Error("Tickets not found");
+  }
+
+  return userTickets;
+};
+
+//NOTE: Get ticket data based on ticketId, userId, artistId
+export const fetchUserEvent = async (ticketId, userId, artistId) => {
+  const { data: userTickets, error: ticketError } = await supabase
+    .from("globalTickets")
+    .select("*")
+    .eq("ticket_id", ticketId)
+    .eq("user_id", userId)
+    .eq("artist_id", artistId);
+
+  if (ticketError) {
+    console.error("Error fetching tickets:", ticketError);
+    throw new Error(ticketError.message);
+  }
+
+  if (userTickets.length === 0) {
+    throw new Error("Tickets not found");
+  }
+
+  return userTickets;
+};

@@ -22,6 +22,7 @@ import { fetchLikedArtistsData } from "../../api/supabase_api";
 const Feed = () => {
   const { authUser } = useAuth();
   const [userLikedArtists, setUserLikedArtists] = useState([]);
+  const [topNFTs, setTopNFTs] = useState([]);
 
   const likedArtists = async () => {
     try {
@@ -31,6 +32,14 @@ const Feed = () => {
       console.error("Error fetching liked artists:", error);
     }
   };
+
+  // const currentTopNFTs = async () => {
+  //   try {
+  //     const NFTs = await fetchTopNFTs()
+  //   } catch (error) {
+
+  //   }
+  // }
 
   //TODO: ADD A LOADER TO WAIT UNTIL ARTISTS ARE FETCHED!!!!
 

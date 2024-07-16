@@ -53,11 +53,14 @@ const TopArtistsMarketplaceCard = ({
           </View>
         </View>
 
-        <Image
-          source={banner}
-          resizeMethod="contain"
-          className="w-[333px] h-[263px] rounded-3xl"
-        />
+        <View className="w-full items-center">
+          <Image
+            source={banner}
+            resizeMethod="contain"
+            className="w-[333px] h-[263px] rounded-3xl"
+          />
+        </View>
+
         <TextBold25 extraClasses={"text-center py-2"}>{expName}</TextBold25>
         <View>
           <Text className="text-[13px] text-white font-mregular text-center">
