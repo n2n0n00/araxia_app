@@ -466,3 +466,54 @@ export const fetchUserEvent = async (ticketId, userId, artistId) => {
 
   return userTickets;
 };
+
+//NOTE: Get & Group Past Experiences By Ticket Location
+
+export const fetchPastCities = async (userId) => {
+  const { data: userTickets, error: ticketError } = await supabase
+    .from("globalTickets")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (ticketError) {
+    console.error("Error fetching tickets:", ticketError);
+    throw new Error(ticketError.message);
+  }
+
+  if (userTickets.length === 0) {
+    throw new Error("Tickets not found");
+  }
+
+  // Group experiences by location
+  const groupedByLocation = userTickets.reduce((acc, ticket) => {
+    const location = ticket.tour_location;
+    if (!acc[location]) {
+      acc[location] = [];
+    }
+    acc[location].push(ticket);
+    return acc;
+  }, {});
+
+  return groupedByLocation;
+};
+
+//NOTE: Get & Group Past Experiences By Ticket Location
+
+export const fetchPastCitiesTickets = async (userId, pastLocation) => {
+  const { data: userPastTickets, error: ticketError } = await supabase
+    .from("globalTickets")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("tour_location", pastLocation);
+
+  if (ticketError) {
+    console.error("Error fetching tickets:", ticketError);
+    throw new Error(ticketError.message);
+  }
+
+  if (userPastTickets.length === 0) {
+    throw new Error("Tickets not found");
+  }
+
+  return userPastTickets;
+};

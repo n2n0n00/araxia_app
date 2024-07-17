@@ -17,12 +17,17 @@ import BgBlackOverlay from "../../components/BackgroundGradients/BgBlackOverlay"
 import SearchBar from "../../components/Search/SearchBar";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "../../context/AuthProvider";
-import { fetchUserUpcomingEvents } from "../../api/supabase_api";
-import locations from "../../constants/constants";
+import {
+  fetchPastCities,
+  fetchUserUpcomingEvents,
+} from "../../api/supabase_api";
+import { locations } from "../../constants/constants";
+import PastLocationExpCard from "../../components/Cards/PastLocationExpCard";
 
 const Tickets = () => {
   const { authUser } = useAuth();
   const [upcomingExp, setUpcomingExp] = useState([]);
+  const [pastExp, setPastExp] = useState([]);
   const { query } = useLocalSearchParams();
 
   const getUpcomingTickets = async () => {
@@ -34,8 +39,19 @@ const Tickets = () => {
     }
   };
 
+  const getPastExperiencesCities = async () => {
+    try {
+      const pastCities = await fetchPastCities(authUser.userId);
+      setPastExp(pastCities);
+      console.log(pastCities);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    getUpcomingTickets(); // Ensure function is called
+    getUpcomingTickets();
+    getPastExperiencesCities();
   }, [authUser.userId]);
 
   useEffect(() => {
@@ -119,14 +135,17 @@ const Tickets = () => {
                     horizontal={false}
                     numColumns={3}
                     showsVerticalScrollIndicator={false}
-                    data={locations}
                     contentContainerStyle={{
                       justifyContent: "center",
                       alignItems: "center",
                     }}
-                    keyExtractor={(item) => item.location}
-                    renderItem={({ item }) => (
-                      <PastLocationExpCard expLocation={item.location} />
+                    data={Object.keys(pastExp)}
+                    keyExtractor={(location) => location}
+                    renderItem={({ item: location }) => (
+                      <PastLocationExpCard
+                        expLocation={location}
+                        userId={authUser.userId}
+                      />
                     )}
                   />
                 </View>

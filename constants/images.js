@@ -18,7 +18,6 @@ import agreementUnticked from "../assets/images/agreementUnticked.png";
 import agreementTicked from "../assets/images/agreementTicked.png";
 import copyWords from "../assets/images/copyWords.png";
 import cryptoWord from "../assets/images/cryptoWord.png";
-
 import topNFTs from "../assets/images/topNFTs.png";
 import topNFTsPressed from "../assets/images/topNFTsPressed.png";
 import topArtists from "../assets/images/topArtists.png";
@@ -28,6 +27,7 @@ import pastLocationBG from "../assets/images/pastLocationBG.png";
 import dummyAvatar from "../assets/images/dummyAvatar.png";
 import XPCert from "../assets/images/XPCert.png";
 import profileBG from "../assets/images/profileBG.png";
+import ticketBg from "../assets/images/ticketBG.png";
 
 export default {
   welcomePNG,
@@ -59,4 +59,5 @@ export default {
   dummyAvatar,
   XPCert,
   profileBG,
+  ticketBg,
 };

@@ -13,12 +13,16 @@ import { icons, images } from "../../../../constants";
 import BgDarkGradient from "../../../../components/BackgroundGradients/BgDarkGradient";
 import BgBlackOverlay from "../../../../components/BackgroundGradients/BgBlackOverlay";
 import { useAuth } from "../../../../context/AuthProvider";
-import TextBold25 from "../../../../components/Typography/TextBold25";
+import TextBold18 from "../../../../components/Typography/TextBold18";
 import TextMedium14 from "../../../../components/Typography/TextMedium14";
 import TextSemi18 from "../../../../components/Typography/TextSemi18";
 import TextRegular16 from "../../../../components/Typography/TextRegular16";
 import BuyNFTButton from "../../../../components/Buttons/BuyNFTButton";
+import GlowLetters from "../../../../components/Typography/GlowLetters";
+import GlassContainer from "../../../../components/BackgroundContainers/GlassContainer";
+import EnterGameTicket from "../../../../components/Buttons/EnterGameTicket";
 
+//TODO: ADD A LOADER FOR THE DATA TO LOAD FIRST && ADD NEW TEXT TO TYPOGRAPHY
 const TicketScreen = () => {
   const { userId, artistId, ticketId } = useLocalSearchParams();
   const [upcomingExp, setUpcomingExp] = useState([]);
@@ -26,7 +30,6 @@ const TicketScreen = () => {
   const getUpcomingTickets = async () => {
     try {
       const upcomingTicket = await fetchUserEvent(ticketId, userId, artistId);
-      console.log(upcomingTicket);
       setUpcomingExp(upcomingTicket);
     } catch (error) {
       console.error(error);
@@ -34,7 +37,7 @@ const TicketScreen = () => {
   };
 
   useEffect(() => {
-    getUpcomingTickets(); // Ensure function is called
+    getUpcomingTickets();
   }, [ticketId]);
 
   const handleBack = () => {
@@ -64,9 +67,9 @@ const TicketScreen = () => {
             <View className="flex-col items-center w-screen h-full p-4">
               <View className="w-full flex-col items-start justify-between">
                 <View className="mt-5">
-                  <TextBold25>{upcomingExp[0]?.experience_name}</TextBold25>
+                  <GlowLetters>{upcomingExp[0]?.experience_name}</GlowLetters>
                 </View>
-                <View className="flex-row mt-10">
+                <View className="flex-row mt-1">
                   <Image
                     className="h-[40px] w-[40px] rounded-full mr-4"
                     resizeMode="cover"
@@ -79,30 +82,58 @@ const TicketScreen = () => {
                 </View>
               </View>
 
-              <TextRegular16 extraClasses={"mt-10 mb-5"}>
+              <TextRegular16 extraClasses={"mt-10"}>
                 {upcomingExp[0]?.experience_description}
               </TextRegular16>
 
-              <View className="w-full h-[80px] place-content-center place justify-between flex-wrap border-2 border-red-500">
-                <TextMedium14 extraClasses={"mr-4 text-center"}>
-                  Total NFTs To Capture: {upcomingExp[0]?.experience_nfts}
-                </TextMedium14>
-                <TextMedium14 extraClasses={"mr-4 text-center"}>
-                  Total XP: {upcomingExp[0]?.experience_points}
-                </TextMedium14>
-                <TextMedium14 extraClasses={"mr-4 text-center"}>
-                  Experience Type: {upcomingExp[0]?.experience_type}
-                </TextMedium14>
-                <TextMedium14 extraClasses={"mr-4 text-center"}>
-                  Location: {upcomingExp[0]?.tour_location}
-                </TextMedium14>
-                <TextMedium14 extraClasses={"text-center"}>
-                  Running Time: {upcomingExp[0]?.running_time}
-                </TextMedium14>
-              </View>
               <View>
-                <BuyNFTButton />
+                <EnterGameTicket
+                  userId={userId}
+                  artistId={artistId}
+                  concertTicketId={ticketId}
+                  experienceId={""}
+                  gameCompleted={upcomingExp[0]?.completed}
+                />
               </View>
+
+              <GlassContainer
+                extraClasses="w-full items-start justify-between mt-8"
+                insideContainerClasses={"p-4"}
+              >
+                <TextBold18 extraClasses={"pb-5 text-2xl"}>
+                  Experience Stats
+                </TextBold18>
+                <TextMedium14 extraClasses={"mr-4 text-left text-lg"}>
+                  Total NFTs To Capture:{" "}
+                  <Text className="text-purple-400 font-mbold">
+                    {upcomingExp[0]?.experience_nfts}
+                  </Text>
+                </TextMedium14>
+                <TextMedium14 extraClasses={"mr-4 text-left text-lg"}>
+                  Total XP:{" "}
+                  <Text className="text-purple-400 font-mbold">
+                    {upcomingExp[0]?.experience_points}
+                  </Text>
+                </TextMedium14>
+                <TextMedium14 extraClasses={"mr-4 text-left text-lg"}>
+                  Experience Type:{" "}
+                  <Text className="text-purple-400 font-mbold">
+                    {upcomingExp[0]?.experience_type}
+                  </Text>
+                </TextMedium14>
+                <TextMedium14 extraClasses={"mr-4 text-left text-lg"}>
+                  Location:{" "}
+                  <Text className="text-purple-400 font-mbold">
+                    {upcomingExp[0]?.tour_location}
+                  </Text>
+                </TextMedium14>
+                <TextMedium14 extraClasses={"text-left text-lg"}>
+                  Running Time:{" "}
+                  <Text className="text-purple-400 font-mbold">
+                    {upcomingExp[0]?.running_time}
+                  </Text>
+                </TextMedium14>
+              </GlassContainer>
             </View>
           </ScrollView>
         </BgBlackOverlay>

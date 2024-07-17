@@ -73,6 +73,18 @@ const RootLayout = () => {
           name="tickets/[userId]/[artistId]/[ticketId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="enter_game/[userId]/[artistId]/[experienceId]"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="view_ticket/[userId]/[artistId]/[concertTicketId]"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="past_locations/[userId]/[expLocation]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );
