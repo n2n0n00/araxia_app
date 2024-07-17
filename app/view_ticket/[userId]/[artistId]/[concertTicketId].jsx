@@ -54,14 +54,14 @@ const TicketScreen = () => {
           </TouchableOpacity>
         </View>
         <BgBlackOverlay>
-          <ScrollView>
+          <View>
             <View className="justify-center items-center w-screen h-screen p-4 pt-20">
               <TicketContainer extraClasses={"w-[300px]"}>
                 <Image
                   source={{
                     uri: ticketData[0]?.ticket_qr,
                   }}
-                  className="mt-36 h-[260px] mb-1"
+                  className="h-[260px] mb-1"
                   resizeMode="contain"
                 />
                 <TextSemi20 extraClasses={"text-purple-800 text-center"}>
@@ -117,7 +117,7 @@ const TicketScreen = () => {
                 </View>
               </TicketContainer>
             </View>
-          </ScrollView>
+          </View>
         </BgBlackOverlay>
       </BgDarkGradient>
     </SafeAreaView>

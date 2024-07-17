@@ -19,7 +19,7 @@ const EnterGameTicket = ({
     router.push(`/enter_game/${userId}/${artistId}/${experienceId}`);
   };
   return (
-    <View className="flex-row items-center justify-around w-[400px] bg-[#30B283] h-[80px] rounded-full mt-8">
+    <View className="flex-row items-center justify-around w-[350px] bg-[#30B283] h-[80px] rounded-full mt-8">
       <TouchableOpacity onPress={seeTicket}>
         <LinearGradient
           start={{ x: 0, y: 0.5 }}
