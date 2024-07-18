@@ -11,6 +11,7 @@ const SearchBar = ({
   otherStyles,
   placeholder,
   initialQuery,
+  onSearch,
   ...props
 }) => {
   const pathname = usePathname();
@@ -32,8 +33,10 @@ const SearchBar = ({
 
           if (pathname.startsWith("/search")) {
             router.setParams({ query });
+            onSearch();
           } else {
             router.push(`/search/${query}`);
+            onSearch();
           }
         }}
       >

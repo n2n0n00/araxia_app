@@ -504,7 +504,8 @@ export const fetchPastCitiesTickets = async (userId, pastLocation) => {
     .from("globalTickets")
     .select("*")
     .eq("user_id", userId)
-    .eq("tour_location", pastLocation);
+    .eq("tour_location", pastLocation)
+    .eq("completed", true);
 
   if (ticketError) {
     console.error("Error fetching tickets:", ticketError);

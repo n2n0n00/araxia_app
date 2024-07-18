@@ -8,17 +8,22 @@ import { dataAltPosts, exp } from "../../constants/constants";
 
 // import EmptyState from "../../components/EmptyState";
 
-const SearchQuery = ({ returnedData }) => {
-  //to call the function put it into a callback
-  // const { data: posts, refetch } = useAppwrite(() => searchPosts(query));
-
+const SearchQuery = ({ returnedData, filter }) => {
   return (
     <SafeAreaView className="flex-1 h-full pb-[70px] w-screen">
       <FlatList
         horizontal={false}
         numColumns={2}
-        data={exp || returnedData}
-        keyExtractor={(item) => item.expName}
+        data={returnedData}
+        keyExtractor={(item) => {
+          filter === "User"
+            ? item.userId
+            : filter === "Artist"
+            ? item.userId
+            : filter === "Experience"
+            ? item.experience_id
+            : filter === "NFT" && item.id;
+        }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           justifyContent: "center",
@@ -28,10 +33,34 @@ const SearchQuery = ({ returnedData }) => {
         }}
         renderItem={({ item }) => (
           <SearchCard
-            key={item.expName}
-            source={item}
-            expImage={item.expImage}
-            expArtist={item.expArtist}
+            image={
+              filter === "User"
+                ? item.avatar
+                : filter === "Artist"
+                ? item.avatar
+                : filter === "Experience"
+                ? item.experience_banner
+                : filter === "NFT" && item.image_url
+            }
+            name={
+              filter === "User"
+                ? item.username
+                : filter === "Artist"
+                ? item.artistName
+                : filter === "Experience"
+                ? item.experience_name
+                : filter === "NFT" && item.name
+            }
+            filter={filter}
+            categoryId={
+              filter === "User"
+                ? item.userId
+                : filter === "Artist"
+                ? item.userId
+                : filter === "Experience"
+                ? item.experience_id
+                : filter === "NFT" && item.id
+            }
           />
         )}
         // ListHeaderComponent={() => (
