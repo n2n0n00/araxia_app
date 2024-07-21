@@ -1,6 +1,4 @@
-import { Alert } from "react-native";
 import { supabase } from "../supabase";
-import { decode } from "base64-arraybuffer";
 
 export const searchUserDatabaseUser = async (query) => {
   if (!query) {
@@ -109,7 +107,6 @@ export const searchGlobalNFTs = async (query) => {
   }
 
   try {
-    // Ensure the table exists by fetching minimal data (e.g., column names)
     const { error: tableError } = await supabase
       .from("globalNFTs")
       .select("*")
@@ -208,34 +205,26 @@ export const searchAllTables = async (query, filter) => {
 
     switch (filter) {
       case "Artist":
-        const userTableResultsArtist = await searchUserDatabaseArtist(query);
-        searchResults = userTableResultsArtist;
+        searchResults = await searchUserDatabaseArtist(query);
         break;
       case "User":
-        const userTableResultsUser = await searchUserDatabaseUser(query);
-        searchResults = userTableResultsUser;
+        searchResults = await searchUserDatabaseUser(query);
         break;
       case "NFT":
-        const globalNFTsResults = await searchGlobalNFTs(query);
-        searchResults = globalNFTsResults;
+        searchResults = await searchGlobalNFTs(query);
         break;
       case "Experience":
-        const experiencesDatabaseResults = await searchExperiencesDirectory(
-          query
-        );
-        searchResults = experiencesDatabaseResults;
+        searchResults = await searchExperiencesDirectory(query);
+        break;
+      default:
+        searchResults = [];
         break;
     }
-
-    // const userTableResultsUser = await searchUserDatabaseUser(query);
-    // const userTableResultsArtist = await searchUserDatabaseArtist(query);
-    // const experiencesDatabaseResults = await searchExperiencesDirectory(query);
-    // const globalNFTsResults = await searchGlobalNFTs(query);
 
     return searchResults;
   } catch (error) {
     console.error(
-      "Error fetching search results from all tables:",
+      `Error fetching search results for query "${query}" and filter "${filter}":`,
       error.message
     );
     throw new Error(error.message);

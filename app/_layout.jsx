@@ -85,6 +85,14 @@ const RootLayout = () => {
           name="past_locations/[userId]/[expLocation]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="experience/[artistId]/[experienceId]"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="global_nfts/[ownerId]/[nftId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

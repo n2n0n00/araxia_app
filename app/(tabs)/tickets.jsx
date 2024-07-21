@@ -43,7 +43,6 @@ const Tickets = () => {
     try {
       const pastCities = await fetchPastCities(authUser.userId);
       setPastExp(pastCities);
-      console.log(pastCities);
     } catch (error) {
       console.error(error);
     }

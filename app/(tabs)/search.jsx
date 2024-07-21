@@ -2,9 +2,8 @@ import {
   View,
   Image,
   SafeAreaView,
-  Text,
-  TouchableOpacity,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
@@ -40,28 +39,26 @@ const Search = () => {
     }
   };
 
-  const handleFilterPress = (filter) => () => {
-    setFilter(filter);
+  const handleFilterPress = (newFilter) => {
+    if (newFilter !== filter) {
+      setFilter(newFilter);
+      setReturnedData([]);
+    }
   };
 
   useEffect(() => {
     if (query) {
       handleSearch();
     }
-  }, [query]);
+  }, [query, filter]);
 
   const handleSearch = async () => {
-    if (query || filter) {
-      const searchData = await getSearchResults();
-      if (searchData && Object.keys(searchData).length === 0) {
-        await getSearchResults();
-      }
-    }
+    await getSearchResults();
   };
 
   return (
     <SafeAreaView className="flex-1">
-      <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
+      <BgDarkGradient linearGradientMarginTop="-mt-5">
         <Image
           source={images.loginBG}
           resizeMode="contain"
@@ -72,7 +69,7 @@ const Search = () => {
             <AraxiaHeadBar />
             <View>
               <SearchBar
-                placeholder={"Search for an experience..."}
+                placeholder="Search for an experience..."
                 initialQuery={query}
                 onSearch={handleSearch}
               />
@@ -84,7 +81,7 @@ const Search = () => {
                   className={`px-3 py-2 ${
                     filter === item.label ? "bg-green-600" : "bg-purple-800"
                   } rounded-full mr-2`}
-                  onPress={handleFilterPress(item.label)}
+                  onPress={() => handleFilterPress(item.label)}
                 >
                   <TextMedium18>{item.label}</TextMedium18>
                 </TouchableOpacity>
@@ -94,36 +91,23 @@ const Search = () => {
               <View className="mt-60">
                 <ActivityIndicator size={80} color="#C796FF" />
               </View>
-            ) : filter === "Artist" ? (
-              <SearchQuery returnedData={returnedData} filter="Artist" />
-            ) : filter === "NFT" ? (
-              <SearchQuery returnedData={returnedData} filter="NFT" />
-            ) : filter === "User" ? (
-              <SearchQuery returnedData={returnedData} filter="User" />
-            ) : filter === "Experience" ? (
-              <SearchQuery returnedData={returnedData} filter="Experience" />
             ) : (
-              <></>
+              <SearchQuery returnedData={returnedData} filter={filter} />
             )}
-
-            {isLoading === false && !query && (
+            {!isLoading && !query && (
               <View className="mb-[400px] w-screen items-center">
-                <TextSemi25 extraClasses={"text-left text-purple-300"}>
-                  {" "}
+                <TextSemi25 extraClasses="text-left text-purple-300">
                   1. Search for something! {"\n"} 2. Choose a category! {"\n"}{" "}
                   3. Click on Search!
                 </TextSemi25>
               </View>
             )}
-
-            {isLoading === false && query && returnedData.length === 0 ? (
+            {!isLoading && query && returnedData.length === 0 && (
               <View className="mb-[400px] w-screen items-center">
-                <TextSemi25 extraClasses={"text-center"}>
+                <TextSemi25 extraClasses="text-center">
                   Hmmm, no results. {"\n"} Try something else!
                 </TextSemi25>
               </View>
-            ) : (
-              <></>
             )}
           </View>
         </BgBlackOverlay>

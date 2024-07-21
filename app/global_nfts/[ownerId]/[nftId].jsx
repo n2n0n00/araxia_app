@@ -1,37 +1,38 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { icons, images } from "../../../constants";
+import {
+  addUserLike,
+  checkUserLike,
+  getIndividualNFTData,
+  globalNFTPageListener,
+  removeUserLike,
+  updateFavoriteCount,
+} from "../../../api/supabase_api";
+import { useAuth } from "../../../context/AuthProvider";
+import { useEffect, useState } from "react";
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
+
+import { AntDesign, Feather } from "@expo/vector-icons";
 import BgBlackOverlay from "../../../components/BackgroundGradients/BgBlackOverlay";
 import TextBold25 from "../../../components/Typography/TextBold25";
 import TextMedium18 from "../../../components/Typography/TextMedium18";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import TextRegular18 from "../../../components/Typography/TextRegular18";
-import TextBold15 from "../../../components/Typography/TextBold15";
 import BuyNFTButton from "../../../components/Buttons/BuyNFTButton";
-import {
-  getIndividualNFTData,
-  globalNFTPageListener,
-  updateFavoriteCount,
-  addUserLike,
-  removeUserLike,
-  checkUserLike,
-} from "../../../api/supabase_api";
-import Feather from "@expo/vector-icons/Feather";
-import { useAuth } from "../../../context/AuthProvider";
+import TextBold15 from "../../../components/Typography/TextBold15";
+import { icons, images } from "../../../constants";
 
-const OwnedNFT = () => {
+const GenericNFTScreen = () => {
   globalNFTPageListener();
   const { authUser } = useAuth();
-  const { userId, nftId } = useLocalSearchParams();
+  const { ownerId, nftId } = useLocalSearchParams();
+
   const [NFT, setNFT] = useState(null);
   const [creator, setCreator] = useState(null);
   const [owner, setOwner] = useState(null);
@@ -46,10 +47,8 @@ const OwnedNFT = () => {
     setMaximizeImage(!maximizeImage);
   };
 
-  const handleUserProfileRoute = (userId) => {
-    if (userId === authUser.userId) {
-      router.push("/profile");
-    } else router.push(`/user/${userId}`);
+  const handleUserProfileRoute = (ownerId) => {
+    router.push(`/user/${ownerId}`);
   };
 
   const handleLikedNFT = async () => {
@@ -58,7 +57,7 @@ const OwnedNFT = () => {
       setLikeNFT(true);
       setNFT({ ...NFT, favorite_count: likesCounter });
       await updateFavoriteCount(nftId, likesCounter);
-      await addUserLike(userId, nftId);
+      await addUserLike(ownerId, nftId);
     }
   };
 
@@ -68,7 +67,7 @@ const OwnedNFT = () => {
       setLikeNFT(false);
       setNFT({ ...NFT, favorite_count: likesCounter });
       await updateFavoriteCount(nftId, likesCounter);
-      await removeUserLike(userId, nftId);
+      await removeUserLike(ownerId, nftId);
     }
   };
 
@@ -80,14 +79,14 @@ const OwnedNFT = () => {
         setCreator(creator);
         setOwner(owner);
 
-        const userLiked = await checkUserLike(userId, nftId);
+        const userLiked = await checkUserLike(ownerId, nftId);
         setLikeNFT(userLiked);
       } catch (error) {
         console.error("Error fetching NFT and related data:", error.message);
       }
     };
     fetchNFT();
-  }, [nftId, userId]);
+  }, [nftId, ownerId]);
 
   if (!NFT || !owner || !creator) {
     return (
@@ -221,4 +220,4 @@ const OwnedNFT = () => {
   );
 };
 
-export default OwnedNFT;
+export default GenericNFTScreen;

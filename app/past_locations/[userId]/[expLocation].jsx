@@ -29,7 +29,6 @@ const ExperienceLocation = () => {
     try {
       const getTickets = await fetchPastCitiesTickets(userId, expLocation);
       setPastTickets(getTickets);
-      console.log(getTickets);
     } catch (error) {
       console.error("Error fetching grouped experiences:", error.message);
     }

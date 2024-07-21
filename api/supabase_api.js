@@ -133,26 +133,6 @@ export const getIndividualNFT = async (nftId) => {
   }
 };
 
-// export const getIndividualNFTData = async (userId) => {
-//   try {
-//     let { data: userData, error } = await supabase
-//       .from("userDatabase")
-//       .select("*")
-//       .eq("userId", userId);
-
-//     if (error) {
-//       console.error("Error fetching user data:", error.message);
-//       throw error;
-//     }
-
-//     console.log("User Data:", userData); // Log the fetched data
-//     return userData;
-//   } catch (error) {
-//     console.error("Error fetching user data:", error.message);
-//     throw error;
-//   }
-// };
-
 export const getIndividualNFTData = async (nftId) => {
   try {
     // Fetch the NFT data
@@ -173,9 +153,6 @@ export const getIndividualNFTData = async (nftId) => {
 
     const { creator_id, owner_id } = nft;
 
-    console.log("NFT Creator ID:", creator_id);
-    console.log("NFT Owner ID:", owner_id);
-
     // Fetch the creator data
     const { data: creatorData, error: creatorError } = await supabase
       .from("userDatabase")
@@ -187,8 +164,6 @@ export const getIndividualNFTData = async (nftId) => {
       throw creatorError;
     }
 
-    console.log("Creator Data Response:", creatorData);
-
     // Fetch the owner data
     const { data: ownerData, error: ownerError } = await supabase
       .from("userDatabase")
@@ -199,8 +174,6 @@ export const getIndividualNFTData = async (nftId) => {
       console.error("Error fetching owner data:", ownerError.message);
       throw ownerError;
     }
-
-    console.log("Owner Data Response:", ownerData);
 
     return { nft, creator: creatorData[0], owner: ownerData[0] };
   } catch (error) {
@@ -301,6 +274,7 @@ export const checkUserLike = async (userId, nftId) => {
     .select("*")
     .eq("user_id", userId)
     .eq("nft_id", nftId);
+
   if (error) {
     console.error("Error checking user like:", error);
     return false;

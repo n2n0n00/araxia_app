@@ -12,7 +12,6 @@ import FandomCard from "../../components/ProfileComponents/FandomCard";
 import { useAuth } from "../../context/AuthProvider";
 import { addressShortener } from "../../utils/addressShortener";
 import { getUserNFTs, globalNFTsListener } from "../../api/supabase_api";
-import { supabase } from "../../api/supabase";
 
 const Profile = () => {
   const { authUser } = useAuth();
