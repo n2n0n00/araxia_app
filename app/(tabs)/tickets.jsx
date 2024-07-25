@@ -3,9 +3,9 @@ import {
   Text,
   FlatList,
   Image,
-  RefreshControl,
   SafeAreaView,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
@@ -18,22 +18,30 @@ import SearchBar from "../../components/Search/SearchBar";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "../../context/AuthProvider";
 import {
+  checkExperiencesCompletion,
   fetchPastCities,
   fetchUserUpcomingEvents,
 } from "../../api/supabase_api";
-import { locations } from "../../constants/constants";
 import PastLocationExpCard from "../../components/Cards/PastLocationExpCard";
 
 const Tickets = () => {
   const { authUser } = useAuth();
   const [upcomingExp, setUpcomingExp] = useState([]);
+  const [pastCities, setPastCities] = useState({});
   const [pastExp, setPastExp] = useState([]);
+  const [loading, setLoading] = useState(true); // Overall loading state
+  const [loadingPastCities, setLoadingPastCities] = useState(false); // Separate loading state for past cities
   const { query } = useLocalSearchParams();
 
   const getUpcomingTickets = async () => {
     try {
       const upcomingTickets = await fetchUserUpcomingEvents(authUser.userId);
-      setUpcomingExp(upcomingTickets);
+      const checkingStatus = await checkExperiencesCompletion(upcomingTickets);
+
+      const completedExperiences = checkingStatus.completedExperiences;
+      const notCompletedExperience = checkingStatus.notCompletedExperiences;
+      setUpcomingExp(notCompletedExperience);
+      setPastExp(completedExperiences);
     } catch (error) {
       console.error(error);
     }
@@ -41,21 +49,43 @@ const Tickets = () => {
 
   const getPastExperiencesCities = async () => {
     try {
-      const pastCities = await fetchPastCities(authUser.userId);
-      setPastExp(pastCities);
+      setLoadingPastCities(true); // Set loading for past cities
+      const pastCitiesData = await fetchPastCities(pastExp);
+      setPastCities(pastCitiesData);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingPastCities(false); // Ensure to set loading to false
     }
   };
 
   useEffect(() => {
-    getUpcomingTickets();
-    getPastExperiencesCities();
-  }, [authUser.userId]);
+    const fetchData = async () => {
+      setLoading(true); // Start overall loading
+      await getUpcomingTickets();
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    // Call a function or perform any action when query changes
-  }, [query]);
+    if (pastExp.length > 0) {
+      getPastExperiencesCities();
+    }
+  }, [pastExp]);
+
+  useEffect(() => {
+    if (pastCities && !loadingPastCities) {
+      setLoading(false); // Set overall loading to false once pastCities is loaded
+    }
+  }, [pastCities, loadingPastCities]);
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#C796FF" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -93,7 +123,7 @@ const Tickets = () => {
                     renderItem={({ item }) => {
                       const handleTicket = () => {
                         router.push(
-                          `/tickets/${authUser.userId}/${item.artist_id}/${item.ticket_id}`
+                          `/tickets/${authUser.userId}/${item.experience_id}/${item.artist_id}/${item.ticket_id}`
                         );
                       };
                       return (
@@ -102,7 +132,7 @@ const Tickets = () => {
                           expArtist={item.artist_name}
                           ticketLink={handleTicket}
                           expDate={item.experience_starts_at}
-                          expLocation={`${item.tour_location}, ${item.experience_country}`}
+                          expLocation={`${item.experience_city}, ${item.experience_country}`}
                         />
                       );
                     }}
@@ -130,23 +160,27 @@ const Tickets = () => {
                       </TextBold25>
                     </View>
                   </View>
-                  <FlatList
-                    horizontal={false}
-                    numColumns={3}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    data={Object.keys(pastExp)}
-                    keyExtractor={(location) => location}
-                    renderItem={({ item: location }) => (
-                      <PastLocationExpCard
-                        expLocation={location}
-                        userId={authUser.userId}
-                      />
-                    )}
-                  />
+                  {loadingPastCities ? (
+                    <ActivityIndicator size="large" color="#C796FF" />
+                  ) : (
+                    <FlatList
+                      horizontal={false}
+                      numColumns={3}
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                      data={Object.keys(pastCities)}
+                      keyExtractor={(location) => location}
+                      renderItem={({ item: location }) => (
+                        <PastLocationExpCard
+                          expLocation={location}
+                          userId={authUser.userId}
+                        />
+                      )}
+                    />
+                  )}
                 </View>
               </>
             }
@@ -164,5 +198,11 @@ const styles = StyleSheet.create({
     textShadowColor: "#C796FF",
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
   },
 });

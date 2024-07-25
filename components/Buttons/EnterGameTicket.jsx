@@ -12,7 +12,9 @@ const EnterGameTicket = ({
   gameCompleted,
 }) => {
   const seeTicket = () => {
-    router.push(`/view_ticket/${userId}/${artistId}/${concertTicketId}`);
+    router.push(
+      `/view_ticket/${userId}/${artistId}/${experienceId}/${concertTicketId}`
+    );
   };
 
   const enterGame = () => {

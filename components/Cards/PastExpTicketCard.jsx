@@ -5,14 +5,15 @@ import { router } from "expo-router";
 
 const PastExpTicketCard = ({
   experienceName,
-  artistId,
+  experienceId,
   banner,
   userId,
   ticketId,
+  artistId,
 }) => {
   const pastTicketRoute = () => {
     //TODO add experiences routes
-    router.push(`/tickets/${userId}/${artistId}/${ticketId}`);
+    router.push(`/tickets/${userId}/${experienceId}/${artistId}/${ticketId}`);
   };
   return (
     <TouchableOpacity onPress={pastTicketRoute} className="h-[200px]">

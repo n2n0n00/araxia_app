@@ -3,32 +3,39 @@ import {
   Text,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { fetchUserEvent } from "../../../../api/supabase_api";
-import BgDarkGradient from "../../../../components/BackgroundGradients/BgDarkGradient";
-import BgBlackOverlay from "../../../../components/BackgroundGradients/BgBlackOverlay";
-import { icons, images, samples } from "../../../../constants";
-import TicketContainer from "../../../../components/BackgroundContainers/TicketContainer";
-import TextBold22 from "../../../../components/Typography/TextBold22";
-import TextExtra22 from "../../../../components/Typography/TextExtra22";
-import TextSemi20 from "../../../../components/Typography/TextSemi20";
 
-//TODO: ARA SCAN LINK TO GO TO THE TRANSACTION AND LOADER!!!
+import BgDarkGradient from "../../../../../components/BackgroundGradients/BgDarkGradient";
+import BgBlackOverlay from "../../../../../components/BackgroundGradients/BgBlackOverlay";
+import { icons, images } from "../../../../../constants";
+import TicketContainer from "../../../../../components/BackgroundContainers/TicketContainer";
+import TextBold22 from "../../../../../components/Typography/TextBold22";
+import TextExtra22 from "../../../../../components/Typography/TextExtra22";
+import TextSemi20 from "../../../../../components/Typography/TextSemi20";
+import { fetchUserEvent } from "../../../../../api/supabase_api";
 
 const TicketScreen = () => {
-  const { userId, artistId, concertTicketId } = useLocalSearchParams();
+  const { userId, experienceId, concertTicketId } = useLocalSearchParams();
   const [ticketData, setTicketData] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
 
   const getTicket = async () => {
     try {
-      const ticket = await fetchUserEvent(concertTicketId, userId, artistId);
+      setLoading(true); // Start loading
+      const ticket = await fetchUserEvent(
+        concertTicketId,
+        userId,
+        experienceId
+      );
       setTicketData(ticket);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -39,6 +46,25 @@ const TicketScreen = () => {
   const handleBack = () => {
     router.back();
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1">
+        <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
+          <Image
+            source={images.loginBG}
+            resizeMode="contain"
+            className="w-screen h-full top-0 mt-6 rounded-3xl absolute"
+          />
+          <BgBlackOverlay>
+            <View className="flex-1 justify-center items-center w-screen">
+              <ActivityIndicator size="large" color="#C796FF" />
+            </View>
+          </BgBlackOverlay>
+        </BgDarkGradient>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -59,14 +85,16 @@ const TicketScreen = () => {
               <TicketContainer extraClasses={"w-[300px]"}>
                 <Image
                   source={{
-                    uri: ticketData[0]?.ticket_qr,
+                    uri: ticketData?.userTickets[0]?.ticket_qr,
                   }}
                   className="h-[260px] mb-1"
                   resizeMode="contain"
                 />
                 <TextSemi20 extraClasses={"text-purple-800 text-center"}>
                   Attendee:{" "}
-                  <Text className="underline">{ticketData[0]?.bought_by}</Text>
+                  <Text className="underline">
+                    {ticketData?.userTickets[0]?.bought_by}
+                  </Text>
                 </TextSemi20>
                 <View className="flex-row mt-2 items-center justify-between">
                   <View className="flex-col justify-between">
@@ -75,7 +103,7 @@ const TicketScreen = () => {
                         Date
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData[0]?.tour_date}
+                        {ticketData?.userExperienceData[0]?.tour_date}
                       </TextSemi20>
                     </View>
 
@@ -84,7 +112,7 @@ const TicketScreen = () => {
                         Seat
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData[0]?.seat_number}
+                        {ticketData?.userTickets[0]?.seat_number}
                       </TextSemi20>
                     </View>
                   </View>
@@ -94,7 +122,7 @@ const TicketScreen = () => {
                         Time
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData[0]?.tour_time}
+                        {ticketData?.userExperienceData[0]?.tour_time}
                       </TextSemi20>
                     </View>
                     <View>
@@ -102,7 +130,7 @@ const TicketScreen = () => {
                         Venue
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData[0]?.venue}
+                        {ticketData?.userTickets[0]?.venue}
                       </TextSemi20>
                     </View>
                   </View>
@@ -112,7 +140,7 @@ const TicketScreen = () => {
                     Smart Contract Address
                   </TextExtra22>
                   <TextSemi20 extraClasses={"text-purple-500 text-center"}>
-                    {ticketData[0]?.smart_contract_address}
+                    {ticketData?.userTickets[0]?.smart_contract_address}
                   </TextSemi20>
                 </View>
               </TicketContainer>

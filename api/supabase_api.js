@@ -400,53 +400,11 @@ export const fetchUserDetails = async (artistId) => {
   return artistData;
 };
 
-//NOTE: Get upcoming events tickets and data
+// NOTE: Get tickets experienceID
 export const fetchUserUpcomingEvents = async (userId) => {
   const { data: userTickets, error: ticketError } = await supabase
     .from("globalTickets")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("completed", false);
-
-  if (ticketError) {
-    console.error("Error fetching tickets:", ticketError);
-    throw new Error(ticketError.message);
-  }
-
-  if (userTickets.length === 0) {
-    throw new Error("Tickets not found");
-  }
-
-  return userTickets;
-};
-
-//NOTE: Get ticket data based on ticketId, userId, artistId
-export const fetchUserEvent = async (ticketId, userId, artistId) => {
-  const { data: userTickets, error: ticketError } = await supabase
-    .from("globalTickets")
-    .select("*")
-    .eq("ticket_id", ticketId)
-    .eq("user_id", userId)
-    .eq("artist_id", artistId);
-
-  if (ticketError) {
-    console.error("Error fetching tickets:", ticketError);
-    throw new Error(ticketError.message);
-  }
-
-  if (userTickets.length === 0) {
-    throw new Error("Tickets not found");
-  }
-
-  return userTickets;
-};
-
-//NOTE: Get & Group Past Experiences By Ticket Location
-
-export const fetchPastCities = async (userId) => {
-  const { data: userTickets, error: ticketError } = await supabase
-    .from("globalTickets")
-    .select("*")
+    .select("experience_id, ticket_id")
     .eq("user_id", userId);
 
   if (ticketError) {
@@ -454,41 +412,217 @@ export const fetchPastCities = async (userId) => {
     throw new Error(ticketError.message);
   }
 
-  if (userTickets.length === 0) {
-    throw new Error("Tickets not found");
+  if (!userTickets || userTickets.length === 0) {
+    console.warn("No tickets found for user:", userId);
+    return [];
   }
 
-  // Group experiences by location
-  const groupedByLocation = userTickets.reduce((acc, ticket) => {
-    const location = ticket.tour_location;
-    if (!acc[location]) {
-      acc[location] = [];
+  return userTickets;
+};
+
+// Check experiences' completion and return each experience's ticket_id
+export const checkExperiencesCompletion = async (userTickets) => {
+  try {
+    // Extract experience IDs
+    const experienceIds = userTickets.map((ticket) => ticket.experience_id);
+
+    const { data: experiences, error } = await supabase
+      .from("experiencesDatabase")
+      .select("*")
+      .in("experience_id", experienceIds); // Fetch experiences based on the IDs
+
+    if (error) {
+      console.error("Error fetching experiences:", error);
+      throw new Error(error.message);
     }
-    acc[location].push(ticket);
+
+    if (!experiences || experiences.length === 0) {
+      console.warn("No experiences found for given IDs:", experienceIds);
+      return { notCompletedExperiences: [], completedExperiences: [] };
+    }
+
+    // Map experience IDs to ticket IDs
+    const experienceMap = userTickets.reduce((acc, ticket) => {
+      if (!acc[ticket.experience_id]) {
+        acc[ticket.experience_id] = [];
+      }
+      acc[ticket.experience_id].push(ticket.ticket_id);
+      return acc;
+    }, {});
+
+    // Filter completed and not completed experiences
+    const notCompletedExperiences = experiences
+      .filter((experience) => !experience.completed)
+      .map((experience) => ({
+        ...experience,
+        ticket_id: experienceMap[experience.experience_id] || [],
+      }));
+    const completedExperiences = experiences
+      .filter((experience) => experience.completed)
+      .map((experience) => ({
+        ...experience,
+        ticket_id: experienceMap[experience.experience_id] || [],
+      }));
+
+    return { notCompletedExperiences, completedExperiences };
+  } catch (error) {
+    console.error("Error processing experiences:", error);
+    throw new Error(error.message);
+  }
+};
+
+// // Check experiencesID if experience is completed or not
+// export const checkExperiencesCompletion = async (experienceIds) => {
+//   try {
+//     const { data: experiences, error } = await supabase
+//       .from("experiencesDatabase")
+//       .select("*")
+//       .in("experience_id", experienceIds); //to get for each experienceId in experienceIds array from mapping array in frontend
+
+//     if (error) {
+//       console.error("Error fetching experiences:", error);
+//       throw new Error(error.message);
+//     }
+
+//     if (!experiences || experiences.length === 0) {
+//       console.warn("No experiences found for given IDs:", experienceIds);
+//       return { notCompletedExperiences: [], completedExperiences: [] };
+//     }
+
+//     const notCompletedExperiences = experiences.filter(
+//       (experience) => !experience.completed
+//     );
+//     const completedExperiences = experiences.filter(
+//       (experience) => experience.completed
+//     );
+
+//     return { notCompletedExperiences, completedExperiences };
+//   } catch (error) {
+//     console.error("Error processing experiences:", error);
+//     throw new Error(error.message);
+//   }
+// };
+
+// NOTE: Get ticket data based on ticketId, userId, experienceId
+export const fetchUserEvent = async (ticketId, userId, experienceId) => {
+  try {
+    // Fetch user tickets and experience data in parallel
+    const [
+      { data: userTickets, error: ticketError },
+      { data: userExperienceData, error: experienceError },
+    ] = await Promise.all([
+      supabase
+        .from("globalTickets")
+        .select("*")
+        .eq("ticket_id", ticketId)
+        .eq("user_id", userId)
+        .eq("experience_id", experienceId),
+      supabase
+        .from("experiencesDatabase")
+        .select("*")
+        .eq("experience_id", experienceId),
+    ]);
+
+    // Handle any errors
+    if (ticketError) {
+      console.error("Error fetching tickets:", ticketError);
+      throw new Error(ticketError.message);
+    }
+    if (experienceError) {
+      console.error("Error fetching experiences:", experienceError);
+      throw new Error(experienceError.message);
+    }
+
+    // Check if data exists
+    if (!userTickets || userTickets.length === 0) {
+      console.warn("No tickets found for given parameters.");
+      return [];
+    }
+    if (!userExperienceData || userExperienceData.length === 0) {
+      console.warn("No experiences found for given parameters.");
+      return [];
+    }
+
+    // Return combined data
+    return { userTickets, userExperienceData };
+  } catch (error) {
+    console.error("Error fetching user event:", error);
+    throw new Error(error.message);
+  }
+};
+
+// NOTE: Get & Group Past Experiences By Ticket Location
+export const fetchPastCities = (experiencesData) => {
+  if (!experiencesData || experiencesData.length === 0) {
+    console.warn("No experiences data provided.");
+    return {};
+  }
+
+  // Group experiences by city
+  const pastCities = experiencesData.reduce((acc, experience) => {
+    const city = experience.experience_city;
+    if (!acc[city]) {
+      acc[city] = [];
+    }
+    acc[city].push(experience);
     return acc;
   }, {});
 
-  return groupedByLocation;
+  return pastCities;
 };
 
-//NOTE: Get & Group Past Experiences By Ticket Location
-
 export const fetchPastCitiesTickets = async (userId, pastLocation) => {
-  const { data: userPastTickets, error: ticketError } = await supabase
-    .from("globalTickets")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("tour_location", pastLocation)
-    .eq("completed", true);
+  try {
+    // First, fetch the completed experience IDs
+    const { data: completedExperiences, error: experiencesError } =
+      await supabase
+        .from("experiencesDatabase")
+        .select("experience_id")
+        .eq("completed", true)
+        .eq("experience_city", pastLocation);
 
-  if (ticketError) {
-    console.error("Error fetching tickets:", ticketError);
-    throw new Error(ticketError.message);
+    if (experiencesError) {
+      console.error("Error fetching completed experiences:", experiencesError);
+      throw new Error(experiencesError.message);
+    }
+
+    if (!completedExperiences || completedExperiences.length === 0) {
+      console.warn(
+        "No completed experiences found for the given location:",
+        pastLocation
+      );
+      return [];
+    }
+
+    // Extract experience IDs
+    const experienceIds = completedExperiences.map((exp) => exp.experience_id);
+
+    // Then, fetch the user tickets for those experiences
+    const { data: userPastTickets, error: ticketError } = await supabase
+      .from("globalTickets")
+      .select(
+        "*, experiencesDatabase(experience_city, experience_name, artist_id, experience_banner)"
+      )
+      .eq("user_id", userId)
+      .in("experience_id", experienceIds);
+
+    if (ticketError) {
+      console.error("Error fetching tickets:", ticketError);
+      throw new Error(ticketError.message);
+    }
+
+    if (!userPastTickets || userPastTickets.length === 0) {
+      console.warn(
+        "No completed tickets found for the given location:",
+        pastLocation
+      );
+      return [];
+    }
+
+    console.log(userPastTickets);
+    return userPastTickets;
+  } catch (error) {
+    console.error("Error fetching past cities tickets:", error);
+    throw new Error(error.message);
   }
-
-  if (userPastTickets.length === 0) {
-    throw new Error("Tickets not found");
-  }
-
-  return userPastTickets;
 };

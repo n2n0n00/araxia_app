@@ -70,7 +70,7 @@ const RootLayout = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="tickets/[userId]/[artistId]/[ticketId]"
+          name="tickets/[userId]/[experienceId]/[artistId]/[ticketId]"
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -78,7 +78,7 @@ const RootLayout = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="view_ticket/[userId]/[artistId]/[concertTicketId]"
+          name="view_ticket/[userId]/[artistId]/[experienceId]/[concertTicketId]"
           options={{ headerShown: false }}
         />
         <Stack.Screen

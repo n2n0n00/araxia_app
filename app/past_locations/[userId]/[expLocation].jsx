@@ -91,9 +91,12 @@ const ExperienceLocation = () => {
                     keyExtractor={(item) => item.ticket_id}
                     renderItem={({ item }) => (
                       <PastExpTicketCard
-                        experienceName={item.experience_name}
-                        artistId={item.artist_id}
-                        banner={item.experience_banner}
+                        experienceName={
+                          item.experiencesDatabase.experience_name
+                        }
+                        artistId={item.experiencesDatabase.artist_id}
+                        experienceId={item.experience_id}
+                        banner={item.experiencesDatabase.experience_banner}
                         userId={userId}
                         ticketId={item.ticket_id}
                       />
