@@ -51,7 +51,7 @@ const BuyExperiencePageSearch = () => {
       setLikeExperience(true);
       setExperience({ ...experience, favorite_count: likesCounter });
       await updateExperienceFavoriteCount(experienceId, likesCounter);
-      await addUserLikedExperience(artistId, experienceId);
+      await addUserLikedExperience(authUser.userId, experienceId);
     }
   };
 
@@ -61,7 +61,7 @@ const BuyExperiencePageSearch = () => {
       setLikeExperience(false);
       setExperience({ ...experience, favorite_count: likesCounter });
       await updateExperienceFavoriteCount(experienceId, likesCounter);
-      await removeUserLikedExperience(artistId, experienceId);
+      await removeUserLikedExperience(authUser.userId, experienceId);
     }
   };
 

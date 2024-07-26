@@ -660,7 +660,7 @@ export const checkUserLikedExperience = async (userId, experienceId) => {
 export const addUserLikedExperience = async (userId, experienceId) => {
   const { error } = await supabase
     .from("userLikedExperiences")
-    .insert([{ user_id: userId, experienceId: experienceId }]);
+    .insert([{ user_id: userId, experience_id: experienceId }]);
   if (error) {
     console.error("Error adding user like:", error);
   }
@@ -671,7 +671,7 @@ export const removeUserLikedExperience = async (userId, experienceId) => {
   const { error } = await supabase
     .from("userLikedExperiences")
     .delete()
-    .match({ user_id: userId, experienceId: experienceId });
+    .match({ user_id: userId, experience_id: experienceId });
   if (error) {
     console.error("Error removing user like:", error);
   }
