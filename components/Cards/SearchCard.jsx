@@ -3,20 +3,23 @@ import React from "react";
 import TextMedium18 from "../Typography/TextMedium18";
 import { router } from "expo-router";
 
-const SearchCard = ({ image, name, filter, categoryId, ownerId }) => {
+//userOrigin is who made the experience etc, componentId is id of each category item each time
+
+const SearchCard = ({ image, name, filter, componentId, userOriginId }) => {
   const navigateToRoute = () => {
     switch (filter) {
       case "Artist":
-        router.push(`/artist/${categoryId}`);
+        router.push(`/artist/${componentId}`);
         break;
       case "User":
-        router.push(`/user/${categoryId}`);
+        router.push(`/user/${componentId}`);
         break;
       case "Experience":
-        router.push(`/experience/${ownerId}/${categoryId}`);
+        console.log(userOriginId, componentId);
+        router.push(`/experience/${userOriginId}/${componentId}`);
         break;
       case "NFT":
-        router.push(`/global_nfts/${ownerId}/${categoryId}`);
+        router.push(`/global_nfts/${userOriginId}/${componentId}`);
         break;
     }
   };

@@ -626,3 +626,92 @@ export const fetchPastCitiesTickets = async (userId, pastLocation) => {
     throw new Error(error.message);
   }
 };
+
+//Note: Fetch user liked experience
+// update favorite counter on NFT page
+export const updateExperienceFavoriteCount = async (experienceId, newCount) => {
+  const { data, error } = await supabase
+    .from("experiencesDatabase")
+    .update({ favorite_count: newCount })
+    .eq("experience_id", experienceId);
+
+  if (error) {
+    console.error("Error updating favorite count:", error);
+  } else {
+    console.log("Favorite count updated:", data);
+  }
+};
+// check if user has liked the experience in the userLikedExperiences table
+export const checkUserLikedExperience = async (userId, experienceId) => {
+  const { data, error } = await supabase
+    .from("userLikedExperiences")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("experience_id", experienceId);
+
+  if (error) {
+    console.error("Error checking user like:", error);
+    return false;
+  }
+  return data.length > 0;
+};
+
+// add user like in the userLikedExperiences table
+export const addUserLikedExperience = async (userId, experienceId) => {
+  const { error } = await supabase
+    .from("userLikedExperiences")
+    .insert([{ user_id: userId, experienceId: experienceId }]);
+  if (error) {
+    console.error("Error adding user like:", error);
+  }
+};
+
+// remove user like from the userLikedExperiences table
+export const removeUserLikedExperience = async (userId, experienceId) => {
+  const { error } = await supabase
+    .from("userLikedExperiences")
+    .delete()
+    .match({ user_id: userId, experienceId: experienceId });
+  if (error) {
+    console.error("Error removing user like:", error);
+  }
+};
+
+// get experiences data based one experienceId
+export const getIndividualExperienceData = async (experienceId) => {
+  try {
+    // Fetch the NFT data
+    const { data: experienceData, error: expError } = await supabase
+      .from("experiencesDatabase")
+      .select("*")
+      .eq("experience_id", experienceId);
+
+    if (expError) {
+      console.error("Error fetching Experience data:", expError.message);
+      throw expError;
+    }
+
+    const experience = experienceData[0];
+    if (!experience) {
+      throw new Error("Experience not found");
+    }
+
+    const { artist_id } = experience;
+
+    // Fetch the creator data
+    const { data: creatorData, error: creatorError } = await supabase
+      .from("userDatabase")
+      .select("*")
+      .eq("userId", artist_id);
+
+    if (creatorError) {
+      console.error("Error fetching creator data:", creatorError.message);
+      throw creatorError;
+    }
+
+    return { experience, creator: creatorData[0] };
+  } catch (error) {
+    console.error("Error fetching Experience and related data:", error.message);
+    throw error;
+  }
+};

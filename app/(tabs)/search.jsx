@@ -30,6 +30,7 @@ const Search = () => {
       try {
         const searchQuery = await searchAllTables(query, filter);
         setReturnedData(searchQuery || []);
+        console.log(searchQuery);
       } catch (error) {
         console.error("Error fetching search results:", error.message);
         setReturnedData([]);
@@ -97,8 +98,8 @@ const Search = () => {
             {!isLoading && !query && (
               <View className="mb-[400px] w-screen items-center">
                 <TextSemi25 extraClasses="text-left text-purple-300">
-                  1. Search for something! {"\n"} 2. Choose a category! {"\n"}{" "}
-                  3. Click on Search!
+                  1. Search for something!{"\n"}2. Choose a category!{"\n"}3.
+                  Click on Search!
                 </TextSemi25>
               </View>
             )}

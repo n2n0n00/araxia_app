@@ -46,7 +46,7 @@ const SearchQuery = ({ returnedData, filter }) => {
     }
   };
 
-  const getOwner = (item) => {
+  const getUserOrigin = (item) => {
     switch (filter) {
       case "Experience":
         return item.artist_id;
@@ -76,8 +76,8 @@ const SearchQuery = ({ returnedData, filter }) => {
             image={getImage(item)}
             name={getName(item)}
             filter={filter}
-            categoryId={keyExtractor(item)}
-            ownerId={getOwner(item)}
+            componentId={keyExtractor(item)}
+            userOriginId={getUserOrigin(item)}
           />
         )}
       />
