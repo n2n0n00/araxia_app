@@ -93,6 +93,14 @@ const RootLayout = () => {
           name="global_nfts/[ownerId]/[nftId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="followers/[userId]/followers"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="following/[userId]/following"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

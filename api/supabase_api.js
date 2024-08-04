@@ -55,9 +55,12 @@ export const uploadAvatar = async (authUser, form, setUploading) => {
 // updating the whole user profile data, used in the UserProfile component to allow user to update their profile
 
 export const updateUserProfile = async (authUser, form, avatarUrl) => {
+  if (!authUser || !authUser.userId) {
+    throw new Error("User authentication is not available");
+  }
+
   const updates = {
     username: form.username,
-    // email: form.email,
     bio: form.bio,
     currentFandom: form.fandom,
     avatar: avatarUrl || form.avatar,
@@ -67,15 +70,22 @@ export const updateUserProfile = async (authUser, form, avatarUrl) => {
     const { data, error } = await supabase
       .from("userDatabase")
       .update(updates)
-      .eq("userId", authUser.userId);
+      .eq("userId", authUser.userId)
+      .single();
 
     if (error) {
-      throw error;
+      console.error("Update error:", error);
+      throw new Error(`Profile update failed: ${error.message}`);
     }
 
-    Alert.alert("Success", "Profile updated successfully");
+    if (!data) {
+      throw new Error("Profile update failed: No matching user found");
+    }
+
+    return data;
   } catch (error) {
-    Alert.alert("Error", `Profile update failed: ${error.message}`);
+    console.error("Unexpected error:", error);
+    throw error;
   }
 };
 
@@ -712,6 +722,206 @@ export const getIndividualExperienceData = async (experienceId) => {
     return { experience, creator: creatorData[0] };
   } catch (error) {
     console.error("Error fetching Experience and related data:", error.message);
+    throw error;
+  }
+};
+
+// NOTE: Returns all rows where the user is the one that has been followed
+export const getFollowingUsers = async (userId) => {
+  try {
+    let { data: followingUsers, error } = await supabase
+      .from("followingList")
+      .select("user_who_followed_id")
+      .eq("user_who_was_followed_id", userId);
+
+    if (error) {
+      console.error("Error fetching following users:", error.message);
+      return [];
+    }
+
+    if (!followingUsers || followingUsers.length === 0) {
+      console.warn("No following users found for userId:", userId);
+      return [];
+    }
+
+    return followingUsers;
+  } catch (error) {
+    console.error(`getFollowingUsers threw an error: ${error.message}`);
+    throw new Error(`getFollowingUsers threw an error: ${error.message}`);
+  }
+};
+
+// NOTE: Returns all rows where the user is the one that has followed other users
+export const getFollowedUsers = async (userId) => {
+  try {
+    let { data: followedUsers, error } = await supabase
+      .from("followingList")
+      .select("user_who_was_followed_id")
+      .eq("user_who_followed_id", userId);
+
+    if (error) {
+      console.error("Error fetching followed users:", error.message);
+      return [];
+    }
+
+    if (!followedUsers || followedUsers.length === 0) {
+      console.warn("No followed users found for userId:", userId);
+      return [];
+    }
+
+    return followedUsers;
+  } catch (error) {
+    console.error(`getFollowedUsers threw an error: ${error.message}`);
+    throw new Error(`getFollowedUsers threw an error: ${error.message}`);
+  }
+};
+
+//TODO: THIS FUNCTION IS FOR THE GAME BACKEND AND FOR ARTISTS PROFILES ONLY
+// NOTE: Creates a follow relationship between two users
+export const followUser = async (followerId, followedId) => {
+  try {
+    // Check if the relationship already exists
+    let { data: existingRelationship, error: checkError } = await supabase
+      .from("followingList")
+      .select("relationship_id")
+      .eq("user_who_followed_id", followerId)
+      .eq("user_who_was_followed_id", followedId)
+      .single(); // Using single to get only one match
+
+    if (checkError && checkError.code !== "PGRST116") {
+      // Check if error is not "No data found"
+      console.error(
+        "Error checking existing relationship:",
+        checkError.message
+      );
+      return { success: false, message: checkError.message };
+    }
+
+    if (existingRelationship) {
+      return { success: false, message: "Relationship already exists" };
+    }
+
+    // Insert the new follow relationship
+    let { data, error } = await supabase.from("followingList").insert([
+      {
+        user_who_followed_id: followerId,
+        user_who_was_followed_id: followedId,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error creating follow relationship:", error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    throw new Error(`followUser threw an error: ${error.message}`);
+  }
+};
+//TODO: THIS FUNCTION IS FOR THE GAME BACKEND AND FOR ARTISTS PROFILES ONLY
+// NOTE: Unfollows a user by deleting the relationship
+export const unfollowUser = async (followerId, followedId) => {
+  try {
+    let { data, error } = await supabase
+      .from("followingList")
+      .delete()
+      .eq("user_who_followed_id", followerId)
+      .eq("user_who_was_followed_id", followedId);
+
+    if (error) {
+      console.error("Error unfollowing user:", error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    throw new Error(`unfollowUser threw an error: ${error.message}`);
+  }
+};
+
+//NOTE:FETCH AND CHOOSE A FANDOM
+
+// Fetch all fandoms from the database with their ids
+export const fetchFandoms = async () => {
+  const { data, error } = await supabase
+    .from("fandomsDatabase")
+    .select("fandom_id, fandom_name");
+
+  if (error) {
+    console.error("Error fetching fandoms:", error);
+    return [];
+  }
+  return data;
+};
+
+export const handleFandomSelection = async (
+  userId,
+  selectedFandomId,
+  selectedFandomName
+) => {
+  try {
+    // Check if the user is already subscribed to any fandom
+    const { data: existingSubscription, error: fetchError } = await supabase
+      .from("fandomSubscribers")
+      .select("user_id, fandom_id")
+      .eq("user_id", userId)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      throw fetchError;
+    }
+
+    let fandomSubscriptionResult;
+
+    if (existingSubscription) {
+      // If user is already subscribed, update the existing subscription
+      const { data, error: updateError } = await supabase
+        .from("fandomSubscribers")
+        .update({ fandom_id: selectedFandomId })
+        .eq("user_id", userId)
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      fandomSubscriptionResult = data;
+    } else {
+      // If user is not subscribed, create a new subscription
+      const { data, error: insertError } = await supabase
+        .from("fandomSubscribers")
+        .insert([{ user_id: userId, fandom_id: selectedFandomId }])
+        .single();
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      fandomSubscriptionResult = data;
+    }
+
+    // Update the userDatabase with the new fandom
+    const { data: userData, error: userUpdateError } = await supabase
+      .from("userDatabase")
+      .update({ currentFandom: selectedFandomName })
+      .eq("userId", userId)
+      .single();
+
+    if (userUpdateError) {
+      throw userUpdateError;
+    }
+
+    console.log("Updated fandom subscription and user profile:", {
+      fandomSubscription: fandomSubscriptionResult,
+      userUpdate: userData,
+    });
+    return {
+      fandomSubscription: fandomSubscriptionResult,
+      userUpdate: userData,
+    };
+  } catch (error) {
+    console.error("Error handling fandom selection:", error);
     throw error;
   }
 };

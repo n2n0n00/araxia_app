@@ -5,6 +5,8 @@ import { addressShortener } from "../../utils/addressShortener";
 import {
   fetchUserDetails,
   getUserNFTs,
+  getFollowingUsers,
+  getFollowedUsers,
   globalNFTsListener,
 } from "../../api/supabase_api";
 import { FlatList, Image, SafeAreaView, View } from "react-native";
@@ -18,37 +20,50 @@ import NFTsList from "../../components/ProfileComponents/NFTsList";
 import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPosts";
 import { images } from "../../constants";
 import { useAuth } from "../../context/AuthProvider";
+import { numberFormatter } from "../../utils/numberFormatter";
 
 const ArtistId = () => {
-  //TODO: ADD A LOADER BEFORE THE DATA LOADER
   const { authUser } = useAuth();
   const { artistId } = useLocalSearchParams();
-
+  const [following, setFollowing] = useState([]);
+  const [followers, setFollowers] = useState([]);
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
 
-  const userDetails = async () => {
-    try {
-      const artist = await fetchUserDetails(artistId);
-      setUserData(artist[0]);
-      setUserCryptoAddress(addressShortener(await artist[0]?.cryptoAddress));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    userDetails();
-
-    const fetchNFTs = async () => {
-      globalNFTsListener(setUserNFTs, artistId);
-
-      const nfts = await getUserNFTs(artistId);
-      setUserNFTs(nfts);
+    const userDetails = async () => {
+      try {
+        const artist = await fetchUserDetails(artistId);
+        setUserData(artist[0]);
+        setUserCryptoAddress(addressShortener(await artist[0]?.cryptoAddress));
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    fetchNFTs();
+    const fetchUserExtendedData = async () => {
+      try {
+        globalNFTsListener(setUserNFTs, artistId);
+
+        const [nfts, followingList, followersList] = await Promise.all([
+          getUserNFTs(artistId),
+          getFollowingUsers(artistId),
+          getFollowedUsers(artistId),
+        ]);
+
+        setUserNFTs(nfts);
+        setFollowers(followingList);
+        setFollowing(followersList);
+      } catch (error) {
+        console.error("Error in fetchUserExtendedData:", error.message);
+      }
+    };
+
+    if (artistId) {
+      userDetails();
+      fetchUserExtendedData();
+    }
   }, [artistId]);
 
   return (
@@ -73,8 +88,16 @@ const ArtistId = () => {
                         currentUser={authUser.userId}
                         totalNfts={userData.nfts}
                         levelXP={userData.levelXP}
-                        followers={userData.followers?.length || 0}
-                        following={userData.following?.length || 0}
+                        followers={
+                          followers.length
+                            ? numberFormatter(followers.length)
+                            : 0
+                        }
+                        following={
+                          following.length
+                            ? numberFormatter(following.length)
+                            : 0
+                        }
                         cryptoAddress={userCryptoAddress}
                         username={userData.username}
                         bio={userData.bio}

@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-
+.supabase.js
 # Expo
 .expo/
 dist/

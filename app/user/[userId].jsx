@@ -4,6 +4,8 @@ import { supabase } from "../../api/supabase";
 import { addressShortener } from "../../utils/addressShortener";
 import {
   fetchUserDetails,
+  getFollowedUsers,
+  getFollowingUsers,
   getUserNFTs,
   globalNFTsListener,
 } from "../../api/supabase_api";
@@ -18,35 +20,50 @@ import NFTsList from "../../components/ProfileComponents/NFTsList";
 import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPosts";
 import { images } from "../../constants";
 import { useAuth } from "../../context/AuthProvider";
+import { numberFormatter } from "../../utils/numberFormatter";
 
 const UserProfilePage = () => {
   const { authUser } = useAuth();
   const { userId } = useLocalSearchParams();
+  const [following, setFollowing] = useState([]);
+  const [followers, setFollowers] = useState([]);
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
 
-  const userDetails = async () => {
-    try {
-      const user = await fetchUserDetails(userId);
-      setUserData(user[0]);
-      setUserCryptoAddress(addressShortener(await user[0]?.cryptoAddress));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    userDetails();
-
-    const fetchNFTs = async () => {
-      globalNFTsListener(setUserNFTs, userId);
-
-      const nfts = await getUserNFTs(userId);
-      setUserNFTs(nfts);
+    const userDetails = async () => {
+      try {
+        const artist = await fetchUserDetails(userId);
+        setUserData(artist[0]);
+        setUserCryptoAddress(addressShortener(await artist[0]?.cryptoAddress));
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    fetchNFTs();
+    const fetchUserExtendedData = async () => {
+      try {
+        globalNFTsListener(setUserNFTs, userId);
+
+        const [nfts, followingList, followersList] = await Promise.all([
+          getUserNFTs(userId),
+          getFollowingUsers(userId),
+          getFollowedUsers(userId),
+        ]);
+
+        setUserNFTs(nfts);
+        setFollowers(followingList);
+        setFollowing(followersList);
+      } catch (error) {
+        console.error("Error in fetchUserExtendedData:", error.message);
+      }
+    };
+
+    if (userId) {
+      userDetails();
+      fetchUserExtendedData();
+    }
   }, [userId]);
 
   return (
@@ -71,14 +88,23 @@ const UserProfilePage = () => {
                         currentUser={authUser.userId}
                         totalNfts={userData.nfts}
                         levelXP={userData.levelXP}
-                        followers={userData.followers?.length || 0}
-                        following={userData.following?.length || 0}
+                        followers={
+                          followers.length
+                            ? numberFormatter(followers.length)
+                            : 0
+                        }
+                        following={
+                          following.length
+                            ? numberFormatter(following.length)
+                            : 0
+                        }
                         cryptoAddress={userCryptoAddress}
                         username={userData.username}
                         bio={userData.bio}
                         userId={userData.userId}
                         avatar={userData.avatar}
                       />
+
                       <FandomCard currentFandom={userData.currentFandom} />
                     </>
                   )}
@@ -89,7 +115,9 @@ const UserProfilePage = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={null}
             ListFooterComponent={
-              <View className="items-center justify-center flex-1 w-full p-4 mt-10 h-full">
+              <View
+                className={`items-center justify-center flex-1 w-full p-4 mt-10 h-full`}
+              >
                 {userData && (
                   <TabsInterface
                     tabLeft="nfts"

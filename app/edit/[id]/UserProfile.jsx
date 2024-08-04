@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { Picker } from "@react-native-picker/picker";
 import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
 import BgBlackOverlay from "../../../components/BackgroundGradients/BgBlackOverlay";
 import { icons, images } from "../../../constants";
@@ -20,14 +21,19 @@ import GlassContainer from "../../../components/BackgroundContainers/GlassContai
 import TextSemi18 from "../../../components/Typography/TextSemi18";
 import SubmitButton from "../../../components/Buttons/SubmitButton";
 import { useAuth } from "../../../context/AuthProvider";
-import { uploadAvatar, updateUserProfile } from "../../../api/supabase_api";
+import {
+  uploadAvatar,
+  fetchFandoms,
+  handleFandomSelection,
+} from "../../../api/supabase_api";
 
 const UserProfile = () => {
-  const { authUser } = useAuth();
+  const { authUser, updateAuthUser } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [editing, setEditing] = useState(true);
+  const [fandoms, setFandoms] = useState([]);
   const [form, setForm] = useState({
     username: authUser?.username || "",
-    // email: authUser?.email || "",
     bio: authUser?.bio || "",
     fandom: authUser?.currentFandom || "",
     avatar: authUser?.avatar || null,
@@ -35,15 +41,25 @@ const UserProfile = () => {
   });
 
   useEffect(() => {
-    setForm({
-      username: authUser?.username || "",
-      // email: authUser?.email || "",
-      bio: authUser?.bio || "",
-      fandom: authUser?.currentFandom || "",
-      avatar: authUser?.avatar || null,
-      base64: "" || null,
-    });
+    const getAllFandoms = async () => {
+      const fandoms = await fetchFandoms();
+      setFandoms(fandoms);
+    };
+
+    getAllFandoms();
   }, []);
+
+  useEffect(() => {
+    if (editing === true) {
+      setForm((prevForm) => ({
+        ...prevForm,
+        username: authUser.username || "",
+        bio: authUser.bio || "",
+        fandom: authUser.currentFandom || "",
+        avatar: authUser.avatar || null,
+      }));
+    }
+  }, [editing]);
 
   const openAvatarPicker = async () => {
     let permissionResult =
@@ -73,19 +89,68 @@ const UserProfile = () => {
     }
   };
 
+  const handleFandomSelect = async (fandomName, fandomId) => {
+    try {
+      // Update the selected fandom in the form state
+      setForm((prevForm) => ({ ...prevForm, fandom: fandomName }));
+
+      // Handle the backend logic of subscribing to the fandom and updating user profile
+      await handleFandomSelection(authUser?.userId, fandomId, fandomName);
+
+      // Update the authUser context
+      const result = await updateAuthUser({ currentFandom: fandomName });
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error("Error updating fandom:", error);
+      Alert.alert("Error", "Failed to update fandom. Please try again.");
+      // Revert the form state if the update fails
+      setForm((prevForm) => ({
+        ...prevForm,
+        fandom: authUser?.currentFandom || "",
+      }));
+    }
+  };
+
   const submitChanges = async () => {
-    // if (!form.username || !form.email || !form.bio || !form.fandom) {
     if (!form.username || !form.bio || !form.fandom) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
 
-    const avatarUrl = await uploadAvatar(authUser, form, setUploading);
-    await updateUserProfile(authUser, form, avatarUrl);
+    try {
+      setUploading(true);
+      const avatarUrl = await uploadAvatar(authUser, form, setUploading);
 
-    router.push("/profile");
+      const updatedUserData = {
+        username: form.username,
+        bio: form.bio,
+        currentFandom: form.fandom,
+        avatar: avatarUrl || form.avatar,
+      };
+
+      const result = await updateAuthUser(updatedUserData);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      // Update local form state
+      setForm((prevForm) => ({
+        ...prevForm,
+        ...updatedUserData,
+      }));
+
+      Alert.alert("Success", "Profile updated successfully");
+      router.push("/profile");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "Failed to update profile. Please try again.");
+    } finally {
+      setEditing(false);
+      setUploading(false);
+    }
   };
-
   const handleBack = () => {
     router.push("/profile");
   };
@@ -114,14 +179,6 @@ const UserProfile = () => {
                 iconsLibrary="FontAwesome"
                 onChangeText={(username) => setForm({ ...form, username })}
               />
-              {/* <EditFields
-                label={"Email"}
-                icon="email"
-                value={form.email}
-                iconsLibrary="Entypo"
-                onChangeText={(email) => setForm({ ...form, email })}
-                extraClasses="mt-4"
-              /> */}
               <EditFields
                 label={"Bio"}
                 icon="info-with-circle"
@@ -130,14 +187,35 @@ const UserProfile = () => {
                 onChangeText={(bio) => setForm({ ...form, bio })}
                 extraClasses="mt-4"
               />
-              <EditFields
-                label={"Fandom"}
-                icon="lightbulb-o"
-                value={form.fandom}
-                iconsLibrary="FontAwesome"
-                onChangeText={(fandom) => setForm({ ...form, fandom })}
-                extraClasses="mt-4"
-              />
+              {/* Fandom Picker */}
+              <View className="w-full mt-4">
+                <TextSemi18 extraClasses={"pb-2 pl-2"}>Fandom</TextSemi18>
+                <GlassContainer
+                  insideContainerClasses={
+                    "flex-row items-center justify-between"
+                  }
+                >
+                  <Picker
+                    selectedValue={form.fandom}
+                    onValueChange={(itemValue, itemIndex) => {
+                      const selectedFandomId =
+                        fandoms[itemIndex - 1]?.fandom_id;
+                      handleFandomSelect(itemValue, selectedFandomId);
+                    }}
+                    style={{ width: "100%", color: "white" }}
+                  >
+                    <Picker.Item label="Select a Fandom" value="None" />
+                    {fandoms.map((fandom) => (
+                      <Picker.Item
+                        key={fandom.fandom_id}
+                        label={fandom.fandom_name}
+                        value={fandom.fandom_name}
+                      />
+                    ))}
+                  </Picker>
+                </GlassContainer>
+              </View>
+              {/* Avatar Picker */}
               <View className="flex-col mt-4">
                 <TextSemi18 extraClasses={"pb-2 pl-2"}>Avatar</TextSemi18>
                 <GlassContainer
@@ -156,7 +234,7 @@ const UserProfile = () => {
                       Choose an Avatar
                     </Text>
                   )}
-                  <TouchableOpacity onPress={() => openAvatarPicker("image")}>
+                  <TouchableOpacity onPress={openAvatarPicker}>
                     <View className="w-14 h-14 border border-dashed border-purple-100 flex justify-center items-center">
                       <Entypo name="upload-to-cloud" size={24} color="white" />
                     </View>

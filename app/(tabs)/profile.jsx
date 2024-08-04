@@ -11,24 +11,45 @@ import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPost
 import FandomCard from "../../components/ProfileComponents/FandomCard";
 import { useAuth } from "../../context/AuthProvider";
 import { addressShortener } from "../../utils/addressShortener";
-import { getUserNFTs, globalNFTsListener } from "../../api/supabase_api";
+import {
+  getFollowedUsers,
+  getFollowingUsers,
+  getUserNFTs,
+  globalNFTsListener,
+} from "../../api/supabase_api";
+import { numberFormatter } from "../../utils/numberFormatter";
 
 const Profile = () => {
   const { authUser } = useAuth();
-  const cryptoAddressShort = addressShortener(authUser.cryptoAddress);
 
+  const cryptoAddressShort = addressShortener(authUser?.cryptoAddress);
+  const [following, setFollowing] = useState([]);
+  const [followers, setFollowers] = useState([]);
   const [userNFTs, setUserNFTs] = useState([]);
 
   useEffect(() => {
-    const fetchNFTs = async () => {
-      globalNFTsListener(setUserNFTs, authUser.userId);
+    const fetchData = async () => {
+      try {
+        globalNFTsListener(setUserNFTs, authUser?.userId);
 
-      const nfts = await getUserNFTs(authUser.userId);
-      setUserNFTs(nfts);
+        const [nfts, following, followers] = await Promise.all([
+          getUserNFTs(authUser.userId),
+          getFollowingUsers(authUser.userId),
+          getFollowedUsers(authUser.userId),
+        ]);
+
+        setUserNFTs(nfts);
+        setFollowing(followers);
+        setFollowers(following);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
     };
 
-    fetchNFTs();
-  }, []);
+    if (authUser) {
+      fetchData();
+    }
+  }, [authUser]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -48,15 +69,22 @@ const Profile = () => {
                     currentUser={authUser.userId}
                     totalNfts={authUser.nfts}
                     levelXP={authUser.levelXP}
-                    followers={authUser.followers.length}
-                    following={authUser.following.length}
+                    followers={
+                      followers.length ? numberFormatter(followers.length) : 0
+                    }
+                    following={
+                      following.length ? numberFormatter(following.length) : 0
+                    }
                     cryptoAddress={cryptoAddressShort}
                     username={authUser.username}
                     bio={authUser.bio}
                     userId={authUser.userId}
                     avatar={authUser.avatar}
                   />
-                  <FandomCard currentFandom={authUser.currentFandom} />
+                  <FandomCard
+                    isUserArtist={authUser.isUserArtist}
+                    currentFandom={authUser.currentFandom}
+                  />
                 </View>
               </>
             }

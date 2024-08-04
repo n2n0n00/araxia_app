@@ -93,6 +93,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateAuthUser = async (newUserData) => {
+    try {
+      const { data, error } = await supabase
+        .from("userDatabase")
+        .update(newUserData)
+        .eq("userId", authUser.userId)
+        .single();
+
+      if (error) {
+        console.error("Error updating user data:", error);
+        return { success: false, message: error.message };
+      }
+
+      // Update the local state
+      setAuthUser((prevUser) => ({ ...prevUser, ...newUserData }));
+      return { success: true, data };
+    } catch (error) {
+      console.error("Unexpected error updating user data:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
   const signUpWithEmail = async (email, password) => {
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -226,7 +248,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, signUpWithEmail, signInWithEmail, signOut, authUser }}
+      value={{
+        user,
+        updateAuthUser,
+        signUpWithEmail,
+        signInWithEmail,
+        signOut,
+        authUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

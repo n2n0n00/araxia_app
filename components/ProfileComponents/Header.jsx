@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Touchable } from "react-native";
 import React, { useEffect, useState } from "react";
 import GlassContainer from "../BackgroundContainers/GlassContainer";
 import { icons, images } from "../../constants";
@@ -51,6 +51,14 @@ const Header = ({
   const handleUnlikedArtist = async () => {
     setArtistLike(false);
     await removeArtistLike(userId, artistId);
+  };
+
+  const handleUserFollowers = () => {
+    router.push(`followers/${userId}/followers`);
+  };
+
+  const handleUserFollowing = () => {
+    router.push(`following/${userId}/following`);
   };
 
   return (
@@ -111,14 +119,14 @@ const Header = ({
           />
         </View>
         <View className="flex-col">
-          <View className="mb-8">
+          <TouchableOpacity className="mb-8" onPress={handleUserFollowing}>
             <TextBold18>{following}</TextBold18>
             <TextMedium14>Following</TextMedium14>
-          </View>
-          <View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleUserFollowers}>
             <TextBold18>{followers}</TextBold18>
             <TextMedium14>Followers</TextMedium14>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
       <View className="flex-col items-center mt-4">
