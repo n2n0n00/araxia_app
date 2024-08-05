@@ -105,7 +105,10 @@ const UserProfilePage = () => {
                         avatar={userData.avatar}
                       />
 
-                      <FandomCard currentFandom={userData.currentFandom} />
+                      <FandomCard
+                        isUserArtist={userData.isUserArtist}
+                        currentFandom={userData.currentFandom}
+                      />
                     </>
                   )}
                 </View>

@@ -14,7 +14,7 @@ const FandomCard = ({ currentFandom, isUserArtist }) => {
       >
         <View className="py-2 w-full items-center">
           <TextSemi18>
-            Fandom Data:{" "}
+            Fandom Page:{" "}
             <Text className="text-purple-400 font-mextrabold text-lg uppercase">
               {currentFandom}
             </Text>

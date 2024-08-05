@@ -101,6 +101,10 @@ const RootLayout = () => {
           name="following/[userId]/following"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="fandom/[fandomId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

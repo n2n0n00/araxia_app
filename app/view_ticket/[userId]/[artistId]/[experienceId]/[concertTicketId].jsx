@@ -17,6 +17,8 @@ import TextBold22 from "../../../../../components/Typography/TextBold22";
 import TextExtra22 from "../../../../../components/Typography/TextExtra22";
 import TextSemi20 from "../../../../../components/Typography/TextSemi20";
 import { fetchUserEvent } from "../../../../../api/supabase_api";
+import { dateReformatter } from "../../../../../utils/dateReformatter";
+import { timezoneReformatter } from "../../../../../utils/timezoneReformatter";
 
 const TicketScreen = () => {
   const { userId, experienceId, concertTicketId } = useLocalSearchParams();
@@ -103,7 +105,9 @@ const TicketScreen = () => {
                         Date
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData?.userExperienceData[0]?.tour_date}
+                        {dateReformatter(
+                          ticketData?.userExperienceData[0]?.tour_date
+                        )}
                       </TextSemi20>
                     </View>
 
@@ -122,7 +126,9 @@ const TicketScreen = () => {
                         Time
                       </TextBold22>
                       <TextSemi20 extraClasses={"text-purple-500"}>
-                        {ticketData?.userExperienceData[0]?.tour_time}
+                        {timezoneReformatter(
+                          ticketData?.userExperienceData[0]?.tour_time
+                        )}
                       </TextSemi20>
                     </View>
                     <View>
