@@ -27,6 +27,7 @@ import TextRegular18 from "../../../components/Typography/TextRegular18";
 import BuyNFTButton from "../../../components/Buttons/BuyNFTButton";
 import TextBold15 from "../../../components/Typography/TextBold15";
 import { icons, images } from "../../../constants";
+import GenericFullScreenLoader from "../../../components/Loaders/GenericFullScreenLoader";
 
 const GenericNFTScreen = () => {
   globalNFTPageListener();
@@ -89,11 +90,7 @@ const GenericNFTScreen = () => {
   }, [nftId, ownerId]);
 
   if (!NFT || !owner || !creator) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
+    return <GenericFullScreenLoader />;
   }
 
   return (

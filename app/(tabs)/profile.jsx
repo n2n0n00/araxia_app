@@ -18,6 +18,7 @@ import {
   globalNFTsListener,
 } from "../../api/supabase_api";
 import { numberFormatter } from "../../utils/numberFormatter";
+import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
 
 const Profile = () => {
   const { authUser } = useAuth();
@@ -27,11 +28,14 @@ const Profile = () => {
   const [followers, setFollowers] = useState([]);
   const [userNFTs, setUserNFTs] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         globalNFTsListener(setUserNFTs, authUser?.userId);
 
+        setLoading(true);
         const [nfts, following, followers] = await Promise.all([
           getUserNFTs(authUser.userId),
           getFollowingUsers(authUser.userId),
@@ -43,13 +47,19 @@ const Profile = () => {
         setFollowers(following);
       } catch (error) {
         console.error("Error fetching data:", error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (authUser) {
       fetchData();
     }
-  }, [authUser]);
+  }, []);
+
+  if (loading) {
+    return <GenericFullScreenLoader />;
+  }
 
   return (
     <SafeAreaView className="flex-1">

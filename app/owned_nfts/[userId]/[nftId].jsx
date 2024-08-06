@@ -27,6 +27,7 @@ import {
 } from "../../../api/supabase_api";
 import Feather from "@expo/vector-icons/Feather";
 import { useAuth } from "../../../context/AuthProvider";
+import GenericFullScreenLoader from "../../../components/Loaders/GenericFullScreenLoader";
 
 const OwnedNFT = () => {
   globalNFTPageListener();
@@ -90,11 +91,7 @@ const OwnedNFT = () => {
   }, [nftId, userId]);
 
   if (!NFT || !owner || !creator) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
+    return <GenericFullScreenLoader />;
   }
 
   return (

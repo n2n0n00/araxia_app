@@ -18,25 +18,34 @@ import PastExpTicketCard from "../../../components/Cards/PastExpTicketCard";
 import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
 import BgBlackOverlay from "../../../components/BackgroundGradients/BgBlackOverlay";
 import { images } from "../../../constants";
+import GenericFullScreenLoader from "../../../components/Loaders/GenericFullScreenLoader";
 
 //TODO: Loader and search ability need to be added
 
 const ExperienceLocation = () => {
   const { userId, expLocation } = useLocalSearchParams();
   const [pastTickets, setPastTickets] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
 
   const getPastTickets = async () => {
     try {
+      setLoading(true); // Start loading
       const getTickets = await fetchPastCitiesTickets(userId, expLocation);
       setPastTickets(getTickets);
     } catch (error) {
       console.error("Error fetching grouped experiences:", error.message);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   useEffect(() => {
     getPastTickets();
   }, [expLocation]);
+
+  if (loading) {
+    return <GenericFullScreenLoader />;
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -51,12 +60,12 @@ const ExperienceLocation = () => {
             ListHeaderComponent={
               <>
                 <AraxiaHeadBar nonTabPage />
-                <View>
+                {/* <View>
                   <SearchBar
                     placeholder={"Search for an experience..."}
                     // initialQuery={query}
                   />
-                </View>
+                </View> */}
               </>
             }
             data={[]}

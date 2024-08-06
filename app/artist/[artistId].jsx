@@ -21,6 +21,8 @@ import ExperiencesPosts from "../../components/ProfileComponents/ExperiencesPost
 import { images } from "../../constants";
 import { useAuth } from "../../context/AuthProvider";
 import { numberFormatter } from "../../utils/numberFormatter";
+import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
+import FollowButton from "../../components/Buttons/FollowButton";
 
 const ArtistId = () => {
   const { authUser } = useAuth();
@@ -30,22 +32,27 @@ const ArtistId = () => {
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
+  const [userDetailsLoader, setUserDetailsLoader] = useState(false);
+  const [userExtendedDataLoader, setUserExtendedDataLoader] = useState(false);
 
   useEffect(() => {
     const userDetails = async () => {
       try {
+        setUserDetailsLoader(true);
         const artist = await fetchUserDetails(artistId);
         setUserData(artist[0]);
         setUserCryptoAddress(addressShortener(await artist[0]?.cryptoAddress));
       } catch (error) {
         console.error(error);
+      } finally {
+        setUserDetailsLoader(false);
       }
     };
 
     const fetchUserExtendedData = async () => {
       try {
         globalNFTsListener(setUserNFTs, artistId);
-
+        setUserExtendedDataLoader(true);
         const [nfts, followingList, followersList] = await Promise.all([
           getUserNFTs(artistId),
           getFollowingUsers(artistId),
@@ -57,6 +64,8 @@ const ArtistId = () => {
         setFollowing(followersList);
       } catch (error) {
         console.error("Error in fetchUserExtendedData:", error.message);
+      } finally {
+        setUserExtendedDataLoader(false);
       }
     };
 
@@ -65,6 +74,14 @@ const ArtistId = () => {
       fetchUserExtendedData();
     }
   }, [artistId]);
+
+  if (
+    (userDetailsLoader && userExtendedDataLoader) ||
+    (!userDetailsLoader && userExtendedDataLoader) ||
+    (userDetailsLoader && !userExtendedDataLoader)
+  ) {
+    return <GenericFullScreenLoader />;
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -82,6 +99,12 @@ const ArtistId = () => {
                 <View className="flex-col items-center w-full p-4 h-[450px]">
                   {userData && (
                     <>
+                      <View className="w-full items-end justify-end">
+                        <FollowButton
+                          userId={authUser.userId}
+                          followedUserId={artistId}
+                        />
+                      </View>
                       <Header
                         isUserArtist={userData.isUserArtist}
                         artistId={userData.userId}
@@ -117,7 +140,7 @@ const ArtistId = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={null}
             ListFooterComponent={
-              <View className="items-center justify-center flex-1 w-full p-4 mt-10 h-full">
+              <View className="items-center justify-center flex-1 w-full p-4 mt-20 h-full">
                 {userData && (
                   <TabsInterface
                     tabLeft="nfts"

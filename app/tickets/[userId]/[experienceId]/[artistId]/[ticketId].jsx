@@ -22,6 +22,7 @@ import BuyNFTButton from "../../../../../components/Buttons/BuyNFTButton";
 import GlowLetters from "../../../../../components/Typography/GlowLetters";
 import GlassContainer from "../../../../../components/BackgroundContainers/GlassContainer";
 import EnterGameTicket from "../../../../../components/Buttons/EnterGameTicket";
+import GenericFullScreenLoader from "../../../../../components/Loaders/GenericFullScreenLoader";
 
 const TicketScreen = () => {
   const { userId, experienceId, artistId, ticketId } = useLocalSearchParams();
@@ -51,13 +52,13 @@ const TicketScreen = () => {
     router.back();
   };
 
+  const handleArtist = () => {
+    router.navigate(`/artist/${artistId}`);
+  };
+
   if (loading) {
     // Show loader while data is being fetched
-    return (
-      <SafeAreaView className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#C796FF" />
-      </SafeAreaView>
-    );
+    return <GenericFullScreenLoader />;
   }
 
   return (
@@ -99,9 +100,11 @@ const TicketScreen = () => {
                   />
                   <View>
                     <TextMedium14>Artist</TextMedium14>
-                    <TextSemi18>
-                      {upcomingExp?.userExperienceData[0]?.artist_name}
-                    </TextSemi18>
+                    <TouchableOpacity onPress={handleArtist}>
+                      <TextSemi18>
+                        {upcomingExp?.userExperienceData[0]?.artist_name}
+                      </TextSemi18>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>

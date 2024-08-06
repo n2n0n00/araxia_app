@@ -778,31 +778,9 @@ export const getFollowedUsers = async (userId) => {
 
 //TODO: THIS FUNCTION IS FOR THE GAME BACKEND AND FOR ARTISTS PROFILES ONLY
 // NOTE: Creates a follow relationship between two users
-export const followUser = async (followerId, followedId) => {
+export const followUserFunction = async (followerId, followedId) => {
   try {
-    // Check if the relationship already exists
-    let { data: existingRelationship, error: checkError } = await supabase
-      .from("followingList")
-      .select("relationship_id")
-      .eq("user_who_followed_id", followerId)
-      .eq("user_who_was_followed_id", followedId)
-      .single(); // Using single to get only one match
-
-    if (checkError && checkError.code !== "PGRST116") {
-      // Check if error is not "No data found"
-      console.error(
-        "Error checking existing relationship:",
-        checkError.message
-      );
-      return { success: false, message: checkError.message };
-    }
-
-    if (existingRelationship) {
-      return { success: false, message: "Relationship already exists" };
-    }
-
-    // Insert the new follow relationship
-    let { data, error } = await supabase.from("followingList").insert([
+    let { error } = await supabase.from("followingList").insert([
       {
         user_who_followed_id: followerId,
         user_who_was_followed_id: followedId,
@@ -813,17 +791,15 @@ export const followUser = async (followerId, followedId) => {
       console.error("Error creating follow relationship:", error.message);
       return { success: false, message: error.message };
     }
-
-    return { success: true, data };
   } catch (error) {
     throw new Error(`followUser threw an error: ${error.message}`);
   }
 };
 //TODO: THIS FUNCTION IS FOR THE GAME BACKEND AND FOR ARTISTS PROFILES ONLY
 // NOTE: Unfollows a user by deleting the relationship
-export const unfollowUser = async (followerId, followedId) => {
+export const unfollowUserFunction = async (followerId, followedId) => {
   try {
-    let { data, error } = await supabase
+    let { error } = await supabase
       .from("followingList")
       .delete()
       .eq("user_who_followed_id", followerId)
@@ -833,11 +809,24 @@ export const unfollowUser = async (followerId, followedId) => {
       console.error("Error unfollowing user:", error.message);
       return { success: false, message: error.message };
     }
-
-    return { success: true, data };
   } catch (error) {
     throw new Error(`unfollowUser threw an error: ${error.message}`);
   }
+};
+
+//NOTE: CHECK IF USER FOLLOWS A USER
+export const checkUserFollow = async (userId, followedUserId) => {
+  const { data, error } = await supabase
+    .from("followingList")
+    .select("*")
+    .eq("user_who_followed_id", userId)
+    .eq("user_who_was_followed_id", followedUserId);
+
+  if (error) {
+    console.error("Error checking user follow:", error);
+    return false;
+  }
+  return data.length > 0;
 };
 
 //NOTE:FETCH AND CHOOSE A FANDOM

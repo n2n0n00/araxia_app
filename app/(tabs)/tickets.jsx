@@ -23,6 +23,7 @@ import {
   fetchUserUpcomingEvents,
 } from "../../api/supabase_api";
 import PastLocationExpCard from "../../components/Cards/PastLocationExpCard";
+import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
 
 const Tickets = () => {
   const { authUser } = useAuth();
@@ -74,17 +75,13 @@ const Tickets = () => {
   }, [pastExp]);
 
   useEffect(() => {
-    if (pastCities && !loadingPastCities) {
+    if (pastCities && loadingPastCities) {
       setLoading(false); // Set overall loading to false once pastCities is loaded
     }
   }, [pastCities, loadingPastCities]);
 
   if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#C796FF" />
-      </View>
-    );
+    return <GenericFullScreenLoader />;
   }
 
   return (
@@ -100,13 +97,13 @@ const Tickets = () => {
             ListHeaderComponent={
               <>
                 <AraxiaHeadBar />
-                <View>
+                {/* <View>
                   <SearchBar
                     placeholder={"Search for an experience..."}
                     initialQuery={query}
                   />
-                </View>
-                <View className="flex-col items-start w-screen p-4 h-[250px]">
+                </View> */}
+                <View className="flex-col items-start w-screen p-4 mt-5 h-[250px]">
                   <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center pb-3">
                     <TextBold25
                       extraClasses="text-[#C796FF]"
