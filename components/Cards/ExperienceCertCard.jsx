@@ -1,22 +1,39 @@
 import { Image, Text, View, StyleSheet, Dimensions } from "react-native";
+import React, { useState, useEffect } from "react";
 import GlassContainer from "../BackgroundContainers/GlassContainer";
-import { EvilIcons } from "@expo/vector-icons";
 import { images } from "../../constants";
 import TextExtra14 from "../Typography/TextExtra14";
+import {
+  getExperienceById,
+  getPlayedDataByUserAndExpId,
+} from "../../api/supabase_api";
 
 const screenWidth = Dimensions.get("window").width;
 
-const ExperienceCertCard = ({
-  photos,
-  content,
-  artistName,
-  cryptoAddress,
-  avatar,
-  comments,
-  likes,
-  timeStamp,
-}) => {
-  const numColumns = photos.length === 1 ? 1 : 2;
+const ExperienceCertCard = ({ experienceId, authUser }) => {
+  const [experienceData, setExperienceData] = useState({});
+  const [userExperienceData, setUserExperienceData] = useState({});
+
+  const getExperienceData = async () => {
+    try {
+      const experienceData = await getExperienceById(experienceId);
+      setExperienceData(experienceData[0]); // Assuming the API returns an array
+
+      const userExpData = await getPlayedDataByUserAndExpId(
+        authUser?.userId,
+        experienceId
+      );
+      setUserExperienceData(userExpData[0]); // Assuming the API returns an array
+    } catch (error) {
+      console.error("Error fetching experience data:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getExperienceData();
+  }, [experienceId, authUser?.userId]); // Dependencies to rerun effect when experienceId or authUser.userId changes
+
+  const numColumns = experienceData?.experience_banner?.length === 1 ? 1 : 2;
 
   return (
     <GlassContainer insideContainerClasses={"py-0 px-0 mb-7"}>
@@ -24,20 +41,19 @@ const ExperienceCertCard = ({
         <View className="flex-row justify-between items-center mb-4">
           <View className="flex-row gap-4 items-center">
             <Image
-              source={avatar}
+              source={{ uri: authUser?.avatar }}
               resizeMethod="contain"
               className="bg-[#BCC2C3] w-[45px] h-[45px] rounded-full"
             />
             <View>
               <Text className="text-[13px] font-mmedium text-white">
-                {artistName}
+                {authUser?.username}
               </Text>
               <Text className="text-[#81999E] font-mregular text-[11px]">
-                {cryptoAddress}
+                {authUser?.cryptoAddress}
               </Text>
             </View>
           </View>
-
           <View className="flex-row gap-1">
             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
@@ -46,20 +62,19 @@ const ExperienceCertCard = ({
         </View>
         <View className="mb-4">
           <Text className="text-[13px] text-white font-mregular">
-            {content}
+            {experienceData?.experience_description}
           </Text>
         </View>
         <View style={styles.photosContainer(numColumns)}>
-          {photos.map((item, index) => (
-            <Image
-              key={index}
-              source={item}
-              style={styles.photo(numColumns)}
-              resizeMethod="contain"
-            />
-          ))}
+          {/* {experienceData?.experience_banner.map((item, index) => ( */}
+          <Image
+            // key={index}
+            source={{ uri: experienceData?.experience_banner }}
+            style={styles.photo(numColumns)}
+            resizeMethod="contain"
+          />
+          {/* ))} */}
         </View>
-
         <View className="p-4">
           <GlassContainer
             insideContainerClasses={"p-3 w-[80vw] relative bg-green-500/30"}
@@ -73,47 +88,40 @@ const ExperienceCertCard = ({
               <TextExtra14 extraClasses={"mb-2"}>
                 Experience Certificate
               </TextExtra14>
-              <TextExtra14 extraClasses={"mb-4"}>Experience Name</TextExtra14>
+              <TextExtra14 extraClasses={"mb-4"}>
+                {experienceData?.experience_name}
+              </TextExtra14>
             </View>
             <View className="flex-row items-center justify-between">
               <View>
-                <TextExtra14>Player Name</TextExtra14>
+                <TextExtra14>
+                  Gained XPs:{" "}
+                  <TextExtra14 extraClasses={"text-red-500"}>
+                    {userExperienceData?.user_metadata?.userGainedXP}/
+                    {experienceData?.experience_points}
+                  </TextExtra14>
+                </TextExtra14>
                 <TextExtra14>
                   Friends Made:{" "}
-                  <TextExtra14 extraClasses={"text-red-500"}>10</TextExtra14>
+                  <TextExtra14 extraClasses={"text-red-500"}>
+                    {userExperienceData?.user_metadata?.inGameFriendsMade}
+                  </TextExtra14>
                 </TextExtra14>
                 <TextExtra14>
                   NFTs Captured:{" "}
-                  <TextExtra14 extraClasses={"text-red-500"}>10/10</TextExtra14>
+                  <TextExtra14 extraClasses={"text-red-500"}>
+                    {userExperienceData?.user_metadata?.userGainedNFTs}/
+                    {experienceData?.experience_nfts}
+                  </TextExtra14>
                 </TextExtra14>
               </View>
               <View>
-                <TextExtra14>Artist Name</TextExtra14>
-                <TextExtra14>London</TextExtra14>
-                <TextExtra14>24/06/24</TextExtra14>
+                <TextExtra14>{experienceData?.artist_name}</TextExtra14>
+                <TextExtra14>{experienceData?.experience_city}</TextExtra14>
+                <TextExtra14>{experienceData?.tour_date}</TextExtra14>
               </View>
             </View>
           </GlassContainer>
-        </View>
-
-        <View className="flex-row w-full items-center justify-between">
-          <View className="flex-row w-2/4 items-start justify-start gap-5">
-            <View className="flex-row items-center">
-              <EvilIcons name="comment" size={30} color="#fff" />
-              <Text className="text-[#fff] font-mregular text-[15px]">
-                {comments}
-              </Text>
-            </View>
-            <View className="flex-row items-center">
-              <EvilIcons name="like" size={30} color="#fff" />
-              <Text className="text-[#fff] font-mregular text-[15px]">
-                {likes}
-              </Text>
-            </View>
-          </View>
-          <Text className="text-[#81999E] font-mregular text-[11px]">
-            {timeStamp}
-          </Text>
         </View>
       </View>
     </GlassContainer>
@@ -137,3 +145,170 @@ const styles = StyleSheet.create({
 });
 
 export default ExperienceCertCard;
+
+// import { Image, Text, View, StyleSheet, Dimensions } from "react-native";
+// import GlassContainer from "../BackgroundContainers/GlassContainer";
+// import { EvilIcons } from "@expo/vector-icons";
+// import { images } from "../../constants";
+// import TextExtra14 from "../Typography/TextExtra14";
+// import { useState } from "react";
+// import { getExperienceById } from "../../api/supabase_api";
+// import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+
+// const screenWidth = Dimensions.get("window").width;
+
+// const ExperienceCertCard = (experienceId, authUser) => {
+//   const [experienceData, setExperienceData] = useState([]);
+//   const [userExperienceData, setUserExperienceData] = useState([]);
+//   const [user, setUser] = useState([]);
+
+//   const getExperienceData = async () => {
+//     const experienceData = await getExperienceById(experienceId);
+//     setExperienceData(experienceData);
+//     setUser(authUser);
+
+//     const userExpData = await getPlayedDataByUserAndExpId(
+//       authUser?.userId,
+//       experienceId
+//     );
+//     setUserExperienceData(userExpData);
+//   };
+
+//   useEffect(() => {
+//     getExperienceData();
+//   }, []);
+
+//   const numColumns = photos.length === 1 ? 1 : 2;
+
+//   return (
+//     <GlassContainer insideContainerClasses={"py-0 px-0 mb-7"}>
+//       <View className="p-4 rounded-xl">
+//         <View className="flex-row justify-between items-center mb-4">
+//           <View className="flex-row gap-4 items-center">
+//             <Image
+//               source={user?.avatar}
+//               resizeMethod="contain"
+//               className="bg-[#BCC2C3] w-[45px] h-[45px] rounded-full"
+//             />
+//             <View>
+//               <Text className="text-[13px] font-mmedium text-white">
+//                 {user?.username}
+//               </Text>
+//               <Text className="text-[#81999E] font-mregular text-[11px]">
+//                 {user?.cryptoAddress}
+//               </Text>
+//             </View>
+//           </View>
+
+//           <View className="flex-row gap-1">
+//             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
+//             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
+//             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
+//           </View>
+//         </View>
+//         <View className="mb-4">
+//           <Text className="text-[13px] text-white font-mregular">
+//             {experienceData?.experience_description}
+//           </Text>
+//         </View>
+//         <View style={styles.photosContainer(numColumns)}>
+//           {experienceData?.experience_banner.map((item, index) => (
+//             <Image
+//               key={index}
+//               source={item}
+//               style={styles.photo(numColumns)}
+//               resizeMethod="contain"
+//             />
+//           ))}
+//         </View>
+
+//         <View className="p-4">
+//           <GlassContainer
+//             insideContainerClasses={"p-3 w-[80vw] relative bg-green-500/30"}
+//           >
+//             <Image
+//               source={images.XPCert}
+//               resizeMethod="contain"
+//               className="absolute left-4 top-2"
+//             />
+//             <View className="flex-col items-center justify-center">
+//               <TextExtra14 extraClasses={"mb-2"}>
+//                 Experience Certificate
+//               </TextExtra14>
+//               <TextExtra14 extraClasses={"mb-4"}>
+//                 {experienceData?.experience_name}
+//               </TextExtra14>
+//             </View>
+//             <View className="flex-row items-center justify-between">
+//               <View>
+//                 <TextExtra14>
+//                   Gained XPs:{" "}
+//                   <TextExtra14 extraClasses={"text-red-500"}>
+//                     {userExperienceData?.user_metadata?.userGainedXP}/
+//                     {experienceData?.experience_points}
+//                   </TextExtra14>
+//                 </TextExtra14>
+//                 <TextExtra14>
+//                   Friends Made:{" "}
+//                   <TextExtra14 extraClasses={"text-red-500"}>
+//                     {userExperienceData?.user_metadata?.inGameFriendsMade}
+//                   </TextExtra14>
+//                 </TextExtra14>
+//                 <TextExtra14>
+//                   NFTs Captured:{" "}
+//                   <TextExtra14 extraClasses={"text-red-500"}>
+//                     {userExperienceData?.user_metadata?.userGainedNFTs}/
+//                     {experienceData?.experience_nfts}
+//                   </TextExtra14>
+//                 </TextExtra14>
+//               </View>
+//               <View>
+//                 <TextExtra14>{experienceData?.artist_name}</TextExtra14>
+//                 <TextExtra14>{experienceData?.experience_city}</TextExtra14>
+//                 <TextExtra14>{experienceData?.tour_date}</TextExtra14>
+//               </View>
+//             </View>
+//           </GlassContainer>
+//         </View>
+
+//         {/* <View className="flex-row w-full items-center justify-between">
+//           <View className="flex-row w-2/4 items-start justify-start gap-5">
+//             <View className="flex-row items-center">
+//               <EvilIcons name="comment" size={30} color="#fff" />
+//               <Text className="text-[#fff] font-mregular text-[15px]">
+//                 {comments}
+//               </Text>
+//             </View>
+//             <View className="flex-row items-center">
+//               <EvilIcons name="like" size={30} color="#fff" />
+//               <Text className="text-[#fff] font-mregular text-[15px]">
+//                 {likes}
+//               </Text>
+//             </View>
+//           </View>
+//           <Text className="text-[#81999E] font-mregular text-[11px]">
+//             {timeStamp}
+//           </Text>
+//         </View> */}
+//       </View>
+//     </GlassContainer>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   photosContainer: (numColumns) => ({
+//     width: "100%",
+//     flexDirection: numColumns === 1 ? "column" : "row",
+//     flexWrap: "wrap",
+//     justifyContent: "space-between",
+//     marginBottom: 16,
+//   }),
+//   photo: (numColumns) => ({
+//     width: numColumns === 1 ? "100%" : (screenWidth - 64) / 2,
+//     height: 204,
+//     borderRadius: 12,
+//     marginBottom: 16,
+//   }),
+// });
+
+// export default ExperienceCertCard;

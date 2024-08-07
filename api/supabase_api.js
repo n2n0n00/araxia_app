@@ -914,3 +914,64 @@ export const handleFandomSelection = async (
     throw error;
   }
 };
+
+// NOTE: Experience post functions in user's profiles
+
+export const getUserSubscribedExperiencesData = async (userId) => {
+  try {
+    const { data: userExperiences, error } = await supabase
+      .from("userExperiences")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error(
+        `Error fetching subscribed experiences: ${error.message}`
+      );
+    }
+
+    return userExperiences;
+  } catch (error) {
+    console.error("Error in getUserSubscribedExperiencesData:", error);
+    return null; // or return an empty array, depending on how you handle null cases
+  }
+};
+
+export const getExperienceById = async (experienceId) => {
+  try {
+    const { data: experiencesDatabase, error } = await supabase
+      .from("experiencesDatabase")
+      .select("*")
+      .eq("experience_id", experienceId);
+
+    if (error) {
+      throw new Error(`Error fetching experience by ID: ${error.message}`);
+    }
+
+    return experiencesDatabase;
+  } catch (error) {
+    console.error("Error in getExperienceById:", error);
+    return null; // or return an empty object/array
+  }
+};
+
+export const getPlayedDataByUserAndExpId = async (userId, experienceId) => {
+  try {
+    const { data: userExperiences, error } = await supabase
+      .from("userExperiences")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("experience_id", experienceId);
+
+    if (error) {
+      throw new Error(
+        `Error fetching played data by user and experience ID: ${error.message}`
+      );
+    }
+
+    return userExperiences;
+  } catch (error) {
+    console.error("Error in getPlayedDataByUserAndExpId:", error);
+    return null; // or return an empty object/array
+  }
+};

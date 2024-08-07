@@ -125,6 +125,7 @@ const UserProfilePage = () => {
                             : 0
                         }
                         cryptoAddress={userCryptoAddress}
+                        longCryptoAddress={userData.cryptoAddress}
                         username={userData.username}
                         bio={userData.bio}
                         userId={userData.userId}

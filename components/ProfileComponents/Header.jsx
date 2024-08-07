@@ -12,6 +12,7 @@ import {
   checkArtistLike,
   removeArtistLike,
 } from "../../api/supabase_api";
+import * as Clipboard from "expo-clipboard";
 
 const Header = ({
   avatar,
@@ -26,8 +27,23 @@ const Header = ({
   currentUser,
   isUserArtist,
   artistId,
+  longCryptoAddress,
 }) => {
   const [artistLike, setArtistLike] = useState(false);
+  //long press to copy smart contract address
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleLongPress = async () => {
+    if (longCryptoAddress) {
+      await Clipboard.setStringAsync(longCryptoAddress);
+      setLinkCopied(true);
+
+      // Reset after a few seconds
+      setTimeout(() => setLinkCopied(false), 4000);
+    } else {
+      Alert.alert("Error", "No address available to copy");
+    }
+  };
 
   useEffect(() => {
     if (isUserArtist === true) {
@@ -130,9 +146,12 @@ const Header = ({
         </View>
       </View>
       <View className="flex-col items-center mt-4">
-        <TextMedium14 extraClasses={"text-[#9D9C9C] mb-1"}>
-          {cryptoAddress}
-        </TextMedium14>
+        <TouchableOpacity onLongPress={handleLongPress}>
+          <TextMedium14 extraClasses={"text-purple-500 mb-1"}>
+            {linkCopied ? "Link Copied!" : cryptoAddress}
+          </TextMedium14>
+        </TouchableOpacity>
+
         <TextSemi27 extraClasses={"mb-1"}>{username}</TextSemi27>
         <TextMedium14 extraClasses={"text-[#9D9C9C] text-center"}>
           {bio}

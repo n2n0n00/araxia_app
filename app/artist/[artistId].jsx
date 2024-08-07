@@ -121,6 +121,7 @@ const ArtistId = () => {
                             ? numberFormatter(following.length)
                             : 0
                         }
+                        longCryptoAddress={userData.cryptoAddress}
                         cryptoAddress={userCryptoAddress}
                         username={userData.username}
                         bio={userData.bio}
