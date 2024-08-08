@@ -6,6 +6,9 @@ import TextSemi25 from "../Typography/TextSemi25";
 const TabsInterface = ({
   tabLeft,
   tabRight,
+  tabCenter,
+  tabCenterComponent,
+  tabCenterLabel,
   tabLeftComponent,
   tabRightComponent,
   tabLeftLabel,
@@ -22,14 +25,27 @@ const TabsInterface = ({
       <View className="flex-row items-center justify-around w-screen border-b-[1px] border-[#C796FF]">
         <TouchableOpacity onPress={() => handleTabChange(tabLeft)}>
           {currentTab === tabLeft ? (
-            <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center pb-3">
+            <View className="border-b-[2px] border-[#C796FF] w-[120px] items-center justify-center pb-3">
               <TextBold25 extraClasses="text-[#C796FF]" styles={styles.glow}>
                 {tabLeftLabel}
               </TextBold25>
             </View>
           ) : (
-            <View className="w-[195px] items-center pb-3">
+            <View className="w-[120px] items-center pb-3">
               <TextSemi25 className="text-white">{tabLeftLabel}</TextSemi25>
+            </View>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleTabChange(tabCenter)}>
+          {currentTab === tabCenter ? (
+            <View className="border-b-[2px] border-[#C796FF] w-[120px] items-center justify-center pb-3">
+              <TextBold25 extraClasses="text-[#C796FF]" styles={styles.glow}>
+                {tabCenterLabel}
+              </TextBold25>
+            </View>
+          ) : (
+            <View className="w-[120px] items-center pb-3">
+              <TextSemi25 className="text-white">{tabCenterLabel}</TextSemi25>
             </View>
           )}
         </TouchableOpacity>
@@ -48,7 +64,9 @@ const TabsInterface = ({
         </TouchableOpacity>
       </View>
       <View className="flex-1">
-        {currentTab === tabLeft ? tabLeftComponent : tabRightComponent}
+        {currentTab === tabRight && tabRightComponent}
+        {currentTab === tabCenter && tabCenterComponent}
+        {currentTab === tabLeft && tabLeftComponent}
       </View>
     </View>
   );

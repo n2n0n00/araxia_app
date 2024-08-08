@@ -15,11 +15,13 @@ import {
   getFollowedUsers,
   getFollowingUsers,
   getUserNFTs,
+  getUserPosts,
   getUserSubscribedExperiencesData,
   globalNFTsListener,
 } from "../../api/supabase_api";
 import { numberFormatter } from "../../utils/numberFormatter";
 import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
+import PostsList from "../../components/ProfileComponents/PostsList";
 
 const Profile = () => {
   const { authUser } = useAuth();
@@ -29,6 +31,7 @@ const Profile = () => {
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [userNFTs, setUserNFTs] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userExperiences, setUserExperiences] = useState([]);
 
@@ -38,18 +41,23 @@ const Profile = () => {
         globalNFTsListener(setUserNFTs, authUser?.userId);
 
         setLoading(true);
-        const [nfts, followingUsers, followedUsers] = await Promise.all([
+        const [
+          nfts,
+          followingUsers,
+          followedUsers,
+          fetchUserPosts,
+          fetchUserExperiences,
+        ] = await Promise.all([
           getUserNFTs(authUser.userId),
           getFollowingUsers(authUser.userId),
           getFollowedUsers(authUser.userId),
+          getUserPosts(authUser.userId),
+          getUserSubscribedExperiencesData(authUser.userId),
         ]);
 
-        const userExperiencesData = await getUserSubscribedExperiencesData(
-          authUser.userId
-        );
-
-        console.log(userExperiencesData);
-        setUserExperiences(userExperiencesData);
+        console.log(userPosts);
+        setUserPosts(fetchUserPosts);
+        setUserExperiences(fetchUserExperiences);
         setUserNFTs(nfts);
         setFollowing(followingUsers);
         setFollowers(followedUsers);
@@ -114,9 +122,13 @@ const Profile = () => {
               <View className="items-center justify-center flex-1 w-full p-4 mt-10 h-full">
                 <TabsInterface
                   tabLeft="nfts"
+                  tabCenter="posts"
                   tabRight="experiences"
                   tabLeftComponent={
                     <NFTsList userNFTs={userNFTs} userId={authUser.userId} />
+                  }
+                  tabCenterComponent={
+                    <PostsList userPosts={userPosts} userData={authUser} />
                   }
                   tabRightComponent={
                     <ExperiencesPosts
@@ -125,6 +137,7 @@ const Profile = () => {
                     />
                   }
                   tabLeftLabel="NFTs"
+                  tabCenterLabel="Posts"
                   tabRightLabel="Experiences"
                 />
               </View>

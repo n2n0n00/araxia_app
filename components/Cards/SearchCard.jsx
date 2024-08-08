@@ -15,7 +15,7 @@ const SearchCard = ({ image, name, filter, componentId, userOriginId }) => {
         router.push(`/user/${componentId}`);
         break;
       case "Experience":
-        console.log(userOriginId, componentId);
+        // console.log(userOriginId, componentId);
         router.push(`/experience/${userOriginId}/${componentId}`);
         break;
       case "NFT":

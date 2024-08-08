@@ -105,6 +105,10 @@ const RootLayout = () => {
           name="fandom/[fandomId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="post/[userId]/[postId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

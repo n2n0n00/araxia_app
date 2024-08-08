@@ -26,10 +26,10 @@ const Feed = () => {
 
   const likedArtists = async () => {
     try {
-      const artists = await fetchLikedArtistsData(authUser.userId);
-      setUserLikedArtists(artists);
+      // const artists = await fetchLikedArtistsData(authUser.userId);
+      // setUserLikedArtists(artists);
     } catch (error) {
-      console.error("Error fetching liked artists:", error);
+      // console.error("Error fetching liked artists:", error);
     }
   };
 

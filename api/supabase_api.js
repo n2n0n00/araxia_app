@@ -975,3 +975,41 @@ export const getPlayedDataByUserAndExpId = async (userId, experienceId) => {
     return null; // or return an empty object/array
   }
 };
+
+//NOTE: Get user posts
+export const getUserPosts = async (userId) => {
+  try {
+    const { data: userPosts, error } = await supabase
+      .from("userPosts")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error(`Error fetching user posts: ${error.message}`);
+    }
+
+    return userPosts;
+  } catch (error) {
+    console.error("Error in getUserPosts:", error);
+    return null; // or return an empty array, depending on how you handle null cases
+  }
+};
+
+//NOTE: Get posts by postId
+export const getPostById = async (postId) => {
+  try {
+    const { data: userPosts, error } = await supabase
+      .from("userPosts")
+      .select("*")
+      .eq("post_id", postId);
+
+    if (error) {
+      throw new Error(`Error fetching user posts: ${error.message}`);
+    }
+
+    return userPosts;
+  } catch (error) {
+    console.error("Error in getPostById:", error);
+    return null; // or return an empty array, depending on how you handle null cases
+  }
+};

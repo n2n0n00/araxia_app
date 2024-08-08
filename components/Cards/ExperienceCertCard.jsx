@@ -7,12 +7,16 @@ import {
   getExperienceById,
   getPlayedDataByUserAndExpId,
 } from "../../api/supabase_api";
+import { dateReformatter } from "../../utils/dateReformatter";
+import { addressShortener } from "../../utils/addressShortener";
 
 const screenWidth = Dimensions.get("window").width;
 
 const ExperienceCertCard = ({ experienceId, authUser }) => {
   const [experienceData, setExperienceData] = useState({});
   const [userExperienceData, setUserExperienceData] = useState({});
+  const [cryptoAddressFormatted, setCryptoAddressFormatted] = useState();
+  const [formattedTourDate, setFormattedTourDate] = useState();
 
   const getExperienceData = async () => {
     try {
@@ -23,7 +27,12 @@ const ExperienceCertCard = ({ experienceId, authUser }) => {
         authUser?.userId,
         experienceId
       );
+
+      const shortenedAddress = addressShortener(authUser?.cryptoAddress);
+      const reformattedDate = dateReformatter(experienceData[0]?.tour_date);
       setUserExperienceData(userExpData[0]); // Assuming the API returns an array
+      setCryptoAddressFormatted(shortenedAddress);
+      setFormattedTourDate(reformattedDate);
     } catch (error) {
       console.error("Error fetching experience data:", error.message);
     }
@@ -50,7 +59,7 @@ const ExperienceCertCard = ({ experienceId, authUser }) => {
                 {authUser?.username}
               </Text>
               <Text className="text-[#81999E] font-mregular text-[11px]">
-                {authUser?.cryptoAddress}
+                {cryptoAddressFormatted}
               </Text>
             </View>
           </View>
@@ -65,7 +74,7 @@ const ExperienceCertCard = ({ experienceId, authUser }) => {
             {experienceData?.experience_description}
           </Text>
         </View>
-        <View style={styles.photosContainer(numColumns)}>
+        <View style={styles.photosContainer(numColumns)} className="">
           {/* {experienceData?.experience_banner.map((item, index) => ( */}
           <Image
             // key={index}
@@ -118,7 +127,7 @@ const ExperienceCertCard = ({ experienceId, authUser }) => {
               <View>
                 <TextExtra14>{experienceData?.artist_name}</TextExtra14>
                 <TextExtra14>{experienceData?.experience_city}</TextExtra14>
-                <TextExtra14>{experienceData?.tour_date}</TextExtra14>
+                <TextExtra14>{formattedTourDate}</TextExtra14>
               </View>
             </View>
           </GlassContainer>
@@ -129,15 +138,17 @@ const ExperienceCertCard = ({ experienceId, authUser }) => {
 };
 
 const styles = StyleSheet.create({
+  // TODO: fix when posting is created
   photosContainer: (numColumns) => ({
     width: "100%",
-    flexDirection: numColumns === 1 ? "column" : "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: numColumns > 1 && "row",
+    flexWrap: numColumns > 1 && "wrap",
+    justifyContent: numColumns > 1 ? "space-between" : "center",
+    alignItems: "center",
     marginBottom: 16,
   }),
   photo: (numColumns) => ({
-    width: numColumns === 1 ? "100%" : (screenWidth - 64) / 2,
+    width: numColumns > 1 ? "100%" : (screenWidth - 64) / 2,
     height: 204,
     borderRadius: 12,
     marginBottom: 16,

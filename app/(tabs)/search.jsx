@@ -30,7 +30,7 @@ const Search = () => {
       try {
         const searchQuery = await searchAllTables(query, filter);
         setReturnedData(searchQuery || []);
-        console.log(searchQuery);
+        s;
       } catch (error) {
         console.error("Error fetching search results:", error.message);
         setReturnedData([]);
