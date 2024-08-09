@@ -21,20 +21,29 @@ import {
   getIndividualNFTData,
   globalNFTPageListener,
   updateFavoriteCount,
-  addUserLike,
+  addUserLikeOnPost,
   removeUserLike,
   checkUserLike,
+  getPostById,
+  fetchUserDetails,
+  updateLikeCounterOnUserLikedPosts,
+  removeUserLikeOnPost,
+  checkUserLikeOnPost,
 } from "../../../api/supabase_api";
 import Feather from "@expo/vector-icons/Feather";
 import { useAuth } from "../../../context/AuthProvider";
 import GenericFullScreenLoader from "../../../components/Loaders/GenericFullScreenLoader";
+import TextSemi20 from "../../../components/Typography/TextSemi20";
+import { FlatList } from "react-native-web";
 
 const PostPage = () => {
-  globalNFTPageListener();
   const { authUser } = useAuth();
   const { userId, postId } = useLocalSearchParams();
+
   const [user, setUser] = useState(null);
   const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
   const [maximizeImage, setMaximizeImage] = useState(false);
   const [likePost, setLikePost] = useState(false);
 
@@ -49,16 +58,18 @@ const PostPage = () => {
   const handleUserProfileRoute = (userId) => {
     if (userId === authUser.userId) {
       router.push("/profile");
-    } else router.push(`/user/${userId}`);
+    } else {
+      router.push(`/user/${userId}`);
+    }
   };
 
   const handleLikedPost = async () => {
     if (!likePost) {
       const likesCounter = post.favorite_count + 1;
       setLikePost(true);
-      setPost({ ...post, favorite_count: likesCounter });
-      await updateFavoriteCount(postId, likesCounter);
-      await addUserLike(authUser.userId, postId);
+      setPost((prevPost) => ({ ...prevPost, favorite_count: likesCounter }));
+      await updateLikeCounterOnUserLikedPosts(postId, likesCounter);
+      await addUserLikeOnPost(authUser.userId, postId);
     }
   };
 
@@ -66,32 +77,62 @@ const PostPage = () => {
     if (likePost) {
       const likesCounter = post.favorite_count - 1;
       setLikePost(false);
-      setPost({ ...post, favorite_count: likesCounter });
-      await updateFavoriteCount(postId, likesCounter);
-      await removeUserLike(authUser.userId, postId);
+      setPost((prevPost) => ({ ...prevPost, favorite_count: likesCounter }));
+      await updateLikeCounterOnUserLikedPosts(postId, likesCounter);
+      await removeUserLikeOnPost(authUser.userId, postId);
     }
   };
+
+  // const fetchAndSetComments = async () => {
+  //   const fetchedComments = await fetchCommentsByPostId(postId);
+  //   setComments(fetchedComments);
+  // };
+
+  // const handleAddComment = async () => {
+  //   if (newComment.trim()) {
+  //     await addCommentToPost(postId, authUser.userId, newComment);
+  //     setNewComment("");
+  //     fetchAndSetComments(); // Re-fetch comments to update the list
+  //   }
+  // };
+
+  // const handleLikeComment = async (commentId) => {
+  //   await likeComment(commentId, authUser.userId);
+  //   fetchAndSetComments(); // Re-fetch comments to update the list
+  // };
+
+  // const handleReplyToComment = async (commentId, replyText) => {
+  //   await replyToComment(commentId, authUser.userId, replyText);
+  //   fetchAndSetComments(); // Re-fetch comments to update the list
+  // };
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const [post, user] = await Promise.all([
+        const [postData, userData] = await Promise.all([
           getPostById(postId),
           fetchUserDetails(userId),
         ]);
 
-        setUser(user);
-        setPost(post);
-        const authUserLiked = await checkUserLike(authUser.userId, postId);
-        setLikePost(authUserLiked);
+        if (postData.length > 0 && userData.length > 0) {
+          setPost(postData[0]);
+          setUser(userData[0]);
+
+          const authUserLiked = await checkUserLikeOnPost(
+            authUser.userId,
+            postId
+          );
+          setLikePost(authUserLiked);
+        }
       } catch (error) {
         console.error("Error fetching post and related data:", error.message);
       }
     };
-    fetchPost();
-  }, [postId, userId]);
 
-  if (!post) {
+    fetchPost();
+  }, [postId, userId, authUser.userId]);
+
+  if (!post || !user) {
     return <GenericFullScreenLoader />;
   }
 
@@ -115,13 +156,13 @@ const PostPage = () => {
           </TouchableOpacity>
         </View>
         <BgBlackOverlay>
-          //TODO: add carousel ability later
+          {/* TODO: add carousel ability later */}
           <Image
             className="h-[60vh] w-screen rounded-b-[50px]"
             resizeMode="cover"
-            source={{ uri: post.media[0] }}
+            source={{ uri: post?.media[0] }}
           />
-          {maximizeImage ? (
+          {maximizeImage && (
             <TouchableOpacity
               className="h-screen w-screen absolute z-50 items-center justify-center"
               onPress={handleMaximizeImage}
@@ -129,58 +170,65 @@ const PostPage = () => {
               <View className="bg-black opacity-80 h-full w-full absolute" />
               <View className="w-screen h-screen items-center justify-center">
                 <Image
-                  source={{ uri: post.media[0] }}
+                  source={{ uri: post?.media[0] }}
                   resizeMode="contain"
                   className="w-full h-full"
                 />
               </View>
             </TouchableOpacity>
-          ) : (
-            <></>
           )}
           <ScrollView>
             <View className="flex-col items-center w-screen h-full p-4">
-              <View className="w-full flex-row items-end justify-end">
-                {likePost ? (
-                  <TouchableOpacity
-                    onPress={handleUnlikedNFT}
-                    className="flex-row items-center"
-                  >
-                    <AntDesign name="heart" size={24} color="white" />
-                    <TextMedium18 extraClasses={"pl-2"}>
-                      {post?.favorite_count}
-                    </TextMedium18>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={handleLikedPost}
-                    className="flex-row items-center"
-                  >
-                    <AntDesign name="hearto" size={24} color="white" />
-                    <TextMedium18 extraClasses={"pl-2"}>
-                      {post?.favorite_count}
-                    </TextMedium18>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <View className="flex-row w-full items-center justify-between">
+                <TouchableOpacity
+                  onPress={() => handleUserProfileRoute(user.userId)}
+                  className="flex-row items-center"
+                >
+                  <Image
+                    resizeMode="cover"
+                    className="w-[40px] h-[40px] rounded-full mr-2"
+                    source={{ uri: user.avatar }}
+                  />
+                  <TextBold15>{user.username}</TextBold15>
+                </TouchableOpacity>
 
-              <View className="flex-row w-full items-start justify-between my-10">
-                <View>
-                  <TouchableOpacity
-                    onPress={() => handleUserProfileRoute(user.userId)}
-                    className="flex-row items-center mt-2"
-                  >
-                    <Image
-                      resizeMode="cover"
-                      className="w-[40px] h-[40px] rounded-full mr-2"
-                      source={{ uri: user.avatar }}
-                    />
-                    <TextBold15>{user.username}</TextBold15>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  onPress={likePost ? handleUnlikedNFT : handleLikedPost}
+                  className="flex-row items-center"
+                >
+                  <AntDesign
+                    name={likePost ? "heart" : "hearto"}
+                    size={24}
+                    color="white"
+                  />
+                  <TextMedium18 extraClasses={"pl-2"}>
+                    {post?.favorite_count}
+                  </TextMedium18>
+                </TouchableOpacity>
+              </View>
+              <View className="w-full">
                 <TextRegular18 extraClasses={"mt-10 mb-5"}>
-                  {post.content}
+                  {post?.content}
                 </TextRegular18>
+                <View className="w-full h-[1px] bg-purple-700" />
+                <TextSemi20 extraClasses={"py-4"}>Comments</TextSemi20>
+                {/* <FlatList
+                    data={comments}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={renderComment}
+                  />
+                  <View className="flex-row items-center mt-4">
+                    <TextInput
+                      value={newComment}
+                      onChangeText={setNewComment}
+                      placeholder="Add a comment..."
+                      placeholderTextColor="#888"
+                      className="flex-1 bg-gray-800 p-2 rounded-md text-white"
+                    />
+                    <TouchableOpacity onPress={handleAddComment} className="ml-2">
+                      <Feather name="send" size={24} color="white" />
+                    </TouchableOpacity>
+                  </View> */}
               </View>
             </View>
           </ScrollView>

@@ -1013,3 +1013,218 @@ export const getPostById = async (postId) => {
     return null; // or return an empty array, depending on how you handle null cases
   }
 };
+
+//NOTE: Check if User Has Already liked a post
+export const checkUserLikeOnPost = async (userId, postId) => {
+  try {
+    const { data, error } = await supabase
+      .from("userLikedPosts")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("post_id", postId);
+
+    if (error) {
+      console.error("Error checking user like on post:", error);
+      return false;
+    }
+    return data.length > 0;
+  } catch (error) {
+    throw new Error(`checkUserLikeOnPost threw an error: ${error.message}`);
+  }
+};
+
+//NOTE: Add like to post by user
+
+export const addUserLikeOnPost = async (userId, postId) => {
+  try {
+    let { error } = await supabase.from("userLikedPosts").insert([
+      {
+        user_id: userId,
+        post_id: postId,
+      },
+    ]);
+
+    if (error) {
+      console.error(
+        "Error creating user-post like relationship:",
+        error.message
+      );
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(`addUserLikeOnPost threw an error: ${error.message}`);
+  }
+};
+
+//NOTE: Remove like to post by user
+
+export const removeUserLikeOnPost = async (userId, postId) => {
+  try {
+    let { error } = await supabase
+      .from("userLikedPosts")
+      .delete()
+      .eq("user_id", userId)
+      .eq("post_id", postId);
+
+    if (error) {
+      console.error("Error unliking post:", error.message);
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(`removeUserLikeOnPost threw an error: ${error.message}`);
+  }
+};
+
+//NOTE: Update Like Counter
+
+export const updateLikeCounterOnUserLikedPosts = async (postId, newCount) => {
+  try {
+    const { data, error } = await supabase
+      .from("userPosts")
+      .update({ favorite_count: newCount })
+      .eq("post_id", postId);
+
+    if (error) {
+      console.error("Error updating favorite count in userPosts table:", error);
+    } else {
+      console.log("Favorite count updated:", data);
+    }
+  } catch (error) {
+    throw new Error(
+      `updateLikeCounterOnUserLikedPosts threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Fetch Comments from Posts
+
+export const fetchCommentsByPostId = async (postId) => {
+  try {
+    const { data: postComments, error } = await supabase
+      .from("userCommentsOnPosts")
+      .select("*")
+      .eq("post_id", postId);
+    if (error) {
+      console.error("Error reading postComments:", error);
+    } else {
+      return postComments;
+    }
+  } catch (error) {
+    throw new Error(`postComments threw an error: ${error.message}`);
+  }
+};
+
+//NOTE:  Add Comment To Post
+
+export const addCommentToPost = async (postId, userId, comment) => {
+  try {
+    let { error } = await supabase.from("userCommentsOnPosts").insert([
+      {
+        user_id: userId,
+        post_id: postId,
+        comment_content: comment,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error creating post at addCommentToPost:", error.message);
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(`addCommentToPost threw an error: ${error.message}`);
+  }
+};
+
+//NOTE: Check if User Has Already liked a comment
+export const checkUserLikeOnCommentOnPost = async (userId, commentId) => {
+  try {
+    const { data, error } = await supabase
+      .from("userLikedComments")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("comment_id", commentId);
+
+    if (error) {
+      console.error("Error checking user like on comment:", error);
+      return false;
+    }
+    return data.length > 0;
+  } catch (error) {
+    throw new Error(
+      `checkUserLikeOnCommentOnPost threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Add like to comment by user
+
+export const addUserLikeOnCommentOnPost = async (userId, commentId) => {
+  try {
+    let { error } = await supabase.from("userLikedComments").insert([
+      {
+        user_id: userId,
+        comment_id: commentId,
+      },
+    ]);
+
+    if (error) {
+      console.error(
+        "Error creating user-comment like relationship:",
+        error.message
+      );
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(
+      `addUserLikeOnCommentOnPost threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Remove like to comment by user
+
+export const removeUserLikeOnCommentOnPost = async (userId, commentId) => {
+  try {
+    let { error } = await supabase
+      .from("userLikedPosts")
+      .delete()
+      .eq("user_id", userId)
+      .eq("comment_id", commentId);
+
+    if (error) {
+      console.error("Error unliking comment:", error.message);
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(
+      `removeUserLikeOnCommentOnPost threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Update Like Counter on Comment
+
+export const updateLikeCounterOnUserCommentsOnPosts = async (
+  commentId,
+  newCount
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("userCommentsOnPosts")
+      .update({ favorite_count: newCount })
+      .eq("comment_id", commentId);
+
+    if (error) {
+      console.error(
+        "Error updating favorite count in userCommentsOnPosts table:",
+        error
+      );
+    } else {
+      console.log("Favorite count updated:", data);
+    }
+  } catch (error) {
+    throw new Error(
+      `updateLikeCounterOnUserCommentsOnPosts threw an error: ${error.message}`
+    );
+  }
+};
