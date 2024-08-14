@@ -1098,17 +1098,24 @@ export const updateLikeCounterOnUserLikedPosts = async (postId, newCount) => {
 
 //NOTE: Fetch Comments from Posts
 
-export const fetchCommentsByPostId = async (postId) => {
+// Fetch Comments from Posts with Pagination
+export const fetchCommentsByPostId = async (postId, page = 1, limit = 10) => {
   try {
+    const from = (page - 1) * limit;
+    const to = page * limit - 1;
+
     const { data: postComments, error } = await supabase
       .from("userCommentsOnPosts")
       .select("*")
-      .eq("post_id", postId);
+      .eq("post_id", postId)
+      .order("created_at", { ascending: true }) // Assuming there's a created_at column
+      .range(from, to);
+
     if (error) {
       console.error("Error reading postComments:", error);
-    } else {
-      return postComments;
+      return [];
     }
+    return postComments;
   } catch (error) {
     throw new Error(`postComments threw an error: ${error.message}`);
   }
@@ -1186,7 +1193,7 @@ export const addUserLikeOnCommentOnPost = async (userId, commentId) => {
 export const removeUserLikeOnCommentOnPost = async (userId, commentId) => {
   try {
     let { error } = await supabase
-      .from("userLikedPosts")
+      .from("userLikedComments")
       .delete()
       .eq("user_id", userId)
       .eq("comment_id", commentId);
@@ -1225,6 +1232,152 @@ export const updateLikeCounterOnUserCommentsOnPosts = async (
   } catch (error) {
     throw new Error(
       `updateLikeCounterOnUserCommentsOnPosts threw an error: ${error.message}`
+    );
+  }
+};
+
+//TODO:
+
+//NOTE: Fetch Replies from Comments on Posts
+
+// Fetch Replies from Comments on Posts with Pagination
+export const fetchRepliesOnCommentsByCommentId = async (
+  commentId,
+  page = 1,
+  limit = 10
+) => {
+  try {
+    const from = (page - 1) * limit;
+    const to = page * limit - 1;
+
+    const { data: commentReplies, error } = await supabase
+      .from("userRepliesToPostComments")
+      .select("*")
+      .eq("comment_id", commentId)
+      .order("created_at", { ascending: true }) // Assuming there's a created_at column
+      .range(from, to);
+
+    if (error) {
+      console.error("Error reading commentReplies:", error);
+      return [];
+    }
+    return commentReplies;
+  } catch (error) {
+    throw new Error(
+      `userRepliesToPostComments threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE:  Add Reply To Comment
+
+export const addReplyToComment = async (commentId, postId, userId, reply) => {
+  try {
+    let { error } = await supabase.from("userRepliesToPostComments").insert([
+      {
+        user_id: userId,
+        post_id: postId,
+        comment_id: commentId,
+        reply_content: reply,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error creating post at addReplyToComment:", error.message);
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(`addReplyToComment threw an error: ${error.message}`);
+  }
+};
+
+//NOTE: Check if User Has Already liked a reply
+export const checkUserLikeOnReplyOnComment = async (userId, replyId) => {
+  try {
+    const { data, error } = await supabase
+      .from("userLikedReplies")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("reply_id", replyId);
+
+    if (error) {
+      console.error("Error checking user like on reply:", error);
+      return false;
+    }
+    return data.length > 0;
+  } catch (error) {
+    throw new Error(
+      `checkUserLikeOnReplyOnComment threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Add like to reply by user
+
+export const addUserLikeOnReplyOnComment = async (userId, replyId) => {
+  try {
+    let { error } = await supabase.from("userLikedReplies").insert([
+      {
+        user_id: userId,
+        reply_id: replyId,
+      },
+    ]);
+
+    if (error) {
+      console.error(
+        "Error creating user-reply like relationship:",
+        error.message
+      );
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(
+      `addUserLikeOnReplyOnComment threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Remove like to reply by user
+
+export const removeUserLikeOnReplyOnComment = async (userId, replyId) => {
+  try {
+    let { error } = await supabase
+      .from("userLikedReplies")
+      .delete()
+      .eq("user_id", userId)
+      .eq("reply_id", replyId);
+
+    if (error) {
+      console.error("Error unliking reply:", error.message);
+      return { success: false, message: error.message };
+    }
+  } catch (error) {
+    throw new Error(
+      `removeUserLikeOnReplyOnComment threw an error: ${error.message}`
+    );
+  }
+};
+
+//NOTE: Update Like Counter on Reply
+
+export const updateLikeCounterOnUserReplyOnComment = async (
+  replyId,
+  newCount
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("userRepliesToPostComments")
+      .update({ favorite_count: Number(newCount) })
+      .eq("reply_id", replyId);
+
+    if (error) {
+      console.error("Error updating favorite count:", error);
+    } else {
+      console.log("Favorite count updated:", data);
+    }
+  } catch (error) {
+    throw new Error(
+      `updateLikeCounterOnUserReplyOnComment threw an error: ${error.message}`
     );
   }
 };

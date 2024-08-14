@@ -1,12 +1,14 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   SafeAreaView,
   Image,
   TouchableOpacity,
-  ScrollView,
+  ScrollView, // Use ScrollView instead of FlatList
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { icons, images } from "../../../constants";
 import BgDarkGradient from "../../../components/BackgroundGradients/BgDarkGradient";
@@ -17,24 +19,20 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import TextRegular18 from "../../../components/Typography/TextRegular18";
 import TextBold15 from "../../../components/Typography/TextBold15";
 import BuyNFTButton from "../../../components/Buttons/BuyNFTButton";
-import {
-  getIndividualNFTData,
-  globalNFTPageListener,
-  updateFavoriteCount,
-  addUserLikeOnPost,
-  removeUserLike,
-  checkUserLike,
-  getPostById,
-  fetchUserDetails,
-  updateLikeCounterOnUserLikedPosts,
-  removeUserLikeOnPost,
-  checkUserLikeOnPost,
-} from "../../../api/supabase_api";
 import Feather from "@expo/vector-icons/Feather";
 import { useAuth } from "../../../context/AuthProvider";
 import GenericFullScreenLoader from "../../../components/Loaders/GenericFullScreenLoader";
 import TextSemi20 from "../../../components/Typography/TextSemi20";
-import { FlatList } from "react-native-web";
+
+import {
+  getPostById,
+  fetchUserDetails,
+  updateLikeCounterOnUserLikedPosts,
+  addUserLikeOnPost,
+  removeUserLikeOnPost,
+  checkUserLikeOnPost,
+} from "../../../api/supabase_api";
+import CommentSection from "../../../components/CommentsSystem/CommentsSection";
 
 const PostPage = () => {
   const { authUser } = useAuth();
@@ -42,8 +40,6 @@ const PostPage = () => {
 
   const [user, setUser] = useState(null);
   const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
   const [maximizeImage, setMaximizeImage] = useState(false);
   const [likePost, setLikePost] = useState(false);
 
@@ -55,7 +51,7 @@ const PostPage = () => {
     setMaximizeImage(!maximizeImage);
   };
 
-  const handleUserProfileRoute = (userId) => {
+  const handleUserProfileRoute = () => {
     if (userId === authUser.userId) {
       router.push("/profile");
     } else {
@@ -73,7 +69,7 @@ const PostPage = () => {
     }
   };
 
-  const handleUnlikedNFT = async () => {
+  const handleUnlikedPost = async () => {
     if (likePost) {
       const likesCounter = post.favorite_count - 1;
       setLikePost(false);
@@ -82,29 +78,6 @@ const PostPage = () => {
       await removeUserLikeOnPost(authUser.userId, postId);
     }
   };
-
-  // const fetchAndSetComments = async () => {
-  //   const fetchedComments = await fetchCommentsByPostId(postId);
-  //   setComments(fetchedComments);
-  // };
-
-  // const handleAddComment = async () => {
-  //   if (newComment.trim()) {
-  //     await addCommentToPost(postId, authUser.userId, newComment);
-  //     setNewComment("");
-  //     fetchAndSetComments(); // Re-fetch comments to update the list
-  //   }
-  // };
-
-  // const handleLikeComment = async (commentId) => {
-  //   await likeComment(commentId, authUser.userId);
-  //   fetchAndSetComments(); // Re-fetch comments to update the list
-  // };
-
-  // const handleReplyToComment = async (commentId, replyText) => {
-  //   await replyToComment(commentId, authUser.userId, replyText);
-  //   fetchAndSetComments(); // Re-fetch comments to update the list
-  // };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -144,42 +117,42 @@ const PostPage = () => {
           resizeMode="contain"
           className="w-screen h-full top-0 mt-6 rounded-3xl absolute"
         />
-        <View className="mt-8 w-screen p-4 flex-row items-center justify-between absolute left-0 top-0 z-50">
-          <TouchableOpacity onPress={handleBack}>
-            <Image source={icons.backArrow} resizeMethod="contain" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleMaximizeImage}
-            className="h-[40px] w-[40px] rounded-3xl bg-purple-900 items-center justify-center"
-          >
-            <Feather name="maximize" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
+
         <BgBlackOverlay>
-          {/* TODO: add carousel ability later */}
-          <Image
-            className="h-[60vh] w-screen rounded-b-[50px]"
-            resizeMode="cover"
-            source={{ uri: post?.media[0] }}
-          />
-          {maximizeImage && (
-            <TouchableOpacity
-              className="h-screen w-screen absolute z-50 items-center justify-center"
-              onPress={handleMaximizeImage}
-            >
-              <View className="bg-black opacity-80 h-full w-full absolute" />
-              <View className="w-screen h-screen items-center justify-center">
-                <Image
-                  source={{ uri: post?.media[0] }}
-                  resizeMode="contain"
-                  className="w-full h-full"
-                />
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <View className="flex-col items-center w-full p-4">
+              <View className="mt-8 w-screen p-4 flex-row items-center justify-between absolute left-0 top-0 z-50">
+                <TouchableOpacity onPress={handleBack}>
+                  <Image source={icons.backArrow} resizeMethod="contain" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleMaximizeImage}
+                  className="h-[40px] w-[40px] rounded-3xl bg-purple-900 items-center justify-center"
+                >
+                  <Feather name="maximize" size={24} color="white" />
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-          )}
-          <ScrollView>
-            <View className="flex-col items-center w-screen h-full p-4">
-              <View className="flex-row w-full items-center justify-between">
+              <Image
+                className="h-[60vh] w-screen rounded-b-[50px] -mt-4"
+                resizeMode="cover"
+                source={{ uri: post?.media[0] }}
+              />
+              {maximizeImage && (
+                <TouchableOpacity
+                  className="h-screen w-screen absolute top-0 left-0 z-50 items-center justify-center"
+                  onPress={handleMaximizeImage}
+                >
+                  <View className="bg-black opacity-80 h-full w-full absolute" />
+                  <View className="w-screen h-screen items-center justify-center">
+                    <Image
+                      source={{ uri: post?.media[0] }}
+                      resizeMode="contain"
+                      className="w-full h-full"
+                    />
+                  </View>
+                </TouchableOpacity>
+              )}
+              <View className="flex-row w-full items-center justify-between pt-8">
                 <TouchableOpacity
                   onPress={() => handleUserProfileRoute(user.userId)}
                   className="flex-row items-center"
@@ -193,7 +166,13 @@ const PostPage = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={likePost ? handleUnlikedNFT : handleLikedPost}
+                  onPress={() => {
+                    if (likePost) {
+                      handleUnlikedPost();
+                    } else {
+                      handleLikedPost();
+                    }
+                  }}
                   className="flex-row items-center"
                 >
                   <AntDesign
@@ -212,23 +191,9 @@ const PostPage = () => {
                 </TextRegular18>
                 <View className="w-full h-[1px] bg-purple-700" />
                 <TextSemi20 extraClasses={"py-4"}>Comments</TextSemi20>
-                {/* <FlatList
-                    data={comments}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderComment}
-                  />
-                  <View className="flex-row items-center mt-4">
-                    <TextInput
-                      value={newComment}
-                      onChangeText={setNewComment}
-                      placeholder="Add a comment..."
-                      placeholderTextColor="#888"
-                      className="flex-1 bg-gray-800 p-2 rounded-md text-white"
-                    />
-                    <TouchableOpacity onPress={handleAddComment} className="ml-2">
-                      <Feather name="send" size={24} color="white" />
-                    </TouchableOpacity>
-                  </View> */}
+              </View>
+              <View className="pb-12 h-full w-full">
+                <CommentSection postId={postId} />
               </View>
             </View>
           </ScrollView>

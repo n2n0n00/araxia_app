@@ -26,7 +26,7 @@ import PostsList from "../../components/ProfileComponents/PostsList";
 const Profile = () => {
   const { authUser } = useAuth();
 
-  const cryptoAddressShort = addressShortener(authUser?.cryptoAddress);
+  // const cryptoAddressShort = addressShortener(authUser?.cryptoAddress);
 
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
@@ -71,7 +71,7 @@ const Profile = () => {
     if (authUser) {
       fetchData();
     }
-  }, []); // Added authUser as dependency to rerun effect when authUser changes
+  }, []);
 
   if (loading) {
     return <GenericFullScreenLoader />;
@@ -92,7 +92,7 @@ const Profile = () => {
                 <AraxiaHeadBar />
                 <View className="flex-col items-center w-full p-4 h-[450px]">
                   <Header
-                    currentUser={authUser.userId}
+                    currentUser={authUser?.userId}
                     totalNfts={authUser.nfts}
                     levelXP={authUser.levelXP}
                     longCryptoAddress={authUser?.cryptoAddress}
@@ -102,7 +102,7 @@ const Profile = () => {
                     following={
                       following.length ? numberFormatter(following.length) : 0
                     }
-                    cryptoAddress={cryptoAddressShort}
+                    // cryptoAddress={cryptoAddressShort}
                     username={authUser.username}
                     bio={authUser.bio}
                     userId={authUser.userId}
