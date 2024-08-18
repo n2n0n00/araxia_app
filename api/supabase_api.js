@@ -1381,3 +1381,68 @@ export const updateLikeCounterOnUserReplyOnComment = async (
     );
   }
 };
+
+// POST Page Listeners
+export const globalPOSTPageCommentsListener = (callback, postId) => {
+  return supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "userCommentsOnPosts" },
+      (payload) => {
+        console.log("Change received!", payload);
+        if (payload.new && payload.new.post_id === postId) {
+          callback(payload.new);
+        }
+      }
+    )
+    .subscribe();
+};
+
+export const globalPOSTPageCommentLikesListener = (callback) => {
+  return supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "userLikedComments" },
+      (payload) => {
+        console.log("Change received!", payload);
+        if (payload.new) {
+          callback(payload.new);
+        }
+      }
+    )
+    .subscribe();
+};
+
+export const globalPOSTPageCommentRepliesListener = (callback) => {
+  return supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "userRepliesToPostComments" },
+      (payload) => {
+        console.log("Change received!", payload);
+        if (payload.new) {
+          callback(payload.new);
+        }
+      }
+    )
+    .subscribe();
+};
+
+export const globalPOSTPageCommentReplyLikesListener = (callback) => {
+  return supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "userLikedReplies" },
+      (payload) => {
+        console.log("Change received!", payload);
+        if (payload.new) {
+          callback(payload.new);
+        }
+      }
+    )
+    .subscribe();
+};
