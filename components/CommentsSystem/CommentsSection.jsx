@@ -26,8 +26,14 @@ import {
   globalPOSTPageCommentLikesListener,
   globalPOSTPageCommentRepliesListener,
   globalPOSTPageCommentReplyLikesListener,
+  fetchUserDetails,
 } from "../../api/supabase_api";
 import EmptyState from "../../components/EmptyComponent/EmptyState";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import CommentProfile from "./CommentProfile";
+import TextMedium14 from "../../components/Typography/TextMedium14";
+import ReplierProfile from "./ReplyProfile";
+import TextRegular13 from "../Typography/TextRegular13";
 
 const PAGE_SIZE = 10;
 
@@ -70,14 +76,17 @@ const CommentSection = ({ postId }) => {
           const replies = await fetchRepliesOnCommentsByCommentId(
             comment.comment_id
           );
+          const userDetails = await fetchUserDetails(comment.user_id);
           const repliesWithLikes = await Promise.all(
             replies.map(async (reply) => {
               const isReplyLiked = await checkUserLikeOnReplyOnComment(
                 authUser.userId,
                 reply.reply_id
               );
+              const userDetails = await fetchUserDetails(reply.user_id);
               return {
                 ...reply,
+                userDetails,
                 liked: isReplyLiked,
                 favorite_count: reply.favorite_count || 0,
               };
@@ -87,6 +96,7 @@ const CommentSection = ({ postId }) => {
             ...comment,
             replies: repliesWithLikes,
             liked: isCommentLiked,
+            userDetails,
             favorite_count: comment.favorite_count || 0,
           };
         })
@@ -349,33 +359,31 @@ const CommentSection = ({ postId }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+    <View className="flex-1">
+      <View className="flex-row items-center mb-5">
         <TextInput
+          multiline
           value={newComment}
           onChangeText={setNewComment}
           placeholder="Add a comment..."
-          style={{
-            flex: 1,
-            borderColor: "#ccc",
-            borderWidth: 1,
-            borderRadius: 20,
-            padding: 10,
-            marginRight: 10,
-          }}
+          placeholderTextColor={"white"}
+          className="flex-1 border-2 border-white rounded-[10px] px-4 py-2 mr-2 text-white font-mregular"
         />
         <TouchableOpacity onPress={handleAddComment}>
-          <AntDesign name="arrowright" size={24} color="blue" />
+          <FontAwesome5 name="arrow-circle-right" size={30} color="white" />
         </TouchableOpacity>
       </View>
       {loading.comments && page === 1 ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <View className="pt-10">
+          <ActivityIndicator size={60} color="#C796FF" />
+        </View>
       ) : comments.length > 0 ? (
         <ScrollView>
           {comments.map((comment) => (
             <CommentItem
               key={comment.comment_id}
               comment={comment}
+              userDetails={comment.userDetails[0]}
               expandedReplies={expandedReplies[comment.comment_id]}
               toggleReplies={toggleReplies}
               handleLike={handleLike}
@@ -390,10 +398,12 @@ const CommentSection = ({ postId }) => {
           ))}
           {hasMore.comments && (
             <TouchableOpacity
-              style={{ padding: 10, alignItems: "center" }}
+              className="p-3 items-center"
               onPress={() => handleLoadMore("comments")}
             >
-              <Text style={{ color: "blue" }}>Load More Comments</Text>
+              <Text className="font-mregular text-[#3399ff]">
+                Load More Comments
+              </Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -416,32 +426,41 @@ const CommentItem = ({
   newReply,
   setNewReply,
   handleAddReply,
+  userDetails,
 }) => (
-  <View
-    style={{ padding: 10, borderBottomColor: "#ccc", borderBottomWidth: 1 }}
-  >
-    <Text style={{ fontWeight: "bold", color: "white" }}>
-      {comment.user_id}
-    </Text>
-    <Text className="text-white">{comment.comment_content}</Text>
+  <View className="p-4 border-2 border-gray-400 mb-2 rounded-[15px]">
+    <CommentProfile
+      userId={userDetails.userId}
+      username={userDetails.username}
+      userAvatar={userDetails.avatar}
+    />
+    <TextMedium14 extraClasses={"my-4"}>{comment.comment_content}</TextMedium14>
     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
       <TouchableOpacity
+        className="flex-row items-center"
         onPress={() => handleLike(comment.comment_id, "comment", comment.liked)}
       >
-        <Text style={{ color: comment.liked ? "blue" : "red" }}>
-          {comment.liked ? "Unlike" : "Like"} ({comment.favorite_count})
+        <AntDesign
+          name={comment.liked ? "heart" : "hearto"}
+          size={24}
+          color="white"
+        />
+        <Text className="font-mregular text-white text-sm ml-2">
+          {comment.favorite_count}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setReplyTo(comment.comment_id)}>
         <Text
-          style={{ color: replyTo === comment.comment_id ? "blue" : "red" }}
+          className={`font-mregular ${
+            replyTo === comment.comment_id ? "text-[#9933ff]" : "text-[#cc99ff]"
+          }`}
         >
-          Reply
+          Add Reply
         </Text>
       </TouchableOpacity>
       {comment.replies.length > 0 && (
         <TouchableOpacity onPress={() => toggleReplies(comment.comment_id)}>
-          <Text style={{ color: "blue" }}>
+          <Text className="font-mregular text-[#3399ff]">
             {expandedReplies ? "Hide" : "View"} Replies (
             {comment.replies.length})
           </Text>
@@ -450,62 +469,67 @@ const CommentItem = ({
     </View>
 
     {expandedReplies && (
-      <View style={{ marginLeft: 20 }}>
+      <View className="ml-5">
         {comment.replies.map((reply) => (
           <ReplyItem
             key={reply.reply_id}
             reply={reply}
+            userDetails={reply.userDetails[0]}
             handleLike={handleLike}
             authUser={authUser}
           />
         ))}
         {comment.replies.length > 0 && (
           <TouchableOpacity
-            style={{ padding: 10, alignItems: "center" }}
+            className="items-center p-3"
             onPress={() => handleLoadMore("replies", comment.comment_id)}
           >
-            <Text style={{ color: "blue" }}>Load More Replies</Text>
+            <Text className="font-mregular text-[#3399ff]">
+              Load More Replies
+            </Text>
           </TouchableOpacity>
         )}
       </View>
     )}
 
     {replyTo === comment.comment_id && (
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
-      >
+      <View className="flex-row items-center mt-6">
         <TextInput
+          multiline
           value={newReply}
           onChangeText={setNewReply}
           placeholder="Add a reply..."
-          style={{
-            flex: 1,
-            borderColor: "#ccc",
-            borderWidth: 1,
-            borderRadius: 20,
-            padding: 10,
-            marginRight: 10,
-          }}
+          placeholderTextColor={"white"}
+          className="flex-1 border-2 border-white rounded-[10px] px-4 py-2 mr-2 text-white font-mregular"
         />
         <TouchableOpacity onPress={() => handleAddReply(comment.comment_id)}>
-          <AntDesign name="arrowright" size={24} color="blue" />
+          <FontAwesome5 name="arrow-circle-right" size={30} color="white" />
         </TouchableOpacity>
       </View>
     )}
   </View>
 );
 
-const ReplyItem = ({ reply, handleLike, authUser }) => (
-  <View style={{ padding: 5, borderBottomColor: "#ccc", borderBottomWidth: 1 }}>
-    <Text style={{ fontWeight: "bold" }} className="text-white">
-      {reply.user_id}
-    </Text>
-    <Text className="text-white">{reply.reply_content}</Text>
+const ReplyItem = ({ reply, handleLike, authUser, userDetails }) => (
+  <View className="p-1 border-gray-400 rounded-[25px] border-2 mt-2 py-2 px-3">
+    <ReplierProfile
+      userId={userDetails.userId}
+      username={userDetails.username}
+      userAvatar={userDetails.avatar}
+    />
+    <TextRegular13>{reply.reply_content}</TextRegular13>
+
     <TouchableOpacity
       onPress={() => handleLike(reply.reply_id, "reply", reply.liked)}
+      className="flex-row items-center justify-end px-2"
     >
-      <Text style={{ color: reply.liked ? "blue" : "red" }}>
-        {reply.liked ? "Unlike" : "Like"} ({reply.favorite_count})
+      <AntDesign
+        name={reply.liked ? "heart" : "hearto"}
+        size={18}
+        color="white"
+      />
+      <Text className="font-mregular text-white text-[11px] ml-2">
+        {reply.favorite_count}
       </Text>
     </TouchableOpacity>
   </View>
