@@ -71,24 +71,22 @@ const PostCard = ({ postId, userData }) => {
             <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
           </View>
         </View>
-        <View className="mb-4">
-          <Text className="text-[13px] text-white font-mregular">
-            {postsData?.content}
-          </Text>
-        </View>
-        <TouchableOpacity
-          onPress={handlePostRoute}
-          style={styles.photosContainer(numColumns)}
-          className=""
-        >
-          {postsData?.media?.map((item, index) => (
-            <Image
-              key={index}
-              source={{ uri: item }}
-              style={styles.photo(numColumns)}
-              resizeMethod="contain"
-            />
-          ))}
+        <TouchableOpacity onPress={handlePostRoute}>
+          <View className="mb-4">
+            <Text className="text-[13px] text-white font-mregular">
+              {postsData?.content}
+            </Text>
+          </View>
+          <View style={styles.photosContainer(numColumns)}>
+            {postsData?.media?.map((item, index) => (
+              <Image
+                key={index}
+                source={{ uri: item }}
+                style={styles.photo(numColumns)}
+                resizeMethod="contain"
+              />
+            ))}
+          </View>
         </TouchableOpacity>
         <View className="flex-row w-full items-center justify-between">
           <View className="flex-row w-2/4 items-start justify-start gap-5">

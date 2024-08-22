@@ -37,7 +37,7 @@ import CommentSection from "../../../components/CommentsSystem/CommentsSection";
 const PostPage = () => {
   const { authUser } = useAuth();
   const { userId, postId } = useLocalSearchParams();
-
+  const [hasMedia, setHasMedia] = useState(false);
   const [user, setUser] = useState(null);
   const [post, setPost] = useState(null);
   const [maximizeImage, setMaximizeImage] = useState(false);
@@ -96,6 +96,11 @@ const PostPage = () => {
             postId
           );
           setLikePost(authUserLiked);
+          if (postData[0]?.media?.length > 0) {
+            setHasMedia(true);
+          }
+
+          console.log(hasMedia);
         }
       } catch (error) {
         console.error("Error fetching post and related data:", error.message);
@@ -125,19 +130,23 @@ const PostPage = () => {
                 <TouchableOpacity onPress={handleBack}>
                   <Image source={icons.backArrow} resizeMethod="contain" />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleMaximizeImage}
-                  className="h-[40px] w-[40px] rounded-3xl bg-purple-900 items-center justify-center"
-                >
-                  <Feather name="maximize" size={24} color="white" />
-                </TouchableOpacity>
+                {hasMedia && (
+                  <TouchableOpacity
+                    onPress={handleMaximizeImage}
+                    className="h-[40px] w-[40px] rounded-3xl bg-purple-900 items-center justify-center"
+                  >
+                    <Feather name="maximize" size={24} color="white" />
+                  </TouchableOpacity>
+                )}
               </View>
-              <Image
-                className="h-[60vh] w-screen rounded-b-[50px] -mt-4"
-                resizeMode="cover"
-                source={{ uri: post?.media[0] }}
-              />
-              {maximizeImage && (
+              {hasMedia && (
+                <Image
+                  className="h-[60vh] w-screen rounded-b-[50px] -mt-4"
+                  resizeMode="cover"
+                  source={{ uri: post?.media[0] }}
+                />
+              )}
+              {hasMedia && maximizeImage && (
                 <TouchableOpacity
                   className="h-screen w-screen absolute top-0 left-0 z-50 items-center justify-center"
                   onPress={handleMaximizeImage}
@@ -152,7 +161,12 @@ const PostPage = () => {
                   </View>
                 </TouchableOpacity>
               )}
-              <View className="flex-row w-full items-center justify-between pt-8">
+
+              <View
+                className={`flex-row w-full items-center justify-between pt-8 ${
+                  !hasMedia && "mt-14"
+                }`}
+              >
                 <TouchableOpacity
                   onPress={() => handleUserProfileRoute(user.userId)}
                   className="flex-row items-center"

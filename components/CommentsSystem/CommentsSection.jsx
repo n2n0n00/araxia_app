@@ -408,7 +408,9 @@ const CommentSection = ({ postId }) => {
           )}
         </ScrollView>
       ) : (
-        <EmptyState message="No comments yet." />
+        <View className="h-full">
+          <EmptyState subtitle="No comments yet." />
+        </View>
       )}
     </View>
   );

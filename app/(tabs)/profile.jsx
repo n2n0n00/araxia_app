@@ -55,7 +55,6 @@ const Profile = () => {
           getUserSubscribedExperiencesData(authUser.userId),
         ]);
 
-        console.log(userPosts);
         setUserPosts(fetchUserPosts);
         setUserExperiences(fetchUserExperiences);
         setUserNFTs(nfts);
@@ -97,10 +96,10 @@ const Profile = () => {
                     levelXP={authUser.levelXP}
                     longCryptoAddress={authUser?.cryptoAddress}
                     followers={
-                      followers.length ? numberFormatter(followers.length) : 0
+                      following.length ? numberFormatter(following.length) : 0
                     }
                     following={
-                      following.length ? numberFormatter(following.length) : 0
+                      followers.length ? numberFormatter(followers.length) : 0
                     }
                     // cryptoAddress={cryptoAddressShort}
                     username={authUser.username}

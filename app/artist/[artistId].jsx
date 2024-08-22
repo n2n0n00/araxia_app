@@ -8,6 +8,7 @@ import {
   getFollowingUsers,
   getFollowedUsers,
   globalNFTsListener,
+  getUserPosts,
 } from "../../api/supabase_api";
 import { FlatList, Image, SafeAreaView, View } from "react-native";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
@@ -23,6 +24,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { numberFormatter } from "../../utils/numberFormatter";
 import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
 import FollowButton from "../../components/Buttons/FollowButton";
+import PostsList from "../../components/ProfileComponents/PostsList";
 
 const ArtistId = () => {
   const { authUser } = useAuth();
@@ -31,6 +33,7 @@ const ArtistId = () => {
   const [followers, setFollowers] = useState([]);
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
   const [userDetailsLoader, setUserDetailsLoader] = useState(false);
   const [userExtendedDataLoader, setUserExtendedDataLoader] = useState(false);
@@ -53,12 +56,14 @@ const ArtistId = () => {
       try {
         globalNFTsListener(setUserNFTs, artistId);
         setUserExtendedDataLoader(true);
-        const [nfts, followingList, followersList] = await Promise.all([
-          getUserNFTs(artistId),
-          getFollowingUsers(artistId),
-          getFollowedUsers(artistId),
-        ]);
-
+        const [nfts, followingList, followersList, fetchUserPosts] =
+          await Promise.all([
+            getUserNFTs(artistId),
+            getFollowingUsers(artistId),
+            getFollowedUsers(artistId),
+            getUserPosts(artistId),
+          ]);
+        setUserPosts(fetchUserPosts);
         setUserNFTs(nfts);
         setFollowers(followingList);
         setFollowing(followersList);
@@ -152,6 +157,11 @@ const ArtistId = () => {
                     tabRightComponent={<ExperiencesPosts />}
                     tabLeftLabel="NFTs"
                     tabRightLabel="Experiences"
+                    tabCenter="posts"
+                    tabCenterLabel="Posts"
+                    tabCenterComponent={
+                      <PostsList userPosts={userPosts} userData={userData} />
+                    }
                   />
                 )}
               </View>

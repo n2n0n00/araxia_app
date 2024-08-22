@@ -7,6 +7,8 @@ import {
   getFollowedUsers,
   getFollowingUsers,
   getUserNFTs,
+  getUserPosts,
+  getUserSubscribedExperiencesData,
   globalNFTsListener,
 } from "../../api/supabase_api";
 import { FlatList, Image, SafeAreaView, View } from "react-native";
@@ -23,6 +25,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { numberFormatter } from "../../utils/numberFormatter";
 import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
 import FollowButton from "../../components/Buttons/FollowButton";
+import PostsList from "../../components/ProfileComponents/PostsList";
 
 const UserProfilePage = () => {
   const { authUser } = useAuth();
@@ -31,6 +34,8 @@ const UserProfilePage = () => {
   const [followers, setFollowers] = useState([]);
   const [userData, setUserData] = useState({});
   const [userNFTs, setUserNFTs] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
+  const [userExperiences, setUserExperiences] = useState([]);
   const [userCryptoAddress, setUserCryptoAddress] = useState();
   const [userDetailsLoader, setUserDetailsLoader] = useState(false);
   const [userExtendedDataLoader, setUserExtendedDataLoader] = useState(false);
@@ -54,12 +59,21 @@ const UserProfilePage = () => {
         globalNFTsListener(setUserNFTs, userId);
 
         setUserExtendedDataLoader(true);
-        const [nfts, followingList, followersList] = await Promise.all([
+        const [
+          nfts,
+          followingList,
+          followersList,
+          fetchUserPosts,
+          fetchUserExperiences,
+        ] = await Promise.all([
           getUserNFTs(userId),
           getFollowingUsers(userId),
           getFollowedUsers(userId),
+          getUserPosts(userId),
+          getUserSubscribedExperiencesData(userId),
         ]);
-
+        setUserPosts(fetchUserPosts);
+        setUserExperiences(fetchUserExperiences);
         setUserNFTs(nfts);
         setFollowers(followingList);
         setFollowing(followersList);
@@ -158,6 +172,11 @@ const UserProfilePage = () => {
                     tabRightComponent={<ExperiencesPosts />}
                     tabLeftLabel="NFTs"
                     tabRightLabel="Experiences"
+                    tabCenter="posts"
+                    tabCenterLabel="Posts"
+                    tabCenterComponent={
+                      <PostsList userPosts={userPosts} userData={userData} />
+                    }
                   />
                 )}
               </View>
