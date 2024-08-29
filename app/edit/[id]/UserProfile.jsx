@@ -114,43 +114,41 @@ const UserProfile = () => {
   };
 
   const submitChanges = async () => {
-    if (!form.username || !form.bio || !form.fandom) {
+    if (!form.content_text || !form.fandom) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
 
     try {
       setUploading(true);
-      const avatarUrl = await uploadAvatar(authUser, form, setUploading);
+      const mediaUpload = await uploadPostMedia(authUser, form, setUploading);
 
-      const updatedUserData = {
-        username: form.username,
-        bio: form.bio,
-        currentFandom: form.fandom,
-        avatar: avatarUrl || form.avatar,
+      const postData = {
+        content: form.content_text,
+        media: await mediaUpload, // Ensure media URLs are correctly passed
+        user_id: authUser.userId,
+        post_location: form.location,
+        post_fandom_name: form.fandom,
+        post_song: form.music,
       };
 
-      const result = await updateAuthUser(updatedUserData);
-      if (!result.success) {
-        throw new Error(result.message);
+      const post = await publishPost(postData);
+
+      if (!post.success) {
+        throw new Error(post.message);
       }
 
-      // Update local form state
-      setForm((prevForm) => ({
-        ...prevForm,
-        ...updatedUserData,
-      }));
-
-      Alert.alert("Success", "Profile updated successfully");
-      router.push("/profile");
+      Alert.alert("Success", "Post published successfully");
+      router.push("/profile"); // Navigate to user profile
     } catch (error) {
-      console.error("Error updating profile:", error);
-      Alert.alert("Error", "Failed to update profile. Please try again.");
+      console.error("Error publishing post:", error);
+      Alert.alert("Error", "Failed to publish post. Please try again.");
     } finally {
       setEditing(false);
       setUploading(false);
     }
   };
+
   const handleBack = () => {
     router.push("/profile");
   };

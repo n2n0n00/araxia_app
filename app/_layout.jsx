@@ -109,6 +109,10 @@ const RootLayout = () => {
           name="post/[userId]/[postId]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="addPost/[userId]"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

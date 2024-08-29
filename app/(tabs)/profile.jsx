@@ -1,4 +1,10 @@
-import { View, FlatList, Image, SafeAreaView } from "react-native";
+import {
+  View,
+  FlatList,
+  Image,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
@@ -22,6 +28,8 @@ import {
 import { numberFormatter } from "../../utils/numberFormatter";
 import GenericFullScreenLoader from "../../components/Loaders/GenericFullScreenLoader";
 import PostsList from "../../components/ProfileComponents/PostsList";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { router } from "expo-router";
 
 const Profile = () => {
   const { authUser } = useAuth();
@@ -72,6 +80,10 @@ const Profile = () => {
     }
   }, []);
 
+  const handleAddPost = () => {
+    router.push(`/addPost/${authUser?.userId}`);
+  };
+
   if (loading) {
     return <GenericFullScreenLoader />;
   }
@@ -84,6 +96,12 @@ const Profile = () => {
           resizeMode="contain"
           className="w-screen h-full top-0 mt-6 rounded-3xl absolute"
         />
+        <TouchableOpacity
+          className="absolute items-center z-50 w-[60px] h-[60px] bg-purple-500 rounded-full p-4 bottom-20 right-4"
+          onPress={handleAddPost}
+        >
+          <FontAwesome6 name="add" size={30} color="white" />
+        </TouchableOpacity>
         <BgBlackOverlay>
           <FlatList
             ListHeaderComponent={

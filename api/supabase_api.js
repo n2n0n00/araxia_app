@@ -1446,3 +1446,152 @@ export const globalPOSTPageCommentReplyLikesListener = (callback) => {
     )
     .subscribe();
 };
+
+//NOTE: Upload Post Media and Publish Post
+
+export const uploadPostMedia = async (authUser, form, setUploading) => {
+  try {
+    const mediaUrls = [];
+
+    for (let i = 0; i < form.base64.length; i++) {
+      const base64String = form.base64[i];
+      const mediaUri = form.media[i];
+      const fileType = mediaUri.split(".").pop();
+      const fileName = `${authUser.userId}-${Date.now()}-${i}.${fileType}`; // Generate unique file name
+
+      // Log base64 string and file name for debugging
+      console.log(`Uploading file: ${fileName}`);
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from("userPostsMedia")
+        .upload(fileName, decode(base64String), {
+          contentType: `image/${fileType}`,
+        });
+
+      if (error) {
+        console.error("Error uploading media:", error.message);
+        throw new Error("Failed to upload media");
+      }
+
+      // Log data returned from upload for debugging
+      console.log("Upload response data:", data);
+
+      // Get the public URL of the uploaded file
+      const { data: publicUrlData, error: urlError } = supabase.storage
+        .from("userPostsMedia")
+        .getPublicUrl(fileName);
+
+      if (urlError) {
+        console.error("Error getting public URL:", urlError.message);
+        throw new Error("Failed to get public URL");
+      }
+
+      // Log public URL for debugging
+      console.log("Public URL:", publicUrlData.publicUrl);
+
+      mediaUrls.push(publicUrlData.publicUrl);
+    }
+
+    return mediaUrls; // Return array of media URLs
+  } catch (error) {
+    console.error("Error in uploadPostMedia:", error);
+    setUploading(false);
+    throw new Error("Failed to upload post media");
+  }
+};
+
+export const publishPost = async (postData) => {
+  try {
+    const { data, error } = await supabase
+      .from("userPosts")
+      .insert([
+        {
+          user_id: postData.user_id,
+          content: postData.content,
+          media: postData.media,
+          post_location: postData.post_location,
+          post_fandom_name: postData.post_fandom_name,
+          post_song: postData.post_song,
+        },
+      ])
+      .single();
+
+    if (error) {
+      console.error("Error publishing post:", error);
+      return { success: false, message: "Failed to publish post" };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error in publishPost:", error);
+    return { success: false, message: "Failed to publish post" };
+  }
+};
+
+// export const uploadPostMedia = async (authUser, form, setUploading) => {
+//   try {
+//     const mediaUrls = [];
+
+//     for (let i = 0; i < form.media.length; i++) {
+//       const mediaUri = form.media[i];
+//       const fileType = form.media[i].split(".").pop();
+//       const fileName = `${authUser.userId}-${Date.now()}-${i}.${fileType}`; // Change the extension based on the file type
+
+//       // Upload to Supabase Storage
+//       const { data, error } = await supabase.storage
+//         .from("userPostsMedia")
+//         .upload(fileName, decode(form.base64), {
+//           uri: mediaUri,
+//           type: fileType,
+//           name: fileName,
+//         });
+
+//       if (error) {
+//         console.error("Error uploading media:", error.message);
+//         throw new Error("Failed to upload media");
+//       }
+
+//       // Get the public URL of the uploaded file
+//       const publicUrl = supabase.storage
+//         .from("userPostsMedia")
+//         .getPublicUrl(fileName).publicURL;
+
+//       mediaUrls.push(publicUrl);
+//     }
+
+//     return mediaUrls; // Return array of media URLs
+//   } catch (error) {
+//     console.error("Error in uploadPostMedia:", error);
+//     setUploading(false);
+//     throw new Error("Failed to upload post media");
+//   }
+// };
+
+// export const publishPost = async (postData) => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("userPosts")
+//       .insert([
+//         {
+//           user_id: postData.user_id,
+//           content: postData.content,
+//           media: postData.media, // This should be an array of media URLs
+//           post_location: postData.post_location,
+//           post_fandom_name: postData.post_fandom_name,
+//           post_song: postData.post_song,
+//         },
+//       ])
+//       .single();
+
+//     if (error) {
+//       console.error("Error publishing post:", error.message);
+//       return { success: false, message: "Failed to publish post" };
+//     }
+
+//     return { success: true, data };
+//   } catch (error) {
+//     console.error("Error in publishPost:", error);
+//     return { success: false, message: "Failed to publish post" };
+//   }
+// };
