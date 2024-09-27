@@ -6,7 +6,10 @@ import {
   RefreshControl,
   SafeAreaView,
   StyleSheet,
+  Platform,
 } from "react-native";
+
+import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
@@ -25,26 +28,44 @@ import { useLocalSearchParams } from "expo-router";
 import TextBold25 from "../../components/Typography/TextBold25";
 import SearchBar from "../../components/Search/SearchBar";
 import TopArtistsMarketplaceCard from "../../components/Cards/TopArtistsMarketplaceCard";
+import {
+  getAllArtists,
+  getFollowingUsers,
+  sortCitiesByProximity,
+} from "../../api/supabase_api";
 
 const Marketplace = () => {
   const { query } = useLocalSearchParams();
   const [refreshing, setRefreshing] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [sortedCitiesData, setSortedCitiesData] = useState(null);
+  const [topArtists, setTopArtists] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  //searchbar query searches the database
-  // const { data: posts, refetch } = useAppwrite(() => searchPosts(query));
-  // then pushes the data into the searchQuery as a data?
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Add your refetch logic  here
-    setRefreshing(false);
-  };
-
-  const refetch = () => <></>;
   useEffect(() => {
-    refetch();
-  }, [query]);
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
 
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      try {
+        const sortedCities = await sortCitiesByProximity(location);
+        setSortedCitiesData(sortedCities);
+
+        const topArtistsData = await getAllArtists();
+        setTopArtists(topArtistsData);
+      } catch (error) {
+        console.error("Error during reverse geocoding:", error);
+      }
+    })();
+  }, []);
+
+  console.log(topArtists);
   return (
     <SafeAreaView className="flex-1">
       <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
@@ -76,28 +97,21 @@ const Marketplace = () => {
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    data={marketplaceTopNear}
-                    keyExtractor={(item) => item.expName}
+                    data={sortedCitiesData}
+                    keyExtractor={(item) => item.experience_id}
                     renderItem={({ item }) => (
                       <NearYouCard
-                        expName={item.expName}
-                        expArtist={item.expArtist}
-                        expLink={item.expLink}
-                        expImage={item.expImage}
+                        experienceName={item.experience_name}
+                        experienceId={item.experience_id}
+                        experienceImage={item.experience_banner}
                       />
                     )}
-                    ListEmptyComponent={() => (
-                      <EmptyState
-                        title="No Experiences Found"
-                        subtitle="Get Your First Experience At The Marketplace"
-                      />
-                    )}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                      />
-                    }
+                    // ListEmptyComponent={() => (
+                    //   <EmptyState
+                    //     title="No Experiences Found"
+                    //     subtitle="Get Your First Experience At The Marketplace"
+                    //   />
+                    // )}
                   />
                 </View>
               </>
@@ -140,24 +154,15 @@ const Marketplace = () => {
                         expName={item.expName}
                       />
                     )}
-                    ListEmptyComponent={() => (
-                      <EmptyState
-                        title="No Experiences Found"
-                        subtitle="Get Your First Experience At The Marketplace"
-                      />
-                    )}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                      />
-                    }
+                    // ListEmptyComponent={() => (
+                    //   <EmptyState
+                    //     title="No Experiences Found"
+                    //     subtitle="Get Your First Experience At The Marketplace"
+                    //   />
+                    // )}
                   />
                 </View>
               </>
-            }
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
         </BgBlackOverlay>

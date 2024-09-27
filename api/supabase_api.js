@@ -1529,69 +1529,74 @@ export const publishPost = async (postData) => {
   }
 };
 
-// export const uploadPostMedia = async (authUser, form, setUploading) => {
-//   try {
-//     const mediaUrls = [];
+//NOTE: Sorting cities in database and user location using the Haversine Formula
+export const sortCitiesByProximity = async (userLocation) => {
+  // fetch cities with coordinates
+  const { data: cities, error } = await supabase
+    .from("experiencesDatabase")
+    .select("*");
 
-//     for (let i = 0; i < form.media.length; i++) {
-//       const mediaUri = form.media[i];
-//       const fileType = form.media[i].split(".").pop();
-//       const fileName = `${authUser.userId}-${Date.now()}-${i}.${fileType}`; // Change the extension based on the file type
+  if (error) {
+    console.error("Error fetching cities:", error);
+    return;
+  }
 
-//       // Upload to Supabase Storage
-//       const { data, error } = await supabase.storage
-//         .from("userPostsMedia")
-//         .upload(fileName, decode(form.base64), {
-//           uri: mediaUri,
-//           type: fileType,
-//           name: fileName,
-//         });
+  // calculate distance between user location and each city
+  const sortedCities = cities
+    .map((city) => {
+      const distance = getDistanceFromLatLonInKm(
+        userLocation.coords.latitude,
+        userLocation.coords.longitude,
+        city.city_latitude,
+        city.city_longitude
+      );
+      return { ...city, distance };
+    })
+    .sort((a, b) => a.distance - b.distance); // Sort by distance
 
-//       if (error) {
-//         console.error("Error uploading media:", error.message);
-//         throw new Error("Failed to upload media");
-//       }
+  // return sorted list of cities
+  console.log("Sorted Cities by Proximity:", sortedCities);
+  return sortedCities;
+};
 
-//       // Get the public URL of the uploaded file
-//       const publicUrl = supabase.storage
-//         .from("userPostsMedia")
-//         .getPublicUrl(fileName).publicURL;
+// using the haversine formula to calculate distance in kilometers
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // radius of the Earth in kilometers
+  const dLat = deg2rad(lat2 - lat1); // convert degree to radian
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // diistance in kilometers
+  return distance;
+}
 
-//       mediaUrls.push(publicUrl);
-//     }
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
 
-//     return mediaUrls; // Return array of media URLs
-//   } catch (error) {
-//     console.error("Error in uploadPostMedia:", error);
-//     setUploading(false);
-//     throw new Error("Failed to upload post media");
-//   }
-// };
+//NOTE: Sorting artists based on followers
+export const getAllArtists = async () => {
+  try {
+    let { data: userDatabase, error } = await supabase
+      .from("userDatabase")
+      .select("*")
+      .eq("isUserArtist", "TRUE");
 
-// export const publishPost = async (postData) => {
-//   try {
-//     const { data, error } = await supabase
-//       .from("userPosts")
-//       .insert([
-//         {
-//           user_id: postData.user_id,
-//           content: postData.content,
-//           media: postData.media, // This should be an array of media URLs
-//           post_location: postData.post_location,
-//           post_fandom_name: postData.post_fandom_name,
-//           post_song: postData.post_song,
-//         },
-//       ])
-//       .single();
+    const sortedArtists = userDatabase
+      .map(async (item) => {
+        const topArtistsByFollowers = await getFollowingUsers();
+        const followers = topArtistsByFollowers.length;
+        return { ...item, followers };
+      })
+      .sort((a, b) => a.followers - b.followers);
 
-//     if (error) {
-//       console.error("Error publishing post:", error.message);
-//       return { success: false, message: "Failed to publish post" };
-//     }
-
-//     return { success: true, data };
-//   } catch (error) {
-//     console.error("Error in publishPost:", error);
-//     return { success: false, message: "Failed to publish post" };
-//   }
-// };
+    return sortedArtists;
+  } catch (error) {
+    console.log(error);
+  }
+};

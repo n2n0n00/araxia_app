@@ -77,7 +77,10 @@ const PostCard = ({ postId, userData }) => {
               {postsData?.content}
             </Text>
           </View>
-          <View style={styles.photosContainer(numColumns)}>
+          <View
+            style={styles.photosContainer(numColumns)}
+            className={`${postsData?.media === "NULL" && "w-0 h-0"}`}
+          >
             {postsData?.media?.map((item, index) => (
               <Image
                 key={index}
