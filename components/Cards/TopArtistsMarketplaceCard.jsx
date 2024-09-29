@@ -12,27 +12,37 @@ import TextMedium18 from "../Typography/TextMedium18";
 import TextBold25 from "../Typography/TextBold25";
 import { LinearGradient } from "expo-linear-gradient";
 import TextSemi18 from "../Typography/TextSemi18";
+import { useState } from "react";
+import { tmzDateReformatter } from "../../utils/tmzDateReformatter";
+import { router } from "expo-router";
 
 const TopArtistsMarketplaceCard = ({
   banner,
   content,
   artistName,
-  cryptoAddress,
+  expCurrency,
   avatar,
   price,
-  getExpLink,
-  expLocation,
+  expCity,
+  expCountry,
   date,
   expName,
-  //   timeStamp,
+  artistId,
+  experienceId,
 }) => {
+  const formattedDate = tmzDateReformatter(date);
+
+  const viewExpRoute = () => {
+    router.push(`/experience/${artistId}/${experienceId}`);
+  };
+
   return (
     <GlassContainer insideContainerClasses={"py-0 px-0 mb-5"}>
       <View className="p-4 rounded-xl">
         <View className="flex-row justify-between items-center mb-4">
           <View className="flex-row gap-4 items-center">
             <Image
-              source={avatar}
+              source={{ uri: avatar }}
               resizeMethod="contain"
               className="bg-[#BCC2C3] w-[45px] h-[45px] rounded-full"
             />
@@ -40,22 +50,13 @@ const TopArtistsMarketplaceCard = ({
               <Text className="text-[13px] font-medium text-white">
                 {artistName}
               </Text>
-              <Text className="text-[#81999E] font-regular text-[11px]">
-                {cryptoAddress}
-              </Text>
             </View>
-          </View>
-
-          <View className="flex-row gap-1">
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
           </View>
         </View>
 
         <View className="w-full items-center">
           <Image
-            source={banner}
+            source={{ uri: banner }}
             resizeMethod="contain"
             className="w-[333px] h-[263px] rounded-3xl"
           />
@@ -68,10 +69,12 @@ const TopArtistsMarketplaceCard = ({
           </Text>
           <View className="flex-row w-full items-center justify-evenly mt-5">
             <Text className="text-[13px] text-white font-mregular">
-              <Text className="font-mbold">Date:</Text> {date}
+              <Text className="font-mbold">Date:</Text> {formattedDate}
             </Text>
             <Text className="text-[13px] text-white font-mregular">
-              <Text className="font-mbold">Location:</Text> {expLocation}
+              <Text className="font-mbold">Location:</Text> {expCity}
+              {", "}
+              {expCountry}
             </Text>
           </View>
         </View>
@@ -79,8 +82,13 @@ const TopArtistsMarketplaceCard = ({
         <View className="flex-row w-full items-center justify-center relative">
           <View className="relative w-[280px] bg-[#30B283] h-[50px] rounded-full mt-8">
             <View className="absolute right-[4px] top-[5px]">
-              <TouchableOpacity className="w-full flex-row items-center justify-between">
-                <TextSemi18 extraClasses={"pl-10"}>{price}</TextSemi18>
+              <TouchableOpacity
+                className="w-full flex-row items-center justify-between"
+                onPress={viewExpRoute}
+              >
+                <TextSemi18 extraClasses={"pl-10"}>
+                  {price} {expCurrency}
+                </TextSemi18>
                 <LinearGradient
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
@@ -88,7 +96,7 @@ const TopArtistsMarketplaceCard = ({
                   locations={["0", "1"]}
                   className="w-[100px] h-[40px] rounded-3xl items-center justify-center"
                 >
-                  <TextSemi18>Get</TextSemi18>
+                  <TextSemi18>Details</TextSemi18>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

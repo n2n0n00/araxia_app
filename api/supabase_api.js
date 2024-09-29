@@ -1580,23 +1580,59 @@ function deg2rad(deg) {
 }
 
 //NOTE: Sorting artists based on followers
-export const getAllArtists = async () => {
+export const getAllTopArtists = async () => {
   try {
     let { data: userDatabase, error } = await supabase
       .from("userDatabase")
       .select("*")
       .eq("isUserArtist", "TRUE");
 
-    const sortedArtists = userDatabase
-      .map(async (item) => {
-        const topArtistsByFollowers = await getFollowingUsers();
+    if (error) {
+      throw error;
+    }
+
+    // Wait for all promises to resolve before sorting
+    const artistsWithFollowers = await Promise.all(
+      userDatabase.map(async (item) => {
+        const topArtistsByFollowers = await getFollowingUsers(item.userId);
+        const topArtistsRecentExperience = await getExperienceByArtistId(
+          item.userId
+        );
+
+        //TODO: NEED TO ADD OTHER PARAMETERS LIKE NUMBER OF POSTS AND TOTAL LIKES...
         const followers = topArtistsByFollowers.length;
-        return { ...item, followers };
+        return { followers, topArtistsRecentExperience };
       })
-      .sort((a, b) => a.followers - b.followers);
+    );
+
+    // Sort in descending order (most followers first)
+    const sortedArtists = artistsWithFollowers.sort(
+      (a, b) => b.followers - a.followers
+    );
 
     return sortedArtists;
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const getExperienceByArtistId = async (artistId) => {
+  try {
+    const { data: experiencesDatabase, error } = await supabase
+      .from("experiencesDatabase")
+      .select("*")
+      .eq("artist_id", artistId)
+      .order("experience_starts_at", { ascending: false }); // Sort by experience_starts_at in descending order
+
+    if (error) {
+      throw new Error(
+        `Error fetching experience by artist ID: ${error.message}`
+      );
+    }
+
+    return experiencesDatabase[0];
+  } catch (error) {
+    console.error("Error in getExperienceByArtistId:", error);
+    return null; // or return an empty object/array
   }
 };

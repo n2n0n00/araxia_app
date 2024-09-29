@@ -65,11 +65,6 @@ const PostCard = ({ postId, userData }) => {
               </Text>
             </View>
           </View>
-          <View className="flex-row gap-1">
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-            <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-          </View>
         </View>
         <TouchableOpacity onPress={handlePostRoute}>
           <View className="mb-4">

@@ -29,8 +29,7 @@ import TextBold25 from "../../components/Typography/TextBold25";
 import SearchBar from "../../components/Search/SearchBar";
 import TopArtistsMarketplaceCard from "../../components/Cards/TopArtistsMarketplaceCard";
 import {
-  getAllArtists,
-  getFollowingUsers,
+  getAllTopArtists,
   sortCitiesByProximity,
 } from "../../api/supabase_api";
 
@@ -57,7 +56,7 @@ const Marketplace = () => {
         const sortedCities = await sortCitiesByProximity(location);
         setSortedCitiesData(sortedCities);
 
-        const topArtistsData = await getAllArtists();
+        const topArtistsData = await getAllTopArtists();
         setTopArtists(topArtistsData);
       } catch (error) {
         console.error("Error during reverse geocoding:", error);
@@ -79,12 +78,12 @@ const Marketplace = () => {
             ListHeaderComponent={
               <>
                 <AraxiaHeadBar />
-                <View>
+                {/* <View>
                   <SearchBar
                     placeholder={"Search for an experience..."}
                     initialQuery={query}
                   />
-                </View>
+                </View> */}
                 <View className="flex-col items-start w-screen p-4 h-[300px]">
                   <View className="border-b-[2px] border-[#C796FF] w-[195px] items-center justify-center pb-3">
                     <TextBold25
@@ -138,20 +137,41 @@ const Marketplace = () => {
                   </View>
                   <FlatList
                     showsVerticalScrollIndicator={false}
-                    data={marketplaceTopArtists}
-                    keyExtractor={(item) => item.expName}
+                    data={topArtists}
+                    keyExtractor={(item) =>
+                      item.topArtistsRecentExperience.artist_id
+                    }
                     renderItem={({ item }) => (
                       <TopArtistsMarketplaceCard
-                        banner={item.expImage}
-                        content={item.content}
-                        artistName={item.expArtist}
-                        cryptoAddress={item.cryptoAddress}
-                        avatar={item.avatar}
-                        price={item.price}
-                        getExpLink={item.expLink}
-                        expLocation={item.location}
-                        date={item.date}
-                        expName={item.expName}
+                        artistId={item.topArtistsRecentExperience.artist_id}
+                        experienceId={
+                          item.topArtistsRecentExperience.experience_id
+                        }
+                        banner={
+                          item.topArtistsRecentExperience.experience_banner
+                        }
+                        content={
+                          item.topArtistsRecentExperience.experience_description
+                        }
+                        artistName={item.topArtistsRecentExperience.artist_name}
+                        avatar={item.topArtistsRecentExperience.artist_avatar}
+                        price={item.topArtistsRecentExperience.experience_price}
+                        expCurrency={
+                          item.topArtistsRecentExperience.experience_currency
+                        }
+                        // getExpLink={item.expLink}
+                        expCity={
+                          item.topArtistsRecentExperience.experience_city
+                        }
+                        expCountry={
+                          item.topArtistsRecentExperience.experience_country
+                        }
+                        date={
+                          item.topArtistsRecentExperience.experience_starts_at
+                        }
+                        expName={
+                          item.topArtistsRecentExperience.expeirence_name
+                        }
                       />
                     )}
                     // ListEmptyComponent={() => (

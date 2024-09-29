@@ -48,12 +48,6 @@ const GenericPostCard = ({
                 </Text>
               </View>
             </View>
-
-            <View className="flex-row gap-1">
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-            </View>
           </View>
           <View className="mb-4">
             <Text className="text-[13px] text-white font-mregular">
@@ -97,12 +91,6 @@ const GenericPostCard = ({
                   {cryptoAddress}
                 </Text>
               </View>
-            </View>
-
-            <View className="flex-row gap-1">
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
-              <View className="bg-[#BCC2C3] w-[4px] h-[5px] rounded-full" />
             </View>
           </View>
           <View className="mb-4">
