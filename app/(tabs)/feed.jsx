@@ -18,6 +18,7 @@ import TopNFTs from "../../components/FeedComponents/TopNFTs";
 import TopArtists from "../../components/FeedComponents/TopArtists";
 import { useAuth } from "../../context/AuthProvider";
 import { fetchLikedArtistsData } from "../../api/supabase_api";
+import TopUsers from "../../components/3DCanvas/TopUsers";
 
 const Feed = () => {
   const { authUser } = useAuth();
@@ -58,55 +59,8 @@ const Feed = () => {
           className="w-screen h-full top-0 mt-6 rounded-3xl absolute"
         />
         <BgBlackOverlay>
-          <FlatList
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={refreshing}
-            //     onRefresh={likedArtists}
-            //   />
-            // }
-            ListHeaderComponent={
-              <>
-                <AraxiaHeadBar />
-                <View className="flex-col items-start w-screen p-4 h-[300px]">
-                  <TextSemi20>Your Favorite Artists</TextSemi20>
-                  <FlatList
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    data={userLikedArtists}
-                    keyExtractor={(item) => item.userId}
-                    renderItem={({ item }) => (
-                      <UpcomingExpCard
-                        artistName={item.username}
-                        artistId={item.userId}
-                        artistAvatar={item.avatar}
-                      />
-                    )}
-                    ListEmptyComponent={() => (
-                      <View className="flex items-center justify-center">
-                        <Text>No Favorite Artists Found</Text>
-                      </View>
-                    )}
-                  />
-                </View>
-              </>
-            }
-            data={[]}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={null}
-            ListFooterComponent={
-              <View className="items-center justify-center flex-1 w-full p-4 h-full">
-                <TabsInterface
-                  tabLeft={"TopNFTs"}
-                  tabRight={"TopArtists"}
-                  tabLeftComponent={<TopNFTs />}
-                  tabRightComponent={<TopArtists />}
-                  tabLeftLabel={"Top NFTs"}
-                  tabRightLabel={"Top Artists"}
-                />
-              </View>
-            }
-          />
+          <AraxiaHeadBar />
+          <TopUsers />
         </BgBlackOverlay>
       </BgDarkGradient>
     </SafeAreaView>

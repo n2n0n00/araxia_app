@@ -64,7 +64,6 @@ const Marketplace = () => {
     })();
   }, []);
 
-  console.log(topArtists);
   return (
     <SafeAreaView className="flex-1">
       <BgDarkGradient linearGradientMarginTop={"-mt-5"}>
