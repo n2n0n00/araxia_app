@@ -1,43 +1,37 @@
-import React, { useRef, useEffect } from "react";
-import { View } from "react-native";
-import { GLView } from "expo-gl";
-import { Renderer } from "expo-three";
-import * as THREE from "three";
+import React from "react";
+import { View, FlatList } from "react-native";
 
-const TopUsers = () => {
-  const onContextCreate = async (gl) => {
-    const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
-
-    // Renderer
-    const renderer = new Renderer({ gl });
-    renderer.setSize(width, height);
-
-    // Scene
-    const scene = new THREE.Scene();
-
-    // Camera
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = -4;
-
-    // Light
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 5, 5).normalize();
-    scene.add(light);
-
-    // Cone geometry (similar to cylinder but with a cone shape)
-    const geometry = new THREE.CylinderGeometry(1, 0.9, 1, 32); // Top radius 0 to form a cone
-    const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const cone = new THREE.Mesh(geometry, material);
-    scene.add(cone);
-
-    // Render the scene once
-    renderer.render(scene, camera);
-    gl.endFrameEXP();
-  };
-
+const TopUsers = (topArtists) => {
   return (
-    <View style={{ flex: 1 }}>
-      <GLView style={{ flex: 1 }} onContextCreate={onContextCreate} />
+    <View className="flex-1 relative">
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={topArtists}
+        keyExtractor={(item) => item.topArtistsRecentExperience.artist_id}
+        renderItem={({ item }) => (
+          <TopArtistsMarketplaceCard
+            artistId={item.topArtistsRecentExperience.artist_id}
+            experienceId={item.topArtistsRecentExperience.experience_id}
+            banner={item.topArtistsRecentExperience.experience_banner}
+            content={item.topArtistsRecentExperience.experience_description}
+            artistName={item.topArtistsRecentExperience.artist_name}
+            avatar={item.topArtistsRecentExperience.artist_avatar}
+            price={item.topArtistsRecentExperience.experience_price}
+            expCurrency={item.topArtistsRecentExperience.experience_currency}
+            // getExpLink={item.expLink}
+            expCity={item.topArtistsRecentExperience.experience_city}
+            expCountry={item.topArtistsRecentExperience.experience_country}
+            date={item.topArtistsRecentExperience.experience_starts_at}
+            expName={item.topArtistsRecentExperience.expeirence_name}
+          />
+        )}
+        // ListEmptyComponent={() => (
+        //   <EmptyState
+        //     title="No Experiences Found"
+        //     subtitle="Get Your First Experience At The Marketplace"
+        //   />
+        // )}
+      />
     </View>
   );
 };

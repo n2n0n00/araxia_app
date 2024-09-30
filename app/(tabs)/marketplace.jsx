@@ -33,6 +33,7 @@ import {
   sortCitiesByProximity,
 } from "../../api/supabase_api";
 
+//TODO: LISTENER OR REFETCH
 const Marketplace = () => {
   const { query } = useLocalSearchParams();
   const [refreshing, setRefreshing] = useState(false);

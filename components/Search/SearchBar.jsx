@@ -12,12 +12,14 @@ const SearchBar = ({
   placeholder,
   initialQuery,
   onSearch,
+  leaderboardSearch,
+  setFilter,
   ...props
 }) => {
   const pathname = usePathname();
   const [query, setQuery] = useState(initialQuery || "");
 
-  return (
+  const normalSearch = () => (
     <GlassContainer
       insideContainerClasses={"flex-row items-center justify-between py-3 px-4"}
     >
@@ -51,6 +53,45 @@ const SearchBar = ({
       />
     </GlassContainer>
   );
+
+  const leaderSearch = () => (
+    <GlassContainer
+      insideContainerClasses={"flex-row items-center justify-between py-3 px-4"}
+    >
+      <TouchableOpacity
+        className="pr-5"
+        onPress={() => {
+          if (!query) {
+            return Alert.alert(
+              "Missing query",
+              "Please input something to search results!"
+            );
+          }
+
+          if (pathname.startsWith("/search")) {
+            router.setParams({ query });
+            onSearch();
+          } else {
+            router.push(`/search/${query}`);
+            onSearch();
+          }
+        }}
+      >
+        <FontAwesome name="search" size={24} color="white" />
+      </TouchableOpacity>
+      <TextInput
+        className="flex-1 text-white font-mregular mt-0.5 text-base"
+        value={query}
+        placeholder={placeholder}
+        placeholderTextColor="#cdcde0"
+        onChangeText={(e) => setQuery(e)}
+      />
+      <TouchableOpacity className="pr-5" onPress={setFilter}>
+        <FontAwesome name="filter" size={24} color="white" />
+      </TouchableOpacity>
+    </GlassContainer>
+  );
+  return leaderboardSearch ? leaderSearch() : normalSearch();
 };
 
 export default SearchBar;

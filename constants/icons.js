@@ -14,8 +14,10 @@ import userNotifications from "../assets/icons/userNotifications.png";
 import userSettigns from "../assets/icons/userSettings.png";
 import levelXP from "../assets/icons/levelXP.png";
 import nftCount from "../assets/icons/nftCount.png";
+import star from "../assets/icons/star.png";
 
 export default {
+  star,
   backArrow,
   feed,
   feedPressed,

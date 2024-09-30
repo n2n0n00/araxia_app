@@ -1599,7 +1599,7 @@ export const getAllTopArtists = async () => {
           item.userId
         );
 
-        //TODO: NEED TO ADD OTHER PARAMETERS LIKE NUMBER OF POSTS AND TOTAL LIKES...
+        //TODO: NEED TO ADD OTHER PARAMETERS LIKE NUMBER OF POSTS AND TOTAL LIKES... ALSO CHECK IF THE EXPERIENCE IS FINISHED OR NOT!!!!!!
         const followers = topArtistsByFollowers.length;
         return { followers, topArtistsRecentExperience };
       })
@@ -1622,6 +1622,7 @@ export const getExperienceByArtistId = async (artistId) => {
       .from("experiencesDatabase")
       .select("*")
       .eq("artist_id", artistId)
+      .eq("completed", false) // Only get experiences with completed as false
       .order("experience_starts_at", { ascending: false }); // Sort by experience_starts_at in descending order
 
     if (error) {
@@ -1630,9 +1631,9 @@ export const getExperienceByArtistId = async (artistId) => {
       );
     }
 
-    return experiencesDatabase[0];
+    return experiencesDatabase[0]; // Return the most recent uncompleted experience
   } catch (error) {
     console.error("Error in getExperienceByArtistId:", error);
-    return null; // or return an empty object/array
+    return null; // Return null or an empty array/object
   }
 };

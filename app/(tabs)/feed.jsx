@@ -10,45 +10,17 @@ import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
 import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
-import UpcomingExpCard from "../../components/Cards/UpcomingExpCard";
-import TextSemi20 from "../../components/Typography/TextSemi20";
+
 import BgBlackOverlay from "../../components/BackgroundGradients/BgBlackOverlay";
-import TabsInterface from "../../components/TabsInterface/TabsInterface";
-import TopNFTs from "../../components/FeedComponents/TopNFTs";
-import TopArtists from "../../components/FeedComponents/TopArtists";
+
 import { useAuth } from "../../context/AuthProvider";
-import { fetchLikedArtistsData } from "../../api/supabase_api";
-import TopUsers from "../../components/3DCanvas/TopUsers";
+import SearchBar from "../../components/Search/SearchBar";
+import LeaderboardCard from "../../components/Cards/LeaderboardCard";
 
 const Feed = () => {
   const { authUser } = useAuth();
-  const [userLikedArtists, setUserLikedArtists] = useState([]);
-  const [topNFTs, setTopNFTs] = useState([]);
-
-  const likedArtists = async () => {
-    try {
-      // const artists = await fetchLikedArtistsData(authUser.userId);
-      // setUserLikedArtists(artists);
-    } catch (error) {
-      // console.error("Error fetching liked artists:", error);
-    }
-  };
-
-  // const currentTopNFTs = async () => {
-  //   try {
-  //     const NFTs = await fetchTopNFTs()
-  //   } catch (error) {
-
-  //   }
-  // }
 
   //TODO: ADD A LOADER TO WAIT UNTIL ARTISTS ARE FETCHED!!!!
-
-  useEffect(() => {
-    if (authUser && authUser.userId) {
-      likedArtists();
-    }
-  }, [authUser]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -60,7 +32,61 @@ const Feed = () => {
         />
         <BgBlackOverlay>
           <AraxiaHeadBar />
-          <TopUsers />
+          <View className="pt-4">
+            <SearchBar
+              placeholder={"Search for an experience..."}
+              initialQuery={null}
+              leaderboardSearch
+            />
+          </View>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={null}
+            keyExtractor={(item) => item.experience_id}
+            renderItem={null}
+            ListHeaderComponentStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            ListHeaderComponent={
+              <View className="pt-8 pb-16">
+                <Text className="font-mbold text-white text-[22px] text-center">
+                  John Smith’s: Winter Wonderland Quest
+                </Text>
+              </View>
+            }
+            ListFooterComponent={
+              <View className="items-center justify-center">
+                <View className=" flex-row">
+                  <View className="pr-2 pt-6">
+                    <LeaderboardCard rank={2} highRank />
+                  </View>
+                  <View className="pr-2">
+                    <LeaderboardCard rank={1} highRank />
+                  </View>
+                  <View className="pt-10">
+                    <LeaderboardCard rank={3} highRank />
+                  </View>
+                </View>
+                <View className="flex-col items-center justify-center">
+                  <View className="pt-10">
+                    <LeaderboardCard
+                      rank={3}
+                      userAddress={"randomshit"}
+                      username={"randomshit"}
+                    />
+                  </View>
+                  <View className="pt-2">
+                    <LeaderboardCard
+                      rank={4}
+                      userAddress={"randomshit"}
+                      username={"randomshit"}
+                    />
+                  </View>
+                </View>
+              </View>
+            }
+          />
         </BgBlackOverlay>
       </BgDarkGradient>
     </SafeAreaView>
