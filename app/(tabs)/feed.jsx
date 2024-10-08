@@ -5,6 +5,7 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import BgDarkGradient from "../../components/BackgroundGradients/BgDarkGradient";
@@ -12,7 +13,6 @@ import { images } from "../../constants";
 import AraxiaHeadBar from "../../components/HeadBars/AraxiaHeadBar";
 
 import BgBlackOverlay from "../../components/BackgroundGradients/BgBlackOverlay";
-import { useAuth } from "../../context/AuthProvider";
 import SearchBar from "../../components/Search/SearchBar";
 import LeaderboardCard from "../../components/Cards/LeaderboardCard";
 import { fetchFandoms } from "../../api/supabase_api";
@@ -20,7 +20,7 @@ import {
   fetchLeaderboardData,
   getExperienceLocations,
 } from "../../api/leaderboards/supabase_leaderboards";
-import { router } from "expo-router";
+import Leaderboard from "../../components/LeaderboardComponents/Leaderboard";
 
 const Feed = () => {
   const [filter, setFilter] = useState(false);
@@ -79,26 +79,27 @@ const Feed = () => {
     setFilter(!filter);
   };
 
-  // This useEffect will trigger search every time preferredLocation or preferredFandom changes
-  useEffect(() => {
-    if (preferredLocation.length > 0 || preferredFandom.length > 0) {
-      searchDBParams();
-    }
-  }, [preferredLocation, preferredFandom]);
-
   const searchDBParams = async () => {
-    console.log("Preferred Locations:", preferredLocation);
-    console.log("Preferred Fandoms:", preferredFandom);
+    try {
+      const resultData = await fetchLeaderboardData(
+        preferredLocation,
+        preferredFandom
+      );
 
-    const resultsData = await fetchLeaderboardData(
-      preferredLocation,
-      preferredFandom
-    );
-    if (resultsData) {
-      console.log("Leaderboard Data:", resultsData);
-      setResults(resultsData); // Set results data to state
-    } else {
-      console.log("No data found or an error occurred.");
+      if (resultData.error) {
+        console.error("Error:", resultData.error);
+        return;
+      }
+
+      if (Object.keys(resultData.data).length === 0) {
+        console.log(resultData.message || "No results found");
+        return;
+      }
+
+      setResults(resultData.data);
+      setFilter(false);
+    } catch (error) {
+      console.error("Unexpected error:", error);
     }
   };
 
@@ -120,54 +121,24 @@ const Feed = () => {
               leaderboardSearch
             />
           </View>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={null}
-            keyExtractor={(item) => item.experience_id}
-            renderItem={null}
-            ListHeaderComponentStyle={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            ListHeaderComponent={
-              <View className="pt-8 pb-16">
-                <Text className="font-mbold text-white text-[22px] text-center">
-                  John Smith’s: Winter Wonderland Quest
-                </Text>
-              </View>
-            }
-            ListFooterComponent={
-              <View className="items-center justify-center">
-                <View className="flex-row">
-                  <View className="pr-2 pt-6">
-                    <LeaderboardCard rank={2} highRank />
-                  </View>
-                  <View className="pr-2">
-                    <LeaderboardCard rank={1} highRank />
-                  </View>
-                  <View className="pt-10">
-                    <LeaderboardCard rank={3} highRank />
-                  </View>
-                </View>
-                <View className="flex-col items-center justify-center">
-                  <View className="pt-10">
-                    <LeaderboardCard
-                      rank={3}
-                      userAddress={"randomshit"}
-                      username={"randomshit"}
-                    />
-                  </View>
-                  <View className="pt-2">
-                    <LeaderboardCard
-                      rank={4}
-                      userAddress={"randomshit"}
-                      username={"randomshit"}
-                    />
-                  </View>
-                </View>
-              </View>
-            }
-          />
+          <View className="h-[85vh] pb-16">
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={Object.entries(results)}
+              renderItem={({ item }) => {
+                const [experienceId, leaderboardData] = item;
+                return (
+                  <Leaderboard
+                    key={experienceId}
+                    experienceId={experienceId}
+                    leaderboardData={leaderboardData}
+                  />
+                );
+              }}
+              keyExtractor={([experienceId]) => experienceId}
+            />
+          </View>
+
           {filter && (
             <View className="absolute top-52 right-6 h-[650px] w-[400px] bg-purple-950 rounded-3xl items-center justify-center flex-col">
               {/* Fandom Section */}

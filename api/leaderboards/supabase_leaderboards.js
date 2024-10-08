@@ -9,10 +9,9 @@ export const getExperienceLocations = async () => {
 
   if (error) {
     console.error("Error fetching experiences:", error);
-    return []; // Always return an array, even in case of error
+    return [];
   }
 
-  // Filter out duplicate city-country combinations
   const uniqueLocations = data.filter(
     (v, i, a) =>
       a.findIndex(
@@ -22,92 +21,96 @@ export const getExperienceLocations = async () => {
       ) === i
   );
 
-  return uniqueLocations; // Make sure this is always an array
+  return uniqueLocations;
 };
 
 export const fetchLeaderboardData = async (
-  preferredLocation,
-  preferredFandom
+  preferredLocations,
+  preferredFandoms
 ) => {
-  // Step 1: Fetch experience_ids based on preferred locations
-  let { data: experiences, error: experienceError } = await supabase
-    .from("experiencesDatabase") // Make sure this matches your actual table name
-    .select("experience_id")
-    .in("experience_city", preferredLocation); // Matches any city in the array
+  try {
+    if (!Array.isArray(preferredLocations) || preferredLocations.length === 0) {
+      throw new Error("preferredLocations must be a non-empty array");
+    }
+    if (!Array.isArray(preferredFandoms) || preferredFandoms.length === 0) {
+      throw new Error("preferredFandoms must be a non-empty array");
+    }
 
-  if (experienceError) {
-    console.error("Error fetching experiences:", experienceError);
-    return [];
+    // First query: Get experience IDs
+    const { data: experiences, error: experienceError } = await supabase
+      .from("experiencesDatabase")
+      .select("experience_id")
+      .in("experience_city", preferredLocations);
+
+    if (experienceError) {
+      console.error("Error fetching experiences:", experienceError);
+      throw new Error("Failed to fetch experiences");
+    }
+
+    if (!experiences || experiences.length === 0) {
+      return {
+        data: [],
+        message: "No experiences found for the given locations",
+        metadata: {
+          queriedLocations: preferredLocations,
+          queriedFandoms: preferredFandoms,
+        },
+      };
+    }
+
+    // Extract experience IDs
+    const experienceIds = experiences.map((exp) => exp.experience_id);
+
+    // Second query: Get leaderboard ranks, now with sorting
+    const { data: leaderboardRanks, error: leaderboardError } = await supabase
+      .from("leaderboardRanks")
+      .select(
+        `
+        *,
+        experience:experiencesDatabase!inner(
+          experience_id,
+          experience_city,
+          experience_name
+        )
+      `
+      )
+      .in("experience_id", experienceIds)
+      .in("fandom_id", preferredFandoms)
+      .order("user_rank", { ascending: true }); // Add this line for sorting
+
+    if (leaderboardError) {
+      console.error("Error fetching leaderboard ranks:", leaderboardError);
+      throw new Error("Failed to fetch leaderboard data");
+    }
+
+    // Group leaderboardRanks by experience_id
+    const groupedByExperience = leaderboardRanks.reduce((acc, item) => {
+      const experienceId = item.experience.experience_id;
+      if (!acc[experienceId]) {
+        acc[experienceId] = [];
+      }
+      acc[experienceId].push(item);
+      return acc;
+    }, {});
+
+    return {
+      data: groupedByExperience,
+      metadata: {
+        experienceCount: experienceIds.length,
+        resultCount: leaderboardRanks?.length || 0,
+        queriedLocations: preferredLocations,
+        queriedFandoms: preferredFandoms,
+      },
+    };
+  } catch (error) {
+    console.error("Error in fetchLeaderboardData:", error.message);
+    return {
+      data: [],
+      error: error.message,
+      metadata: {
+        queriedLocations: preferredLocations || [],
+        queriedFandoms: preferredFandoms || [],
+      },
+    };
   }
-
-  // If no experiences are found, return early
-  if (!experiences || experiences.length === 0) {
-    console.log("No experiences found for the given locations.");
-    return [];
-  }
-
-  const experienceIds = experiences.map((exp) => exp.experience_id);
-
-  // Step 2: Fetch leaderboard ranks based on experience_ids and preferred fandoms
-  let { data: leaderboardRanks, error: leaderboardError } = await supabase
-    .from("leaderboardRanks") // Make sure this matches your actual table name
-    .select("*")
-    .in("experience_id", experienceIds) // Filter by the fetched experience_ids
-    .in("fandom_id", preferredFandom); // Matches any fandom in the array
-
-  if (leaderboardError) {
-    console.error("Error fetching leaderboard ranks:", leaderboardError);
-    return [];
-  }
-
-  return leaderboardRanks; // Return the fetched leaderboard data
 };
-
-// export const fetchLeaderboardData = async (
-//   preferredLocations,
-//   preferredFandoms
-// ) => {
-//   try {
-//     // Step 1: Get Experience IDs Based on City
-//     let { data: experienceData, error: experienceError } = await supabase
-//       .from("experiencesDatabase")
-//       .select("experience_id")
-//       .in("experience_city", preferredLocations);
-
-//     if (experienceError) {
-//       throw new Error(
-//         `Error fetching experience IDs: ${experienceError.message}`
-//       );
-//     }
-
-//     // Extract experience IDs
-//     const experienceIds = experienceData.map((exp) => exp.experience_id);
-
-//     // Step 2: Get Leaderboard Data Based on Experience IDs and Fandom IDs
-//     let { data: leaderboardRanks, error: leaderboardError } = await supabase
-//       .from("leaderboardRanks")
-//       .select(
-//         `
-//         user_id,
-//         experience_id,
-//         user_xp,
-//         user_friends,
-//         user_rank,
-//         experiencesDatabase (experience_name, experience_city, experience_country, artist_name, artist_avatar)
-//       `
-//       )
-//       .in("experience_id", experienceIds) // Filters by the experience IDs obtained
-//       .in("fandom_id", preferredFandoms); // Filters by the preferred fandom IDs
-
-//     if (leaderboardError) {
-//       throw new Error(
-//         `Error fetching leaderboard data: ${leaderboardError.message}`
-//       );
-//     }
-
-//     return leaderboardRanks; // Return the fetched leaderboard data
-//   } catch (error) {
-//     console.error(error);
-//     return null; // Return null in case of error
-//   }
-// };

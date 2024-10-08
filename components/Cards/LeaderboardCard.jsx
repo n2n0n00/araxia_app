@@ -1,22 +1,34 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { icons, images } from "../../constants";
 import { router } from "expo-router";
+import { fetchUserDetails } from "../../api/supabase_api";
 
 const LeaderboardCard = ({
   rank,
   friendsAdded,
-  NFTsCaptured,
   username,
   userAddress,
   userId,
   userAvatar,
-  totalAvailableNFTs,
+  XPsCaptured,
+  totalAvailableXPs,
   highRank,
 }) => {
+  const [userData, setUserData] = useState();
   const leaderboardCardRoute = () => {
     router.push(`/user/${userId}`);
   };
+
+  const getUserIdData = async () => {
+    const userRankedData = await fetchUserDetails(userId);
+    setUserData(userRankedData[0]);
+  };
+
+  useEffect(() => {
+    getUserIdData();
+  }, [userId]);
+
   const higherRankPlayer = () => (
     <TouchableOpacity onPress={leaderboardCardRoute} className="h-[215px]">
       <View className="bg-purple-900 h-[205px] w-[139px] rounded-2xl relative">
@@ -29,22 +41,21 @@ const LeaderboardCard = ({
           </View>
         </View>
 
-        <View className="flex-col items-center justify-center pt-4">
+        <View className="flex-col items-center justify-center pt-8">
           <Image
-            source={{ uri: userAvatar }}
+            source={{ uri: userData?.avatar }}
             resizeMethod="contain"
-            className="h-[80px] w-[80px]"
+            className="h-[80px] w-[80px] rounded-full"
           />
-          <Text className="font-msemibold text-[10px] text-[#9D9C9C] pt-2">
-            {userAddress}
+          <Text className="font-mbold text-[15px] text-white pt-2">
+            {userData?.username}
           </Text>
-          <Text className="font-mbold text-[15px] text-white">{username}</Text>
           <View className="flex-col items-start justify-start pt-2 w-full pl-3">
-            <Text className="text-[14px] font-mbold text-white">
+            <Text className="text-[14px] font-msemibold text-white">
               Friends: {friendsAdded}
             </Text>
-            <Text className="text-[14px] font-mbold text-white">
-              NFTs: {NFTsCaptured}/{totalAvailableNFTs}
+            <Text className="text-[14px] font-msemibold text-white">
+              XPs: {XPsCaptured} XP
             </Text>
           </View>
         </View>
@@ -70,17 +81,17 @@ const LeaderboardCard = ({
         <View className="flex-row items-center justify-between pl-[70px] w-full">
           <View className="flex-row items-center justify-start">
             <Image
-              source={{ uri: userAvatar }}
+              source={{ uri: userData?.avatar }}
               resizeMethod="contain"
-              className="h-[50px] w-[50px]"
+              className="h-[60px] w-[60px] rounded-full"
             />
             <View className="flex-col items-start justify-start pt-2 pl-4">
               <Text className="font-mbold text-[15px] text-white">
-                {username}
+                {userData?.username}
               </Text>
-              <Text className="font-msemibold text-[10px] text-[#9D9C9C] pt-2">
+              {/* <Text className="font-msemibold text-[10px] text-[#9D9C9C] pt-2">
                 {userAddress}
-              </Text>
+              </Text> */}
             </View>
           </View>
 
@@ -89,7 +100,7 @@ const LeaderboardCard = ({
               Friends: {friendsAdded}
             </Text>
             <Text className="text-[14px] font-mbold text-white">
-              NFTs: {NFTsCaptured}/{totalAvailableNFTs}
+              XPs: {XPsCaptured} XP
             </Text>
           </View>
         </View>
