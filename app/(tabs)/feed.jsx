@@ -31,6 +31,7 @@ const Feed = () => {
   const [fandomChoices, setFandomChoices] = useState([]);
   const [locationChoices, setLocationChoices] = useState([]);
   const [results, setResults] = useState([]);
+  const [isInitialFetch, setIsInitialFetch] = useState(true); // Track if it's the first fetch
 
   const fetchFandomChoices = async () => {
     const fandomNames = await fetchFandoms();
@@ -44,9 +45,46 @@ const Feed = () => {
     setLocationChoices(new Array(allLocations.length).fill(false));
   };
 
+  // useEffect(() => {
+  //   fetchFandomChoices();
+  //   fetchFandomLocations();
+  //   console.log(fandomNamesList);
+  //   console.log(fandomLocationsNameList);
+  //   setPreferredLocation(fandomLocationsNameList);
+  //   setPreferredFandom(fandomNamesList);
+  //   searchDBParams();
+  // }, []);
+
   useEffect(() => {
-    fetchFandomChoices();
-    fetchFandomLocations();
+    const initializeFeed = async () => {
+      try {
+        const fandoms = await fetchFandoms();
+        const locations = await getExperienceLocations();
+
+        if (fandoms.length > 0 && locations.length > 0) {
+          setFandomNamesList(fandoms);
+          setFandomLocationsNameList(locations);
+
+          setPreferredFandom([fandoms[0].fandom_id]);
+          setPreferredLocation([locations[0].experience_city]);
+
+          const resultData = await fetchLeaderboardData(
+            [locations[0].experience_city],
+            [fandoms[0].fandom_id]
+          );
+
+          if (resultData.error) {
+            console.error("Error:", resultData.error);
+          } else {
+            setResults(resultData.data);
+          }
+        }
+      } catch (error) {
+        console.error("Unexpected error during initialization:", error);
+      }
+    };
+
+    initializeFeed();
   }, []);
 
   const toggleCheckbox = (index, setChoices, choices) => {
