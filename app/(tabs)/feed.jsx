@@ -31,60 +31,47 @@ const Feed = () => {
   const [fandomChoices, setFandomChoices] = useState([]);
   const [locationChoices, setLocationChoices] = useState([]);
   const [results, setResults] = useState([]);
-  const [isInitialFetch, setIsInitialFetch] = useState(true); // Track if it's the first fetch
 
   const fetchFandomChoices = async () => {
     const fandomNames = await fetchFandoms();
     setFandomNamesList(fandomNames);
     setFandomChoices(new Array(fandomNames.length).fill(false));
+
+    if (fandomNames.length > 0) {
+      setFandomChoices([
+        true,
+        ...new Array(fandomNames.length - 1).fill(false),
+      ]);
+      setPreferredFandom([fandomNames[0].fandom_id]);
+    }
   };
 
   const fetchFandomLocations = async () => {
     const allLocations = await getExperienceLocations();
     setFandomLocationsNameList(allLocations);
     setLocationChoices(new Array(allLocations.length).fill(false));
+
+    if (allLocations.length > 0) {
+      setLocationChoices([
+        true,
+        ...new Array(allLocations.length - 1).fill(false),
+      ]);
+      setPreferredLocation([allLocations[0].experience_city]);
+    }
   };
 
-  // useEffect(() => {
-  //   fetchFandomChoices();
-  //   fetchFandomLocations();
-  //   console.log(fandomNamesList);
-  //   console.log(fandomLocationsNameList);
-  //   setPreferredLocation(fandomLocationsNameList);
-  //   setPreferredFandom(fandomNamesList);
-  //   searchDBParams();
-  // }, []);
-
   useEffect(() => {
-    const initializeFeed = async () => {
+    const loadInitialData = async () => {
       try {
-        const fandoms = await fetchFandoms();
-        const locations = await getExperienceLocations();
-
-        if (fandoms.length > 0 && locations.length > 0) {
-          setFandomNamesList(fandoms);
-          setFandomLocationsNameList(locations);
-
-          setPreferredFandom([fandoms[0].fandom_id]);
-          setPreferredLocation([locations[0].experience_city]);
-
-          const resultData = await fetchLeaderboardData(
-            [locations[0].experience_city],
-            [fandoms[0].fandom_id]
-          );
-
-          if (resultData.error) {
-            console.error("Error:", resultData.error);
-          } else {
-            setResults(resultData.data);
-          }
-        }
+        await fetchFandomChoices();
+        await fetchFandomLocations();
+        await searchDBParams();
       } catch (error) {
-        console.error("Unexpected error during initialization:", error);
+        console.error("Error loading data", error);
       }
     };
 
-    initializeFeed();
+    loadInitialData();
   }, []);
 
   const toggleCheckbox = (index, setChoices, choices) => {
@@ -117,12 +104,43 @@ const Feed = () => {
     setFilter(!filter);
   };
 
+  // const searchDBParams = async () => {
+  //   try {
+  //     const resultData = await fetchLeaderboardData(
+  //       preferredLocation,
+  //       preferredFandom
+  //     );
+
+  //     if (resultData.error) {
+  //       console.error("Error:", resultData.error);
+  //       return;
+  //     }
+
+  //     if (Object.keys(resultData.data).length === 0) {
+  //       console.log(resultData.message || "No results found");
+  //       return;
+  //     }
+
+  //     setResults(resultData.data);
+  //     setFilter(false);
+  //   } catch (error) {
+  //     console.error("Unexpected error:", error);
+  //   }
+  // };
+
   const searchDBParams = async () => {
     try {
-      const resultData = await fetchLeaderboardData(
-        preferredLocation,
-        preferredFandom
-      );
+      // If filters are empty, default to the first location or fandom, or leave empty to return all results
+      const locations =
+        preferredLocation.length > 0
+          ? preferredLocation
+          : [fandomLocationsNameList[0]?.experience_city];
+      const fandoms =
+        preferredFandom.length > 0
+          ? preferredFandom
+          : [fandomNamesList[0]?.fandom_id];
+
+      const resultData = await fetchLeaderboardData(locations, fandoms);
 
       if (resultData.error) {
         console.error("Error:", resultData.error);
@@ -151,10 +169,11 @@ const Feed = () => {
         />
         <BgBlackOverlay>
           <AraxiaHeadBar />
+
           <View className="pt-4">
             <SearchBar
-              placeholder={"Search for an experience..."}
-              initialQuery={null}
+              // placeholder={"Search for an experience..."}
+              // initialQuery={null}
               setFilter={handleOpenFilterModal}
               leaderboardSearch
             />

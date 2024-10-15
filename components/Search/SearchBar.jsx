@@ -55,10 +55,10 @@ const SearchBar = ({
   );
 
   const leaderSearch = () => (
-    <GlassContainer
-      insideContainerClasses={"flex-row items-center justify-between py-3 px-4"}
-    >
-      <TouchableOpacity
+    <View className="flex-col items-center justify-center">
+      <View className="bg-slate-500 h-[1px] w-[98%] mb-1" />
+      <View className={"flex-row w-full items-end justify-end py-3 px-4"}>
+        {/* <TouchableOpacity
         className="pr-5"
         onPress={() => {
           if (!query) {
@@ -78,18 +78,23 @@ const SearchBar = ({
         }}
       >
         <FontAwesome name="search" size={24} color="white" />
-      </TouchableOpacity>
-      <TextInput
+      </TouchableOpacity> */}
+        {/* <TextInput
         className="flex-1 text-white font-mregular mt-0.5 text-base"
         value={query}
         placeholder={placeholder}
         placeholderTextColor="#cdcde0"
         onChangeText={(e) => setQuery(e)}
-      />
-      <TouchableOpacity className="pr-5" onPress={setFilter}>
-        <FontAwesome name="filter" size={24} color="white" />
-      </TouchableOpacity>
-    </GlassContainer>
+      /> */}
+        <Text className="flex-1 text-white font-msemibold text-xl">
+          Filters
+        </Text>
+        <TouchableOpacity className="pr-5" onPress={setFilter}>
+          <FontAwesome name="filter" size={30} color="white" />
+        </TouchableOpacity>
+      </View>
+      <View className="bg-slate-500 h-[1px] w-[98%] mt-1" />
+    </View>
   );
   return leaderboardSearch ? leaderSearch() : normalSearch();
 };

@@ -1,6 +1,6 @@
 // LeaderboardList.js
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import LeaderboardCard from "../Cards/LeaderboardCard";
 
 const Leaderboard = ({ experienceId, leaderboardData }) => {
@@ -14,10 +14,12 @@ const Leaderboard = ({ experienceId, leaderboardData }) => {
   return (
     <View className="mb-8">
       <View className="pt-8 pb-4">
+        {/* <TouchableOpacity onPress={() => router.push(``)}> */}
         <Text className="font-mbold text-white text-[22px] text-center">
           {leaderboardData[0]?.experience?.experience_name ||
             "Unnamed Experience"}
         </Text>
+        {/* </TouchableOpacity> */}
       </View>
 
       <View className="items-center justify-center">
