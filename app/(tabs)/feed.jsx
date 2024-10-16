@@ -65,13 +65,14 @@ const Feed = () => {
       try {
         await fetchFandomChoices();
         await fetchFandomLocations();
-        await searchDBParams();
+        searchDBParams();
       } catch (error) {
         console.error("Error loading data", error);
       }
     };
 
     loadInitialData();
+    searchDBParams();
   }, []);
 
   const toggleCheckbox = (index, setChoices, choices) => {
@@ -132,11 +133,11 @@ const Feed = () => {
     try {
       // If filters are empty, default to the first location or fandom, or leave empty to return all results
       const locations =
-        preferredLocation.length > 0
+        preferredLocation.length >= 0
           ? preferredLocation
           : [fandomLocationsNameList[0]?.experience_city];
       const fandoms =
-        preferredFandom.length > 0
+        preferredFandom.length >= 0
           ? preferredFandom
           : [fandomNamesList[0]?.fandom_id];
 
@@ -167,7 +168,7 @@ const Feed = () => {
           resizeMode="contain"
           className="w-screen h-full top-0 mt-6 rounded-3xl absolute"
         />
-        <BgBlackOverlay>
+        <BgBlackOverlay innerClasses="h-full w-full">
           <AraxiaHeadBar />
 
           <View className="pt-4">
@@ -178,7 +179,7 @@ const Feed = () => {
               leaderboardSearch
             />
           </View>
-          <View className="h-[85vh] pb-16">
+          <View className="h-[85vh] pb-24 w-screen">
             <FlatList
               showsVerticalScrollIndicator={false}
               data={Object.entries(results)}
@@ -197,7 +198,8 @@ const Feed = () => {
           </View>
 
           {filter && (
-            <View className="absolute top-52 right-6 h-[650px] w-[400px] bg-purple-950 rounded-3xl items-center justify-center flex-col">
+            // <View className="absolute top-52 right-6 h-[650px] w-[400px] bg-purple-950 rounded-3xl items-center justify-center flex-col">
+            <View className="absolute top-52 right-6 h-[500px] w-[350px] bg-purple-950 rounded-3xl items-start justify-top pt-10 flex-col pl-10">
               {/* Fandom Section */}
               <View>
                 <Text className="text-white font-bold text-lg">Fandom</Text>

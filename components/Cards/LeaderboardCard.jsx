@@ -31,8 +31,8 @@ const LeaderboardCard = ({
 
   const higherRankPlayer = () => (
     <TouchableOpacity onPress={leaderboardCardRoute} className="h-[215px]">
-      <View className="bg-purple-900 h-[205px] w-[139px] rounded-2xl relative">
-        <View className="absolute -top-8 right-11">
+      <View className="bg-purple-900 h-[205px] w-[120px] rounded-2xl relative">
+        <View className="absolute -top-8 right-9">
           <Image source={icons.star} className="h-[45px] w-[48px]" />
           <View className="relative items-center justify-center ">
             <Text className="absolute -top-9 font-msemibold text-[20px] text-white">
